@@ -1,5 +1,7 @@
 var scenario_clicked;
 var threshold_clicked;
+var region_dict = [];
+var legend = [];
 
 $(document).ready(function () {
     var chart;
@@ -22,24 +24,12 @@ $(document).ready(function () {
         
         var filter = crossfilter(csv);
 
-        var yearDimension = filter.dimension(function(p) { 
-            //console.log("p.Year: ", p.Year)
-            return Math.round(p.Year); }),  
-            indexDimension = filter.dimension(function(p) { 
-                //console.log("p.Index: ", p.Index)
-                return p.Index; }),
-            regionDimension = filter.dimension(function(p, i) { 
-                //console.log("p.Region: ", p.Region)
-                return p.Region; }),
-            datasetDimension = filter.dimension(function(d) { 
-                //console.log("d.Model: ", d.Model)
-                return d.Model; }),
-            tags = filter.dimension(function (d) { 
-                //console.log("d.Sigma: ", d.Sigma)
-                return d.Sigma; }),
-            scenario = filter.dimension(function (d) { 
-                //console.log("d.Scenario: ", d.Scenario)
-                return d.Scenario; }),
+        var yearDimension = filter.dimension(function(p) { return Math.round(p.Year); }),  
+            indexDimension = filter.dimension(function(p) { return p.Index; }),
+            regionDimension = filter.dimension(function(p, i) { return p.Region; }),
+            datasetDimension = filter.dimension(function(d) { return d.Model; }),
+            tags = filter.dimension(function (d) { return d.Sigma; }),
+            scenario = filter.dimension(function (d) { return d.Scenario; }),
             filter_list = [];     
        
         var yearGroup = yearDimension.group(),
@@ -65,6 +55,17 @@ $(document).ready(function () {
         
         //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
         d3.json("geojson/myFRA_admin12.json", function (statesJson) {
+            
+            //region name dictionary
+            statesJson.features.forEach(function (d, idx) {    
+                region_dict.push({
+                key: d.properties.name,
+                value: idx
+                });
+                legend[idx] = d.properties.name;
+            });   
+            console.log("region_dict: ", region_dict)
+            console.log("legend: ", legend)
          
             franceChart.width(width)
                     .height(height)
@@ -107,7 +108,6 @@ $(document).ready(function () {
               chart.selectAll("g.layer0 g.state").on("click", function(d) { //dblclick
                 if (d3.event.shiftKey) {
                     console.log("click!", d.properties.name);
-                    console.log("scenario: ", $("input:radio[name=rcp]:checked").val())
                     showTimeSeries(d.properties.name);
                 }
               });
@@ -140,9 +140,6 @@ $(document).ready(function () {
                     })
                     .dimension(indexDimension)
                     .group(indexGroup)
-                    //.height(100)
-                    //.on("preRedraw", update0)
-                    //.colors(d3.scale.category20())
                     .renderlet(function(chart){
                         chart.selectAll("g.row rect").attr("fill", "#1f77b4");                   
                     })
@@ -297,6 +294,7 @@ function showTimeSeries(regionName) {
     if (indexChart.filters().length == 1) {
         console.log("In showTimeSeries for ", regionName);
         index_clicked = indexChart.filters()[0];
+        //console.log("model: ", datasetChart.filters())
 
         clearSeries();
 
@@ -323,16 +321,23 @@ function clearSeries() {
 
 function makeRequest(regionName) {
     console.log("region, scenario, sigma: ", regionName +","+ scenario_clicked +","+ threshold_clicked)
-    var models = ["ICHEC-EC-EARTH_HIRHAM5"];
+    //var models = ["OBS Safran", "ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
+    //    "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
+    var models = ["ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
+                  "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
     // var scenario = $("#scenario"); //get from user click
     // var country = regionName; //get from user click
-    // country.series=[];
-    for (var i = 0; i < models.length; i++) {
-        // if ( models.length == 1 ) var d = j;
-        // else var d = i;
-        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/" + variable.value + "/" + scenario.value + "/" + country + "/" + variable.value + "_" + models[i].value + country + ".nc?var=" + variable.value + "&latitude=0&longitude=0&temporal=all&accept=csv";
-        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/GD4/yr/rcp85/16/GD4_rcp85_ICHEC-EC-EARTH_HIRHAM5_1971-2100.nc?var=GD4&latitude=0&longitude=0&temporal=all&accept=csv";
-        addData(request, "#de09a9", 'Solid',  "ICHEC-EC-EARTH_HIRHAM5", "region16");
+    regionNum = 16; //region_dict[legend.indexOf(regionName)].value;
+    console.log("model[i]: ", models[0])
+    for (var i = 0; i < models.length; i++) {        
+        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + models[i] + ".nc?var=" + index + "&latitude=0&longitude=0&temporal=all&accept=csv";
+
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        console.log("request: ", request)
+
+        //fixed request
+        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/GD4/yr/rcp85/16/GD4_rcp85_ICHEC-EC-EARTH_HIRHAM5_1971-2100.nc?var=GD4&latitude=0&longitude=0&temporal=all&accept=csv";
+        addData(request, "#de09a9", 'Solid',  "ICHEC-EC-EARTH_HIRHAM5", "regionName");
     }
 }
 
