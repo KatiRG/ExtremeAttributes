@@ -18,21 +18,21 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
     var filter = crossfilter(csv);
 
     var yearDimension = filter.dimension(function(p) { return Math.round(p.Year); }),  
-    	indexDimension = filter.dimension(function(p) { return p.Index; }),
-    	regionDimension = filter.dimension(function(p, i) { return p.Region; }),
-    	datasetDimension = filter.dimension(function(d) { return d.Data; }),
-    	tags = filter.dimension(function (d) { return d.Sigma; }),
-    	scenario = filter.dimension(function (d) { return d.Scenario; }),
-    	filter_list = [];     
+        indexDimension = filter.dimension(function(p) { return p.Index; }),
+        regionDimension = filter.dimension(function(p, i) { return p.Region; }),
+        datasetDimension = filter.dimension(function(d) { return d.Data; }),
+        tags = filter.dimension(function (d) { return d.Sigma; }),
+        scenario = filter.dimension(function (d) { return d.Scenario; }),
+        filter_list = [];     
    
     var yearGroup = yearDimension.group(),
-    	indexGroup = indexDimension.group(),
+        indexGroup = indexDimension.group(),
         regionGroup = regionDimension.group(),
         datasetGroup = datasetDimension.group();
         //yearGroup = yearDimension.group().reduceSum(function(d) { return d.Value; }),
         //indexGroup = indexDimension.group().reduceSum(function(d) { return d.Value; }),
-    	//regionGroup = regionDimension.group().reduceSum(function(d) { return d.Value; })
-    	//datasetGroup = datasetDimension.group().reduceSum(function(d) { return d.Value; });
+        //regionGroup = regionDimension.group().reduceSum(function(d) { return d.Value; })
+        //datasetGroup = datasetDimension.group().reduceSum(function(d) { return d.Value; });
 
     minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
     maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -52,7 +52,7 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
     //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
     d3.json("geojson/myFRA_admin12.json", function (statesJson) {
 
-    	franceChart.width(600)
+        franceChart.width(600)
                 .height(560)
                 .dimension(regionDimension)
                 .group(regionGroup)
@@ -200,7 +200,7 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                 .sortBy(function(d){ return d.Year; })
                 .order(d3.ascending);            
 
-       	dc.renderAll();
+        dc.renderAll();
 
     }); //end geojson
 
@@ -208,9 +208,9 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
 $("input[name='sigma']").click(function(){
         var radioValue = $("input[name='sigma']:checked").val();
         console.log(radioValue);
-	tags.filterAll();
-	tags.filter(radioValue);
-	dc.redrawAll();
+    tags.filterAll();
+    tags.filter(radioValue);
+    dc.redrawAll();
 });
 
 $("input[name='sigma']").trigger("click");
