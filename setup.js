@@ -38,16 +38,18 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
 
     //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
     var projection = d3.geo.conicConformal() // Lambert-93
-      .center([2.454071, 47.279229]) // On centre la carte sur la France
-      .scale(3400)
-      .translate([width / 2, height / 2]);                     
+          .center([2.454071, 47.279229]) // On centre la carte sur la France
+          .scale(3400)
+          .translate([width / 2, height / 2]);                 
 
     
     //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
     d3.json("geojson/myFRA_admin12.json", function (statesJson) {
 
-        franceChart.width(600)
-                .height(560)
+     
+
+        franceChart.width(width)
+                .height(height)
                 .dimension(regionDimension)
                 .group(regionGroup)
                 //.colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
@@ -56,6 +58,7 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                 .colors(d3.scale.linear().range(colourRange))
                 .projection(projection)
                 .overlayGeoJson(statesJson.features, "state", function (d) {
+                    //console.log(d.properties.name)
                     return d.properties.name;
                 })
                 .title(function (d) {
@@ -63,7 +66,10 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                     return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                 });
         franceChart.on("preRender", function(chart) {//dynamically calculate domain
+            console.log("xxx: ", chart.group().all())
+            console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
             cdomain_preRender = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
+            console.log("divide by 4: ", cdomain_preRender[0]/4)
             chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
             rangeDiff = cdomain_preRender[1] - cdomain_preRender[0];
 
@@ -90,10 +96,18 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
 
         //define colourbar steps:
         function calculateDomain(rangeDiff, colourRange_array) {
-            step = Math.round(rangeDiff/(colourRange_array.length - 1));
+            console.log("cdomain_preRender[0]: ", cdomain_preRender[0])
+            console.log("cdomain_preRender[0] divide by 4: ", cdomain_preRender[0]/4)
+            console.log("rangeDiff: ", rangeDiff)
+            console.log("rangeDiff/4: ", rangeDiff/4)
+            rangeDiff_scaled = rangeDiff/4;
+            step = rangeDiff_scaled/(colourRange_array.length - 1);
+            console.log("step: ", step)
             for (var j = 0; j < colourRange_array.length; j++) {
-               colourDomain[j] = cdomain_preRender[0] + j*step; //j + j*step;
+               //colourDomain[j] = cdomain_preRender[0] + j*step;
+               colourDomain[j] = cdomain_preRender[0]/4 + j*step;
             }
+            console.log("colourDomain in calculateDomain: ", colourDomain)
             return colourDomain;
         }            
 
@@ -107,6 +121,7 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                 })
                 .dimension(indexDimension)
                 .group(indexGroup)
+                //.height(100)
                 //.on("preRedraw", update0)
                 //.colors(d3.scale.category20())
                 .renderlet(function(chart){
@@ -115,7 +130,7 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                 .elasticX(true)
                 .gap(0);
 
-            xAxis_indexChart = indexChart.xAxis().ticks(4);
+            xAxis_indexChart = indexChart.xAxis().ticks(6);
         
 
         // // Define a click event for indexChart bar   
@@ -178,8 +193,8 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
             dataTable.width(1060).height(800)
                 .dimension(timeDimension)
                 .group(function(d) { return ""})
-                //.size(6) //display all data
-                .size(csv.length) //display all data
+                .size(6)
+                //.size(csv.length) //display all data
                 .columns([
                     function(d) { return d.Year; },
                     function(d) { return d.Region; },
@@ -193,8 +208,6 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                 ])
                 .sortBy(function(d){ return d.Year; })
                 .order(d3.ascending);
-
-
 
         dc.renderAll();
 
@@ -252,7 +265,7 @@ function plotColourbar(colourDomain_array, colourRange_array) {
         cb = colorBar().color(d3.scale.linear()
                        .domain(colourDomain_array)
                        .range(colourRange_array))
-                       .size(150).lineWidth(80).precision(1);
+                       .size(150).lineWidth(50).precision(1);
     g.call(cb);
 }
 
