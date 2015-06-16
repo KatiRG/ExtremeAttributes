@@ -50,13 +50,14 @@ $(document).ready(function () {
         d3.selectAll("#total").text(filter.size()); // total number of events
 
         //MAP
-        var width = 600, height = 560;
+        var width = 480, height = 480;
 
         //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
         var projection = d3.geo.conicConformal() // Lambert-93
               .center([2.454071, 47.279229]) // On centre la carte sur la France
-              .scale(3400)
-              .translate([width / 2, height / 2]);                 
+              .scale(2200)
+              .translate([width / 2.5, height / 2.5]);
+              //.translate([width / 2, height / 2]);
 
         
         //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
@@ -182,7 +183,7 @@ $(document).ready(function () {
 
                 datasetChart
                     .width(200) //svg width
-                    .height(80) //svg height
+                    .height(200) //svg height
                     .margins({
                         top: 10,
                         right: 10,
@@ -192,7 +193,10 @@ $(document).ready(function () {
                     .dimension(datasetDimension)
                     .group(datasetGroup)
                     //.on("preRedraw", update0)
-                    .colors(d3.scale.category20())
+                    //.colors(d3.scale.category20())
+                    .renderlet(function(chart){
+                        chart.selectAll("g.row rect").attr("fill", "#1f77b4");                   
+                    })
                     .elasticX(true)
                     .gap(0);
 
@@ -278,7 +282,7 @@ function plotColourbar(colourDomain_array, colourRange_array) {
         cb = colorBar().color(d3.scale.linear()
                        .domain(colourDomain_array)
                        .range(colourRange_array))
-                       .size(150).lineWidth(50).precision(1);
+                       .size(150).lineWidth(30).precision(1);
     g.call(cb);
 }
 
