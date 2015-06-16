@@ -42,6 +42,14 @@
     <script type="text/javascript" src="setup.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" media="all">
 
+    <style type="text/css">
+        h4 span {
+            font-size:14px;
+            font-weight:normal;
+        }
+       
+    </style>
+
 </head>
 
 <body>
@@ -89,7 +97,8 @@
 
                 <div id="colourbar" class="dc-chart col-md-1" style="width: 30px;height:30px;margin-top:280px;margin-left: -40px"></div>
 
-                <div id="france-chart" class="dc-chart col-md-8" style="width: 600px; height: 560px; margin-top: 10px;">
+                <!--<div id="france-chart" class="dc-chart col-md-8" style="width: 600px; height: 560px; margin-top: 10px;">-->
+                <div id="france-chart" class="dc-chart col-md-4">
                     <a class="reset" href="javascript:franceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                     <span class="reset" style="display: none;"> | Current filter: <span class="filter"></span></span>
 
@@ -99,22 +108,31 @@
 
 
                 <div id="chart-indexType" class="dc-chart col-md-2" style="margin-top: 0px; margin-left: 0px;">
-                    <h4>Index</h4>
-                    <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                    <span class="reset" style="display: none;"><span class="filter"></span></span>                                       
+                    <h4>Index
+                            <span>
+                            <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                            <span class="reset" style="display: none;"><span class="filter"></span></span>
+
+                     <!--<span class='reset-hidden' style="visibility: hidden;">Filtered for: <span class="filter"></span></span><a class='reset' href='javascript:dc.filterAll();dc.redrawAll();' style='display: none;'>reset</a>
+                     <div class="clearfix"></div>-->
+                    </span>
+                    </h4> 
+
                 </div>
 
                 <div id="chart-eventYear" class="dc-chart col-md-2" style="margin-top: 0px; margin-left: 80px;">
-                    <h4>Year</h4>
-                    <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                    <span class="reset" style="display: none;"><span class="filter"></span></span>
+                    <h4>Year
+                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"><span class="filter"></span></span>
+                    </h4>    
                 </div>
 
                 <div id="chart-dataset" class="dc-chart col-md-3b" style="margin-top: 0px; margin-left: 100px;">
-                    <h4>Datasets</h4>
-                    <h5>Select observations or model data</h5>                    
-                    <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                    <span class="reset" style="display: none;"><span class="filter"></span></span>
+                    <h4>Datasets                                    
+                        <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"><span class="filter"></span></span>
+                    </h4>
+                    <h5>Select observations or model data</h5> 
                 </div>
                
                 <div>       
