@@ -320,33 +320,27 @@ function clearSeries() {
 
 
 function makeRequest(regionName) {
-    console.log("region, scenario, sigma: ", regionName +","+ scenario_clicked +","+ threshold_clicked)
     //var models = ["OBS Safran", "ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
     //    "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
     var models = ["ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
                   "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
-    // var scenario = $("#scenario"); //get from user click
-    // var country = regionName; //get from user click
     regionNum = 16; //region_dict[legend.indexOf(regionName)].value;
     console.log("model[i]: ", models[0])
-    for (var i = 0; i < models.length; i++) {        
-        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + models[i] + ".nc?var=" + index + "&latitude=0&longitude=0&temporal=all&accept=csv";
-
+    for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
         console.log("request: ", request)
 
         //fixed request
         //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/GD4/yr/rcp85/16/GD4_rcp85_ICHEC-EC-EARTH_HIRHAM5_1971-2100.nc?var=GD4&latitude=0&longitude=0&temporal=all&accept=csv";
-        addData(request, "#de09a9", 'Solid',  "ICHEC-EC-EARTH_HIRHAM5", "regionName");
+        addData(request, "#de09a9", 'Solid',  models[i]);
     }
 }
 
-function addData(request, color, dash, label, country) {
+function addData(request, color, dash, label) {
 
     console.log("color: ", color)
         console.log("dash: ", dash)
         console.log("label: ", label)
-        console.log("country: ", country)
 
     $.ajax({
           async: false,
@@ -368,7 +362,7 @@ function addData(request, color, dash, label, country) {
                 if (lineNo != 0)
                     serie.data.push([Date.parse(items[0]),parseFloat(items[3])]);
                 });
-            serie.name = country;
+            serie.name = label;
             //serie.color = color;
             serie.dashStyle = dash;
 
