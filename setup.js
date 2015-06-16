@@ -5,13 +5,11 @@ franceChart = dc.geoChoroplethChart("#france-chart");
 indexChart = dc.rowChart("#chart-indexType");
 yearChart = dc.barChart("#chart-eventYear");
 datasetChart = dc.rowChart("#chart-dataset");
-
-var colourRange_blue = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-var colourRange_red = ["#fee5d9", "#fcae91", "#fb6a4a", "#de2d26", "#a50f15"];
+ 
 var cdomain_preRender;
 var cdomain_preRedraw;
 var rangeDiff;
-var colourRange = colourRange_blue;
+var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 var colourDomain = [];
 
 d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
@@ -29,10 +27,6 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
         indexGroup = indexDimension.group(),
         regionGroup = regionDimension.group(),
         datasetGroup = datasetDimension.group();
-        //yearGroup = yearDimension.group().reduceSum(function(d) { return d.Value; }),
-        //indexGroup = indexDimension.group().reduceSum(function(d) { return d.Value; }),
-        //regionGroup = regionDimension.group().reduceSum(function(d) { return d.Value; })
-        //datasetGroup = datasetDimension.group().reduceSum(function(d) { return d.Value; });
 
     minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
     maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -198,22 +192,53 @@ d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
                     function(d) { return d.Value; }                  
                 ])
                 .sortBy(function(d){ return d.Year; })
-                .order(d3.ascending);            
+                .order(d3.ascending);
+
+
 
         dc.renderAll();
+
+        //Filter dc charts according to which radio button is checked by user:
+        $("input:radio[name=sigma]").click(function(){
+            var radioValue = $("input:radio[name=sigma]:checked").val();
+            console.log(radioValue);
+            tags.filterAll();
+            tags.filter(radioValue);
+            dc.redrawAll();
+        });
+        $("input:radio[name=rcp]").click(function(){
+            var radioValue = $("input:radio[name=rcp]:checked").val();
+            console.log(radioValue);
+            scenario.filterAll();
+            scenario.filter(radioValue);
+            dc.redrawAll();
+        });
+
+        //$("input:radio[name=sigma]").trigger("click"); //doesn't work. Do as below instead:
+        //Click sigma1 and rcp4.5 radio buttons on page load
+        //http://stackoverflow.com/questions/871063/how-to-set-radio-option-checked-onload-with-jquery
+        $(function() {
+            var $radios = $('input:radio[name=sigma]');
+            //if($radios.is(':checked') === false) {
+                $radios.filter('[value=1]').prop('checked', true);
+                tags.filterAll();
+                tags.filter("1");
+                dc.redrawAll();
+            //}
+        }); 
+
+        $(function() {
+            var $radios = $('input:radio[name=rcp]');
+                $radios.filter('[value="4.5"]').prop('checked', true);
+                scenario.filterAll();
+                scenario.filter("4.5");
+                dc.redrawAll();
+        }); 
 
     }); //end geojson
 
 
-$("input[name='sigma']").click(function(){
-        var radioValue = $("input[name='sigma']:checked").val();
-        console.log(radioValue);
-    tags.filterAll();
-    tags.filter(radioValue);
-    dc.redrawAll();
-});
-
-$("input[name='sigma']").trigger("click");
+    
 
 }); //end csv
 
