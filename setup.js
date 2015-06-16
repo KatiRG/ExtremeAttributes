@@ -323,20 +323,25 @@ function clearSeries() {
 
 function makeRequest(regionName) {
     console.log("region, scenario, sigma: ", regionName +","+ scenario_clicked +","+ threshold_clicked)
-    var models = ["Obs", "M1"];
+    var models = ["OBS Safran"];
     // var scenario = $("#scenario"); //get from user click
     // var country = regionName; //get from user click
     // country.series=[];
     for (var i = 0; i < models.length; i++) {
-        if ( models.length == 1 ) var d = j;
-        else var d = i;
+        // if ( models.length == 1 ) var d = j;
+        // else var d = i;
         //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/" + variable.value + "/" + scenario.value + "/" + country + "/" + variable.value + "_" + models[i].value + country + ".nc?var=" + variable.value + "&latitude=0&longitude=0&temporal=all&accept=csv";
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/tas/rcp85/FIN/tas_EUR-11_all_yearsanomalies_FIN.nc?var=tas&latitude=0&longitude=0&temporal=all&accept=csv";
-        addData(request, ["#000000"], ['Solid'], ["JUNK"]);
+        addData(request, "#de09a9", 'Solid',  "FIN (rcp85 / Yearly / Multi-models mean)", "FIN");
     }
 }
 
-function addData(request, color, dash, country) {
+function addData(request, color, dash, label, country) {
+
+    console.log("color: ", color)
+        console.log("dash: ", dash)
+        console.log("label: ", label)
+        console.log("country: ", country)
 
     $.ajax({
           async: false,
@@ -361,6 +366,8 @@ function addData(request, color, dash, country) {
             serie.name = country;
             //serie.color = color;
             serie.dashStyle = dash;
+
+            console.log("serie: ", serie)
 
             chart.addSeries(serie);
             // var nav = chart.get('navigator');
