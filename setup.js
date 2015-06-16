@@ -2,6 +2,7 @@ var scenario_clicked;
 var threshold_clicked;
 
 $(document).ready(function () {
+    var chart;
 
     franceChart = dc.geoChoroplethChart("#france-chart");
     indexChart = dc.rowChart("#chart-indexType");
@@ -14,21 +15,37 @@ $(document).ready(function () {
     var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
     var colourDomain = [];
 
-    d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
+    //d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
+    d3.csv("data/data_02.csv", function (csv) {    
         var filter = crossfilter(csv);
 
-        var yearDimension = filter.dimension(function(p) { return Math.round(p.Year); }),  
-            indexDimension = filter.dimension(function(p) { return p.Index; }),
-            regionDimension = filter.dimension(function(p, i) { return p.Region; }),
-            datasetDimension = filter.dimension(function(d) { return d.Data; }),
-            tags = filter.dimension(function (d) { return d.Sigma; }),
-            scenario = filter.dimension(function (d) { return d.Scenario; }),
+        var yearDimension = filter.dimension(function(p) { 
+            //console.log("p.Year: ", p.Year)
+            return Math.round(p.Year); }),  
+            indexDimension = filter.dimension(function(p) { 
+                console.log("p.Index: ", p.Index)
+                return p.Index; }),
+            regionDimension = filter.dimension(function(p, i) { 
+                console.log("p.Region: ", p.Region)
+                return p.Region; }),
+            datasetDimension = filter.dimension(function(d) { 
+                console.log("d.Model: ", d.Model)
+                return d.Model; }),
+            tags = filter.dimension(function (d) { 
+                console.log("d.Sigma: ", d.Sigma)
+                return d.Sigma; }),
+            scenario = filter.dimension(function (d) { 
+                console.log("d.Scenario: ", d.Scenario)
+                return d.Scenario; }),
             filter_list = [];     
        
         var yearGroup = yearDimension.group(),
             indexGroup = indexDimension.group(),
             regionGroup = regionDimension.group(),
             datasetGroup = datasetDimension.group();
+
+            console.log("indexGroup.all()", indexGroup.all())
+            console.log("regionGroup.all()", regionGroup.all())
 
         minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
         maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -47,9 +64,7 @@ $(document).ready(function () {
         
         //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
         d3.json("geojson/myFRA_admin12.json", function (statesJson) {
-
          
-
             franceChart.width(width)
                     .height(height)
                     .dimension(regionDimension)
@@ -201,10 +216,8 @@ $(document).ready(function () {
                     .columns([
                         function(d) { return d.Year; },
                         function(d) { return d.Region; },
-                        function(d) { return d.Type; },
-                        function(d) { return d.Season; },
                         function(d) { return d.Index; },
-                        function(d) { return d.Data; },
+                        function(d) { return d.Model; },
                         function(d) { return d.Sigma; },
                         function(d) { return d.Scenario; },
                         function(d) { return d.Value; }                  
@@ -289,8 +302,11 @@ function showTimeSeries(regionName) {
             return index_clicked + " for " + regionName + ", " + "sigma = " + threshold_clicked + ", " + "RCP " + scenario_clicked;
         });
 
-        pushpullCountry(regionName);
+        
         callHighChart();
+      
+        makeRequest(regionName);
+            
     }
 }
 
@@ -300,19 +316,53 @@ function clearSeries() {
 }
 
 
-function pushpullCountry(regionName) {
+function makeRequest(regionName) {
     console.log("region, scenario, sigma: ", regionName +","+ scenario_clicked +","+ threshold_clicked)
-    // //var models = $("#selectModels").jqxDropDownList('getCheckedItems'); //display all
-    // var models = ["Obs", "M1"];
+    var models = ["Obs", "M1"];
     // var scenario = $("#scenario"); //get from user click
     // var country = regionName; //get from user click
     // country.series=[];
-    // for (var i = 0; i < models.length; i++) {
-    //     if ( models.length == 1 ) var d = j;
-    //     else var d = i;
-    //     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/" + variable.value + "/" + scenario.value + "/" + country + "/" + variable.value + "_" + models[i].value + country + ".nc?var=" + variable.value + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    //     addData(request, colors[country], dashStyles[d], country +  " (" + scenario.value + " / " + models[i].originalItem.shortname + ")", country);
-    // }
+    for (var i = 0; i < models.length; i++) {
+        if ( models.length == 1 ) var d = j;
+        else var d = i;
+        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/" + variable.value + "/" + scenario.value + "/" + country + "/" + variable.value + "_" + models[i].value + country + ".nc?var=" + variable.value + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/tas/rcp85/FIN/tas_EUR-11_all_yearsanomalies_FIN.nc?var=tas&latitude=0&longitude=0&temporal=all&accept=csv";
+        addData(request, ["#000000"], ['Solid'], ["JUNK"]);
+    }
+}
+
+function addData(request, color, dash, country) {
+
+    $.ajax({
+          async: false,
+          type: "GET",
+      url: request,
+      success: function(data) {
+            // Split the lines
+            var lines = data.split('\n');
+            var serie = {
+                data: []
+                }; 
+            // Iterate over the lines and add categories or series
+            $.each(lines, function(lineNo, line) {
+            //console.log(line);
+            // ncss display a empty line at end
+            if (line.length == 0) return false;
+                var items = line.split(',');
+                // header line containes categories
+                if (lineNo != 0)
+                    serie.data.push([Date.parse(items[0]),parseFloat(items[3])]);
+                });
+            serie.name = country;
+            //serie.color = color;
+            serie.dashStyle = dash;
+
+            chart.addSeries(serie);
+            // var nav = chart.get('navigator');
+            // nav.setData(serie.data);
+            //     chart.xAxis[0].setExtremes();       
+        }
+    });
 }
 
 function callHighChart() {
@@ -418,7 +468,7 @@ function callHighChart() {
     };
 
     // Create the chart
-    var chart = new Highcharts.StockChart(options);
+    chart = new Highcharts.StockChart(options);
     // http://jsfiddle.net/SyyUZ/4/
 }
 
