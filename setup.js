@@ -16,7 +16,10 @@ $(document).ready(function () {
     var colourDomain = [];
 
     //d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
-    d3.csv("data/data_01.csv", function (csv) {    
+    //d3.csv("data/data_01.csv", function (csv) {
+    d3.csv("data/data_obs_part.csv", function (csv) {        
+
+        
         var filter = crossfilter(csv);
 
         var yearDimension = filter.dimension(function(p) { 
@@ -148,14 +151,6 @@ $(document).ready(function () {
 
                 xAxis_indexChart = indexChart.xAxis().ticks(6);
             
-
-            // // Define a click event for indexChart bar   
-            // indexChart.renderlet(function(chart) {
-            //   chart.selectAll('rect').on("click", function(d) {
-            //     console.log("click!", d);
-            //   });
-            // });    
-
                 yearChart.width(200)
                     .height(200)
                     .margins({
@@ -258,19 +253,24 @@ $(document).ready(function () {
             $("input[name='rcp']").click(function() {
                 var radioValue = $("input[name='rcp']:checked").val();
                 scenario_clicked = $("input:radio[name=rcp]:checked").val();
+                console.log("scenario_clicked: ", scenario_clicked)
                 scenario.filterAll();
                 scenario.filter(radioValue);
                 dc.redrawAll();
             });
 
             $("input[name='sigma'][value='1']").prop('checked', true);
-            $("input[name='rcp'][value='4.5']").prop('checked', true);
+            $("input[name='rcp'][value='rcp45']").prop('checked', true);
             $("input[name='sigma'][value='1']").trigger("click");
-            $("input[name='rcp'][value='4.5']").trigger("click");            
+            $("input[name='rcp'][value='rcp45']").trigger("click");            
 
         }); //end geojson
     }); //end csv
 }) //end document.ready
+
+//--------------------------------------------------------------------
+//  COLOUR-RELATED CODE FOR CHARTS
+//--------------------------------------------------------------------
 
 //colourbar (http://bl.ocks.org/chrisbrich/4209888)
 //attach to div defined in index.html
@@ -288,6 +288,10 @@ function plotColourbar(colourDomain_array, colourRange_array) {
 
 
 
+//--------------------------------------------------------------------
+//  TIME SERIES PLOTTIING
+//--------------------------------------------------------------------
+
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
@@ -300,7 +304,7 @@ function showTimeSeries(regionName) {
           .attr("width", 1000)
           .attr("height", 1000)
           .text(function() {
-            return index_clicked + " for " + regionName + ", " + "sigma = " + threshold_clicked + ", " + "RCP " + scenario_clicked;
+            return index_clicked + " for " + regionName + ", " + "sigma = " + threshold_clicked + ", " + scenario_clicked;
         });
 
         
