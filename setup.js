@@ -323,7 +323,7 @@ function clearSeries() {
 
 function makeRequest(regionName) {
     console.log("region, scenario, sigma: ", regionName +","+ scenario_clicked +","+ threshold_clicked)
-    var models = ["OBS Safran"];
+    var models = ["ICHEC-EC-EARTH_HIRHAM5"];
     // var scenario = $("#scenario"); //get from user click
     // var country = regionName; //get from user click
     // country.series=[];
@@ -331,8 +331,8 @@ function makeRequest(regionName) {
         // if ( models.length == 1 ) var d = j;
         // else var d = i;
         //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/" + variable.value + "/" + scenario.value + "/" + country + "/" + variable.value + "_" + models[i].value + country + ".nc?var=" + variable.value + "&latitude=0&longitude=0&temporal=all&accept=csv";
-        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/integration/tas/rcp85/FIN/tas_EUR-11_all_yearsanomalies_FIN.nc?var=tas&latitude=0&longitude=0&temporal=all&accept=csv";
-        addData(request, "#de09a9", 'Solid',  "FIN (rcp85 / Yearly / Multi-models mean)", "FIN");
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/GD4/yr/rcp85/16/GD4_rcp85_ICHEC-EC-EARTH_HIRHAM5_1971-2100.nc?var=GD4&latitude=0&longitude=0&temporal=all&accept=csv";
+        addData(request, "#de09a9", 'Solid',  "ICHEC-EC-EARTH_HIRHAM5", "region16");
     }
 }
 
