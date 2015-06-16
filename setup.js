@@ -16,36 +16,33 @@ $(document).ready(function () {
     var colourDomain = [];
 
     //d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
-    d3.csv("data/data_02.csv", function (csv) {    
+    d3.csv("data/data_01.csv", function (csv) {    
         var filter = crossfilter(csv);
 
         var yearDimension = filter.dimension(function(p) { 
             //console.log("p.Year: ", p.Year)
             return Math.round(p.Year); }),  
             indexDimension = filter.dimension(function(p) { 
-                console.log("p.Index: ", p.Index)
+                //console.log("p.Index: ", p.Index)
                 return p.Index; }),
             regionDimension = filter.dimension(function(p, i) { 
-                console.log("p.Region: ", p.Region)
+                //console.log("p.Region: ", p.Region)
                 return p.Region; }),
             datasetDimension = filter.dimension(function(d) { 
-                console.log("d.Model: ", d.Model)
+                //console.log("d.Model: ", d.Model)
                 return d.Model; }),
             tags = filter.dimension(function (d) { 
-                console.log("d.Sigma: ", d.Sigma)
+                //console.log("d.Sigma: ", d.Sigma)
                 return d.Sigma; }),
             scenario = filter.dimension(function (d) { 
-                console.log("d.Scenario: ", d.Scenario)
+                //console.log("d.Scenario: ", d.Scenario)
                 return d.Scenario; }),
             filter_list = [];     
        
         var yearGroup = yearDimension.group(),
             indexGroup = indexDimension.group(),
             regionGroup = regionDimension.group(),
-            datasetGroup = datasetDimension.group();
-
-            console.log("indexGroup.all()", indexGroup.all())
-            console.log("regionGroup.all()", regionGroup.all())
+            datasetGroup = datasetDimension.group();         
 
         minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
         maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
