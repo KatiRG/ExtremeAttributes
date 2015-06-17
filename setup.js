@@ -2,6 +2,7 @@ var scenario_clicked;
 var threshold_clicked;
 var region_dict = [];
 var legend = [];
+var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 
 $(document).ready(function () {
     var chart;
@@ -60,12 +61,12 @@ $(document).ready(function () {
             statesJson.features.forEach(function (d, idx) {    
                 region_dict.push({
                 key: d.properties.name,
-                value: idx
+                value: region_id[idx]
                 });
                 legend[idx] = d.properties.name;
             });   
-            console.log("region_dict: ", region_dict)
-            console.log("legend: ", legend)
+            //console.log("region_dict: ", region_dict)
+            //console.log("legend: ", legend)
          
             franceChart.width(width)
                     .height(height)
@@ -77,7 +78,7 @@ $(document).ready(function () {
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
                     .overlayGeoJson(statesJson.features, "state", function (d) {
-                        //console.log(d.properties.name)
+                        ////console.log(d.properties.name)
                         return d.properties.name;
                     })
                     .title(function (d) {
@@ -85,10 +86,10 @@ $(document).ready(function () {
                         return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                     });
             franceChart.on("preRender", function(chart) {//dynamically calculate domain
-                console.log("xxx: ", chart.group().all())
-                console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
+                //console.log("xxx: ", chart.group().all())
+                //console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
                 cdomain_preRender = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                console.log("divide by 4: ", cdomain_preRender[0]/4)
+                //console.log("divide by 4: ", cdomain_preRender[0]/4)
                 chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
                 rangeDiff = cdomain_preRender[1] - cdomain_preRender[0];
 
@@ -107,7 +108,7 @@ $(document).ready(function () {
             franceChart.renderlet(function(chart) {
               chart.selectAll("g.layer0 g.state").on("click", function(d) { //dblclick
                 if (d3.event.shiftKey) {
-                    console.log("click!", d.properties.name);
+                    //console.log("click!", d.properties.name);
                     showTimeSeries(d.properties.name);
                 }
               });
@@ -115,18 +116,18 @@ $(document).ready(function () {
 
             //define colourbar steps:
             function calculateDomain(rangeDiff, colourRange_array) {
-                console.log("cdomain_preRender[0]: ", cdomain_preRender[0])
-                console.log("cdomain_preRender[0] divide by 4: ", cdomain_preRender[0]/4)
-                console.log("rangeDiff: ", rangeDiff)
-                console.log("rangeDiff/4: ", rangeDiff/4)
+                //console.log("cdomain_preRender[0]: ", cdomain_preRender[0])
+                //console.log("cdomain_preRender[0] divide by 4: ", cdomain_preRender[0]/4)
+                //console.log("rangeDiff: ", rangeDiff)
+                //console.log("rangeDiff/4: ", rangeDiff/4)
                 rangeDiff_scaled = rangeDiff/4;
                 step = rangeDiff_scaled/(colourRange_array.length - 1);
-                console.log("step: ", step)
+                //console.log("step: ", step)
                 for (var j = 0; j < colourRange_array.length; j++) {
                    //colourDomain[j] = cdomain_preRender[0] + j*step;
                    colourDomain[j] = cdomain_preRender[0]/4 + j*step;
                 }
-                console.log("colourDomain in calculateDomain: ", colourDomain)
+                //console.log("colourDomain in calculateDomain: ", colourDomain)
                 return colourDomain;
             }            
 
@@ -223,14 +224,14 @@ $(document).ready(function () {
             //Filter dc charts according to which radio button is checked by user:
             $("input:radio[name=sigma]").click(function(){
                 var radioValue = $("input:radio[name=sigma]:checked").val();
-                console.log(radioValue);
+                //console.log(radioValue);
                 tags.filterAll();
                 tags.filter(radioValue);
                 dc.redrawAll();
             });
             $("input:radio[name=rcp]").click(function(){
                 var radioValue = $("input:radio[name=rcp]:checked").val();
-                console.log(radioValue);
+                //console.log(radioValue);
                 scenario.filterAll();
                 scenario.filter(radioValue);
                 dc.redrawAll();
@@ -250,7 +251,7 @@ $(document).ready(function () {
             $("input[name='rcp']").click(function() {
                 var radioValue = $("input[name='rcp']:checked").val();
                 scenario_clicked = $("input:radio[name=rcp]:checked").val();
-                console.log("scenario_clicked: ", scenario_clicked)
+                //console.log("scenario_clicked: ", scenario_clicked)
                 scenario.filterAll();
                 scenario.filter(radioValue);
                 dc.redrawAll();
@@ -292,9 +293,9 @@ function plotColourbar(colourDomain_array, colourRange_array) {
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
-        console.log("In showTimeSeries for ", regionName);
+        //console.log("In showTimeSeries for ", regionName);
         index_clicked = indexChart.filters()[0];
-        //console.log("model: ", datasetChart.filters())
+        ////console.log("model: ", datasetChart.filters())
 
         clearSeries();
 
@@ -313,41 +314,27 @@ function showTimeSeries(regionName) {
     }
 }
 
-function clearSeries() {
-    console.log("in clearSeries!!")
-    d3.selectAll("div#chart-ts").selectAll("h2").remove();                   
-}
+function clearSeries() { d3.selectAll("div#chart-ts").selectAll("h2").remove(); }
 
 
 function makeRequest(regionName) {
-    //var models = ["OBS Safran", "ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
-    //    "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
     var models = ["ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
                   "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
-    var colors = [ "#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d" ]
-    regionNum = 16; //region_dict[legend.indexOf(regionName)].value;
+    var colors = [ "#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d" ];
+    regionNum = region_dict[legend.indexOf(regionName)].value;
 
-    console.log("model[i]: ", models[0])
+    //console.log("model[i]: ", models[0])
     for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-        console.log("request: ", request)
-
-        //fixed request
-        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/GD4/yr/rcp85/16/GD4_rcp85_ICHEC-EC-EARTH_HIRHAM5_1971-2100.nc?var=GD4&latitude=0&longitude=0&temporal=all&accept=csv";
         addData(request, colors[i], 'Solid',  models[i]);
     }
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     addData(request, "#000000", 'Solid',  "Obs Safran");
-
 }
 
 function addData(request, color, dash, label) {
-
-    console.log("color: ", color)
-        console.log("dash: ", dash)
-        console.log("label: ", label)
 
     $.ajax({
           async: false,
@@ -361,7 +348,7 @@ function addData(request, color, dash, label) {
                 }; 
             // Iterate over the lines and add categories or series
             $.each(lines, function(lineNo, line) {
-            //console.log(line);
+            ////console.log(line);
             // ncss display a empty line at end
             if (line.length == 0) return false;
                 var items = line.split(',');
@@ -373,7 +360,7 @@ function addData(request, color, dash, label) {
             serie.color = color;
             serie.dashStyle = dash;
 
-            console.log("serie: ", serie)
+            //console.log("serie: ", serie)
 
             chart.addSeries(serie);
             // var nav = chart.get('navigator');
