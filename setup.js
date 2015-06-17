@@ -19,7 +19,7 @@ $(document).ready(function () {
 
     //d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
     //d3.csv("data/data_01.csv", function (csv) {
-    d3.csv("data/data_obs_part.csv", function (csv) {        
+    d3.csv("data/data_obs.csv", function (csv) {        
 
         
         var filter = crossfilter(csv);
@@ -257,9 +257,9 @@ $(document).ready(function () {
             });
 
             $("input[name='sigma'][value='1']").prop('checked', true);
-            $("input[name='rcp'][value='rcp45']").prop('checked', true);
+            $("input[name='rcp'][value='rcp85']").prop('checked', true);
             $("input[name='sigma'][value='1']").trigger("click");
-            $("input[name='rcp'][value='rcp45']").trigger("click");            
+            $("input[name='rcp'][value='rcp85']").trigger("click");            
 
         }); //end geojson
     }); //end csv
@@ -324,7 +324,9 @@ function makeRequest(regionName) {
     //    "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
     var models = ["ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
                   "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"];
+    var colors = [ "#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d" ]
     regionNum = 16; //region_dict[legend.indexOf(regionName)].value;
+
     console.log("model[i]: ", models[0])
     for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
@@ -332,8 +334,13 @@ function makeRequest(regionName) {
 
         //fixed request
         //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/GD4/yr/rcp85/16/GD4_rcp85_ICHEC-EC-EARTH_HIRHAM5_1971-2100.nc?var=GD4&latitude=0&longitude=0&temporal=all&accept=csv";
-        addData(request, "#de09a9", 'Solid',  models[i]);
+        addData(request, colors[i], 'Solid',  models[i]);
     }
+
+    // obs
+    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    addData(request, "#000000", 'Solid',  "Obs Safran");
+
 }
 
 function addData(request, color, dash, label) {
@@ -363,7 +370,7 @@ function addData(request, color, dash, label) {
                     serie.data.push([Date.parse(items[0]),parseFloat(items[3])]);
                 });
             serie.name = label;
-            //serie.color = color;
+            serie.color = color;
             serie.dashStyle = dash;
 
             console.log("serie: ", serie)
