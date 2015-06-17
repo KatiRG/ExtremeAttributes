@@ -444,6 +444,7 @@ function callHighChart(title) {
             }
         },
         tooltip: {
+	    enabled: false,
             crosshairs: true,
             shared: true,
             valueDecimals: 2,
