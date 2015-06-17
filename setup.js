@@ -396,7 +396,7 @@ function callHighChart() {
         style: {
             color: '#000000',
             fontWeight: 'bold',
-            fontSize: '12px'
+            fontSize: '8px'
         },
         x: -320,
         y: 20,
