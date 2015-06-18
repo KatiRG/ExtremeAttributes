@@ -317,7 +317,7 @@ function showTimeSeries(regionName) {
 
         clearSeries();
 
-        callHighChart(index_clicked + " for " + regionName + ", " + "sigma = " + threshold_clicked + ", " + scenario_clicked);
+        callHighChart(index_clicked + " for " + regionName + ", " + threshold_clicked +" Sigma" + ", " + scenario_clicked);
 
         makeRequest(regionName);
 
@@ -337,17 +337,19 @@ function makeRequest(regionName) {
     regionNum = region_dict[legend.indexOf(regionName)].value;
 
     //console.log("model[i]: ", models[0])
+    datasetFiltered = datasetChart.filters();
     for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-        addData(request, colors[i], 'Solid', models[i]);
+	visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[i]) != -1 ? true : false);
+        addData(request, colors[i], 'Solid', models[i], visible);
     }
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    addData(request, "#000000", 'Solid', "Obs Safran");
+    addData(request, "#000000", 'Solid', "Obs Safran", true);
 }
 
-function addData(request, color, dash, label) {
+function addData(request, color, dash, label, visible) {
 
     $.ajax({
         async: false,
@@ -372,6 +374,7 @@ function addData(request, color, dash, label) {
             serie.name = label;
             serie.color = color;
             serie.dashStyle = dash;
+            serie.visible = visible;
 
             //console.log("serie: ", serie)
 
@@ -388,8 +391,8 @@ function callHighChart(title) {
     var options = {
         chart: {
             renderTo: 'timeChart',
-            zoomType: 'xy',
-            type: 'spline'
+            zoomType: 'xy'
+            //type: 'spline'
         },
         title: {
             text: title,
@@ -420,9 +423,21 @@ function callHighChart(title) {
             gridLineWidth: 1,
             title: {
                 text: ''
-            }
+            },
+            opposite: false,
+	plotLines: [{
+                color: '#000000',
+                dashStyle: 'ShortDash',
+                width: 2,
+                value: 1000,
+		zIndex: 10,
+                label : {
+                    text : '1 Sigma'
+                }
+            }]
         },
         rangeSelector: {
+	    enabled: true,
             inputDateFormat: '%Y',
             buttons: [{
                 type: 'year',
@@ -438,7 +453,7 @@ function callHighChart(title) {
             }]
         },
         navigator: {
-            enabled: true,
+            enabled: false,
             series: {
                 id: 'navigator'
             }
