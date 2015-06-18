@@ -330,6 +330,7 @@ function clearSeries() {
 
 
 function makeRequest(regionName) {
+    // should be dynamic
     var models = ["ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
         "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"
     ];
@@ -347,6 +348,7 @@ function makeRequest(regionName) {
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     addData(request, "#000000", 'Solid', "Obs Safran", true);
+    // calcul of the mean for 1976-2005 for obs
 }
 
 function addData(request, color, dash, label, visible) {
@@ -377,17 +379,19 @@ function addData(request, color, dash, label, visible) {
             serie.visible = visible;
 
             //console.log("serie: ", serie)
-
+	    
+	    
             chart.addSeries(serie);
-            // var nav = chart.get('navigator');
-            // nav.setData(serie.data);
-            //     chart.xAxis[0].setExtremes();       
+            threshold1 = math.mean(serie.data[1]);
+            console.log("serie: ", threshold1); 
+	    console.log(chart.yAxis[0].plotLinesAndBands[0].options.value);
+            chart.yAxis[0].plotLinesAndBands[0].options.value=threshold1; 
+
         }
     });
 }
 
 function callHighChart(title) {
-    var d = [];
     var options = {
         chart: {
             renderTo: 'timeChart',
@@ -429,7 +433,7 @@ function callHighChart(title) {
                 color: '#000000',
                 dashStyle: 'ShortDash',
                 width: 2,
-                value: 1000,
+                value: 0,
 		zIndex: 10,
                 label : {
                     text : '1 Sigma'
