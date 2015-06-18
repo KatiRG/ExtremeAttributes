@@ -313,7 +313,7 @@ function showTimeSeries(regionName) {
     if (indexChart.filters().length == 1) {
         //console.log("In showTimeSeries for ", regionName);
         index_clicked = indexChart.filters()[0];
-        ////console.log("model: ", datasetChart.filters())
+        //console.log("model: ", datasetChart.filters())
 
         clearSeries();
 
@@ -342,16 +342,16 @@ function makeRequest(regionName) {
     for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
 	visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[i]) != -1 ? true : false);
-        addData(request, colors[i], 'Solid', models[i], visible);
+        addData(request, colors[i], 'Solid', models[i], visible, false);
     }
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    addData(request, "#000000", 'Solid', "Obs Safran", true);
+    addData(request, "#000000", 'Solid', "Obs Safran", true, true);
     // calcul of the mean for 1976-2005 for obs
 }
 
-function addData(request, color, dash, label, visible) {
+function addData(request, color, dash, label, visible, addSigma) {
 
     $.ajax({
         async: false,
@@ -365,7 +365,7 @@ function addData(request, color, dash, label, visible) {
             };
             // Iterate over the lines and add categories or series
             $.each(lines, function(lineNo, line) {
-                ////console.log(line);
+                //console.log(line);
                 // ncss display a empty line at end
                 if (line.length == 0) return false;
                 var items = line.split(',');
@@ -378,15 +378,35 @@ function addData(request, color, dash, label, visible) {
             serie.dashStyle = dash;
             serie.visible = visible;
 
-            //console.log("serie: ", serie)
-	    
-	    
             chart.addSeries(serie);
-            threshold1 = math.mean(serie.data[1]);
-            console.log("serie: ", threshold1); 
-	    console.log(chart.yAxis[0].plotLinesAndBands[0].options.value);
-            chart.yAxis[0].plotLinesAndBands[0].options.value=threshold1; 
 
+	    if (addSigma) {
+            	//console.log("serie: ", serie)
+            	var dataValues = []
+            	$.each(serie.data, function( index, value ) {
+			//console.log( index + ": " + value[1] );
+			dataValues.push(value[1]);
+		});
+		// OBS Safran is described from 1971 to 2012
+		// to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
+		// consider 5:34 (in javascript notation start 0) so arr.slice(5,35)
+		dataValues = dataValues.slice(5,35);
+		//console.log(dataValues);
+		//console.log("mean: " + math.mean(dataValues));
+		//console.log("std: " + math.std(dataValues));
+            	threshold1 = math.mean(dataValues) + math.std(dataValues)*threshold_clicked;
+            	//console.log("threshold: ", threshold1); 
+	    	chart.yAxis[0].addPlotLine({
+                	color: '#000000',
+                	dashStyle: 'ShortDash',
+                	width: 2,
+                	value: threshold1,
+			zIndex: 10,
+                	label : {
+                    		text : threshold_clicked + ' Sigma'
+			}
+            	});
+	    }
         }
     });
 }
@@ -428,20 +448,10 @@ function callHighChart(title) {
             title: {
                 text: ''
             },
-            opposite: false,
-	plotLines: [{
-                color: '#000000',
-                dashStyle: 'ShortDash',
-                width: 2,
-                value: 0,
-		zIndex: 10,
-                label : {
-                    text : '1 Sigma'
-                }
-            }]
+            opposite: false
         },
         rangeSelector: {
-	    enabled: true,
+	    selected: 3,
             inputDateFormat: '%Y',
             buttons: [{
                 type: 'year',
@@ -457,10 +467,7 @@ function callHighChart(title) {
             }]
         },
         navigator: {
-            enabled: false,
-            series: {
-                id: 'navigator'
-            }
+            enabled: false
         },
         tooltip: {
 	    enabled: false,
