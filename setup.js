@@ -56,15 +56,16 @@ $(document).ready(function() {
             d3.selectAll("#total").text(filter.size()); // total number of events
 
             //MAP
-            var width = 480,
-                height = 480;
+            var width = 380,
+                height = 380;
 
             //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
             var projection = d3.geo.conicConformal() // Lambert-93
                 .center([2.454071, 47.279229]) // On centre la carte sur la France
-                .scale(2200)
-                .translate([width / 2.5, height / 2.5]);
+                .scale(1500)
+                .translate([width / 2.7, height / 4]);
             //.translate([width / 2, height / 2]);
+            //g = svg.append("g").attr("transform", "translate(10,10)").classed("colorbar", true),
 
 
             //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
@@ -81,8 +82,8 @@ $(document).ready(function() {
                 //console.log("region_dict: ", region_dict)
                 //console.log("legend: ", legend)
 
-                franceChart.width(width)
-                    .height(height)
+                franceChart.width(300)
+                    .height(250)
                     .dimension(regionDimension)
                     .group(regionGroup)
                     //.colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
@@ -160,7 +161,7 @@ $(document).ready(function() {
 
                 xAxis_indexChart = indexChart.xAxis().ticks(3);
 
-                yearChart.width(200)
+                yearChart.width(250)
                     .height(200)
                     .margins({
                         top: 10,
@@ -176,6 +177,7 @@ $(document).ready(function() {
                     .xUnits(function() {
                         return 20;
                     })
+                    .gap(50)
                     .x(d3.scale.linear().domain([minYear, maxYear]))
                     .xAxis().ticks(3).tickFormat(d3.format("d"));
 
@@ -210,7 +212,7 @@ $(document).ready(function() {
                     .group(function(d) {
                         return ""
                     })
-                    .size(6)
+                    .size(11)
                     //.size(csv.length) //display all data
                     .columns([
                         function(d) {

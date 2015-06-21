@@ -12,5 +12,10 @@ input[type="checkbox"] {
     margin: 4px 4px 0;
 }
 
+h4 span {
+    font-size:14px;
+    font-weight:normal;
+}   
+
 table thead { display:block; }
 table tbody { height:300px; overflow-y:scroll; display:block; }

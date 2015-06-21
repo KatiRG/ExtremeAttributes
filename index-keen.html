@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Extreme Events</title>
+  <link rel="stylesheet" type="text/css" href="assets/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="assets/keen-dashboards.css" />
+
+  <!--from original index.html -->
+  <script src="lib/d3.js" charset="utf-8"></script>
+  <script src="lib/jquery-1.10.2.min.js"></script> <!--NEED THIS!!-->
+
+  <!-- d3 and dc -->
+  <script src="lib/crossfilter.js"></script>
+  <script src="lib/dc.min.js"></script>
+  <link rel="stylesheet" href="lib/dc.css"/>
+
+  <!-- css links -->
+  <link href="lib/bootstrap-3.0.2-dist/css/bootstrap.css" rel="stylesheet">
+  <!--<script src="lib/bootstrap-3.0.2-dist/js/bootstrap.min.js"></script>-->
+  <!-- Custom styles for this template -->
+  <link href="sticky-footer-navbar.css" rel="stylesheet">
+
+  <!--Custom files -->
+  <script type="text/javascript" src="lib/d3tip.js"></script>
+  <!-- colorbar http://bl.ocks.org/chrisbrich/4209888 -->
+  <link href="lib/colorbar.css" rel="stylesheet">
+  <script type="text/javascript" src="lib/colorbar.js"></script>
+
+  <script src="lib/highstock.js"></script>
+  <script src="lib/exporting.js"></script> 
+
+  <script src="lib/math.min.js"></script>
+
+  <script type="text/javascript" src="setup.js"></script>
+  <link href="style.css" rel="stylesheet" type="text/css" media="all">
+
+</head>
+
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="./">Extreme Events</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="help.html">Help</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    
+
+    <div class="row">
+      <div class="col-sm-6 col-md-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Threshold   
+          </div>
+          <div class="chart-stage">
+            <!--<img data-src="holder.js/100%x120/white">-->
+            <input type="radio" name="sigma" value="1">1 Sigma<br>
+            <input type="radio" name="sigma" value="2">2 Sigma            
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Scenario
+          </div>
+          <div class="chart-stage">
+            <input type="radio" name="rcp" value="rcp45">RCP 4.5<br>
+            <input type="radio" name="rcp" value="rcp85">RCP 8.5
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Something else
+          </div>
+          <div class="chart-stage">
+            <input type="radio">dummy<br>
+            <input type="radio">dummy
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+<!-- end of three -->
+      <div class="col-sm-6 col-md-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Index
+          </div>
+          <div class="chart-stage">
+            <div id="chart-indexType">
+              <span>
+                  <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                  <span class="reset" style="display: none;"></span>
+              </span>
+            </div>
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Model + Observations
+          </div>
+          <div class="chart-stage">            
+             <div id="chart-dataset">
+              <span>                                    
+                <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                <span class="reset" style="display: none;"></span></span>
+              </span>
+            </div>    
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Year
+          </div>
+          <div class="chart-stage">
+            <div id="chart-eventYear">
+              <span>
+                <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                <span class="reset" style="display: none;"></span></span>
+              </span>  
+            </div>  
+                   
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Summary
+          </div>
+          <div class="chart-stage">
+            <!--<div id="grid-1-1">-->
+              <div id="dc-table-graph">
+                <table class="table table-striped table-hover">
+                  <span id="active">-</span> of <span id="total">-</span> rows selected.
+                </table>
+
+              </div>  
+            <!--</div>-->
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            France by region
+          </div>
+          <div class="chart-stage">
+            <div id="france-chart">
+              <a class="reset" href="javascript:franceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                    <span class="reset" style="display: none;"></span>
+            </div>
+          </div>
+          <div class="chart-notes">
+            Notes about this chart
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+    <hr>
+
+    <p class="small text-muted">Built with &#9829; by <a href="https://keen.io">Keen IO</a></p>
+
+  </div>
+
+  <script type="text/javascript" src="assets/jquery.min.js"></script>
+  <script type="text/javascript" src="assets/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="assets/holder.js"></script>
+  <script>
+    Holder.add_theme("white", { background:"#fff", foreground:"#a7a7a7", size:10 });
+  </script>
+
+  <script type="text/javascript" src="assets/keen.min.js"></script>
+  <script type="text/javascript" src="assets/meta.js"></script>
+
+</body>
+</html>
