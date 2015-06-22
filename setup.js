@@ -63,8 +63,9 @@ $(document).ready(function() {
             //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
             var projection = d3.geo.conicConformal() // Lambert-93
                 .center([2.454071, 47.279229]) // On centre la carte sur la France
-                .scale(2200)
-                .translate([width / 2.5, height / 2.5]);
+                .scale(1900)
+                .translate([width / 3.5, height / 3.5]);
+                //.translate([width / 2.5, height / 2.5]);
             //.translate([width / 2, height / 2]);
 
 
@@ -79,9 +80,7 @@ $(document).ready(function() {
                     });
                     legend[idx] = d.properties.name;
                 });
-                //console.log("region_dict: ", region_dict)
-                //console.log("legend: ", legend)
-
+  
                 franceChart.width(width)
                     .height(height)
                     .dimension(regionDimension)
@@ -291,15 +290,14 @@ $(document).ready(function() {
 
 //colourbar (http://bl.ocks.org/chrisbrich/4209888)
 //attach to div defined in index.html
-function plotColourbar(colourDomain_array, colourRange_array) {
-    var svg = d3.select("div#colourbar").append("svg") //HUOM! must append svg!!
-        .attr("width", 1000)
-        .attr("height", 1000),
-        g = svg.append("g").attr("transform", "translate(10,10)").classed("colorbar", true),
+function plotColourbar(colourDomain_array, colourRange_array) {    
+        var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
+                  .attr("transform", "translate(25,120)")
+                  .classed("colorbar", true),
         cb = colorBar().color(d3.scale.linear()
             .domain(colourDomain_array)
             .range(colourRange_array))
-        .size(150).lineWidth(30).precision(1);
+        .size(150).lineWidth(25).precision(1);
     g.call(cb);
 }
 
