@@ -3,10 +3,11 @@ var threshold_clicked;
 var region_dict = [];
 var legend = [];
 var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
+var highchart;
 
 $(document).ready(function() {
-        var chart;
 
+	var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
         indexChart = dc.rowChart("#chart-indexType");
         yearChart = dc.barChart("#chart-eventYear");
@@ -347,8 +348,22 @@ function makeRequest(regionName) {
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    addData(request, "#000000", 'Solid', "Obs Safran", true, true);
+    addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
     // calcul of the mean for 1976-2005 for obs
+
+
+    highchart.addSeries({
+            type: 'flags',
+            color: '#333333',
+	    fillColor: 'rgba(255,255,255,0.8)',
+            shape: 'squarepin',
+            data: [
+                { x: Date.UTC(2010, 7, 1), text: 'Highcharts Cloud Beta', title: 'a remarkable event' }
+            ],
+	    onSeries: 'Obs Safran', 
+	    showInLegend: false 
+	});
+
 }
 
 function addData(request, color, dash, label, visible, addSigma) {
@@ -374,11 +389,12 @@ function addData(request, color, dash, label, visible, addSigma) {
                     serie.data.push([Date.parse(items[0]), parseFloat(items[3])]);
             });
             serie.name = label;
+            serie.id = label;
             serie.color = color;
             serie.dashStyle = dash;
             serie.visible = visible;
 
-            chart.addSeries(serie);
+            highchart.addSeries(serie);
 
 	    if (addSigma) {
             	//console.log("serie: ", serie)
@@ -396,7 +412,7 @@ function addData(request, color, dash, label, visible, addSigma) {
 		//console.log("std: " + math.std(dataValues));
             	threshold1 = math.mean(dataValues) + math.std(dataValues)*threshold_clicked;
             	//console.log("threshold: ", threshold1); 
-	    	chart.yAxis[0].addPlotLine({
+	    	highchart.yAxis[0].addPlotLine({
                 	color: '#000000',
                 	dashStyle: 'ShortDash',
                 	width: 2,
@@ -441,7 +457,16 @@ function callHighChart(title) {
                     month: '%b \'%y',
                     year: '%Y'
                 }
-            }
+            },
+            plotBands: [{
+                from: Date.UTC(1971, 06, 01),		// month from 0 to 11 !
+                to: Date.UTC(2012, 06, 01),
+                color: '#EEEEEE'
+            },{
+                from: Date.UTC(2012, 06, 01),		// month from 0 to 11 !
+                to: Date.UTC(2200, 01, 01),
+                color: '#EFFFFF'
+            }]
         },
         yAxis: {
             gridLineWidth: 1,
@@ -513,8 +538,8 @@ function callHighChart(title) {
     };
 
     // Create the chart
-    chart = new Highcharts.StockChart(options);
+    highchart = new Highcharts.StockChart(options);
     // http://jsfiddle.net/SyyUZ/4/
-}
 
-//})
+
+}
