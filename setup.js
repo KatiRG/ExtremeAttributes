@@ -7,20 +7,18 @@ var highchart;
 
 $(document).ready(function() {
 
+    var colourDomain = [];
+    var saveRange;
+    var colourBarExists = 0;
+
 	var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
         indexChart = dc.rowChart("#chart-indexType");
         yearChart = dc.barChart("#chart-eventYear");
         datasetChart = dc.rowChart("#chart-dataset");
+                
+        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
-        var cdomain_preRender;
-        var cdomain_preRedraw;
-        var rangeDiff;
-        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-        var colourDomain = [];
-
-        //d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
-        //d3.csv("data/data_01.csv", function (csv) {
         d3.csv("data/data_obs.csv", function(csv) {
 
 
@@ -84,61 +82,35 @@ $(document).ready(function() {
                     .group(regionGroup)              
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
-                    .overlayGeoJson(statesJson.features, "state", function(d) {
-                        ////console.log(d.properties.name)
+                    .overlayGeoJson(statesJson.features, "state", function(d) {                        
                         return d.properties.name;
                     })
                     .title(function(d) {
                         d3.select("#active").text(filter.groupAll().value()); //total number selected
                         return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                     });
-                // franceChart.on("preRender", function(chart) { //dynamically calculate domain
-                //     //console.log("xxx: ", chart.group().all())
-                //     //console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
-                //     cdomain_preRender = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                //     //console.log("divide by 4: ", cdomain_preRender[0]/4)
-                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                //     rangeDiff = cdomain_preRender[1] - cdomain_preRender[0];
-
-                //     calculateDomain(rangeDiff, colourRange); //returns colourDomain
-                //     plotColourbar(colourDomain, colourRange);
-                // });
-                franceChart.on("preRedraw", function(chart) {
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    cdomain_preRedraw = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    rangeDiff = cdomain_preRedraw[1] - cdomain_preRedraw[0];
-
-                    calculateDomain(rangeDiff, colourRange); //returns colourDomain
-                    console.log("calling plotColourbar")
+                franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));       
+                });
+                franceChart.on("preRedraw", function(chart) {//loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));                        
+                });
+                franceChart.on("postRedraw", function(chart) {//use to get range for number of events                    
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));                                    
+                    //calculate colourbar params and plot colourbar
+                    saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();                                    
+                    calculateDomain(saveRange, colourRange); //returns colourDomain                    
                     plotColourbar(colourDomain, colourRange);
                 });
                 //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
-                //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ
+                //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
 
                 //define click action
                 franceChart.renderlet(function(chart) {
                     chart.selectAll("g.layer0 g.state").on("click", function(d) {  
                         showTimeSeries(d.properties.name);                        
                     });
-                })
-
-                //define colourbar steps:
-                function calculateDomain(rangeDiff, colourRange_array) {
-                    //console.log("cdomain_preRender[0]: ", cdomain_preRender[0])
-                    //console.log("cdomain_preRender[0] divide by 4: ", cdomain_preRender[0]/4)
-                    //console.log("rangeDiff: ", rangeDiff)
-                    //console.log("rangeDiff/4: ", rangeDiff/4)
-                    rangeDiff_scaled = rangeDiff / 4;
-                    step = rangeDiff_scaled / (colourRange_array.length - 1);
-                    //console.log("step: ", step)
-                    for (var j = 0; j < colourRange_array.length; j++) {
-                        //colourDomain[j] = cdomain_preRender[0] + j*step;
-                        //colourDomain[j] = cdomain_preRender[0] / 4 + j * step;
-                        colourDomain[j] = cdomain_preRedraw[0] / 4 + j * step;
-                    }
-                    //console.log("colourDomain in calculateDomain: ", colourDomain)
-                    return colourDomain;
-                }
+                })    
 
                 indexChart.width(200) //svg width
                     .height(200) //svg height
@@ -284,20 +256,32 @@ $(document).ready(function() {
 //  COLOUR-RELATED CODE FOR CHARTS
 //--------------------------------------------------------------------
 
-//colourbar (http://bl.ocks.org/chrisbrich/4209888)
-//attach to div defined in index.html
-function plotColourbar(colourDomain_array, colourRange_array) {    
-        var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
-                  .attr("transform", "translate(25,120)")
-                  .classed("colorbar", true),
-        cb = colorBar().color(d3.scale.linear()
-            .domain(colourDomain_array)
-            .range(colourRange_array))
-        .size(150).lineWidth(25).precision(1);
-    g.call(cb);
+//divide colourbar range into 10 equal steps (since 10 colours have been defined):
+function calculateDomain(saveRange, colourRange_array) {
+    rangeDiff = saveRange[1] - saveRange[0];
+    step = rangeDiff / (colourRange_array.length - 1);                    
+    for (var j = 0; j < colourRange_array.length; j++) {                        
+        colourDomain[j] = saveRange[0] + j * step;                        
+    }                                
+    return colourDomain;
 }
 
+//colourbar (http://bl.ocks.org/chrisbrich/4209888)
+function plotColourbar(colourDomain_array, colourRange_array) {    
+    if (colourBarExists == 0) { //only create svg once
+        var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
+                  .attr("transform", "translate(25,120)")
+                  .classed("colorbar", true);           
+    } else var g = d3.select("div#colourbar");
 
+    var cb = colorBar().color(d3.scale.linear()
+            .domain(colourDomain_array)
+            .range(colourRange_array))
+            .size(150).lineWidth(25).precision(1);
+    
+    g.call(cb);
+    colourBarExists = 1;
+}
 
 //--------------------------------------------------------------------
 //  TIME SERIES PLOTTIING
