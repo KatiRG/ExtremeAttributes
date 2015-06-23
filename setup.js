@@ -64,10 +64,7 @@ $(document).ready(function() {
             var projection = d3.geo.conicConformal() // Lambert-93
                 .center([2.454071, 47.279229]) // On centre la carte sur la France
                 .scale(1900)
-                .translate([width / 3.5, height / 3.5]);
-                //.translate([width / 2.5, height / 2.5]);
-            //.translate([width / 2, height / 2]);
-
+                .translate([width / 3.5, height / 3.5]);          
 
             //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
             d3.json("geojson/myFRA_admin12.json", function(statesJson) {
@@ -84,10 +81,7 @@ $(document).ready(function() {
                 franceChart.width(width)
                     .height(height)
                     .dimension(regionDimension)
-                    .group(regionGroup)
-                    //.colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
-                    //.colorDomain([0, 200])                    
-                    //.colorCalculator(function (d) { return d ? franceChart.colors()(d) : '#ccc'; })
+                    .group(regionGroup)              
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
                     .overlayGeoJson(statesJson.features, "state", function(d) {
@@ -98,32 +92,33 @@ $(document).ready(function() {
                         d3.select("#active").text(filter.groupAll().value()); //total number selected
                         return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                     });
-                franceChart.on("preRender", function(chart) { //dynamically calculate domain
-                    //console.log("xxx: ", chart.group().all())
-                    //console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
-                    cdomain_preRender = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    //console.log("divide by 4: ", cdomain_preRender[0]/4)
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    rangeDiff = cdomain_preRender[1] - cdomain_preRender[0];
+                // franceChart.on("preRender", function(chart) { //dynamically calculate domain
+                //     //console.log("xxx: ", chart.group().all())
+                //     //console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
+                //     cdomain_preRender = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
+                //     //console.log("divide by 4: ", cdomain_preRender[0]/4)
+                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                //     rangeDiff = cdomain_preRender[1] - cdomain_preRender[0];
 
-                    calculateDomain(rangeDiff, colourRange); //returns colourDomain
-                    plotColourbar(colourDomain, colourRange);
-                });
+                //     calculateDomain(rangeDiff, colourRange); //returns colourDomain
+                //     plotColourbar(colourDomain, colourRange);
+                // });
                 franceChart.on("preRedraw", function(chart) {
                     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
                     cdomain_preRedraw = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
                     rangeDiff = cdomain_preRedraw[1] - cdomain_preRedraw[0];
+
+                    calculateDomain(rangeDiff, colourRange); //returns colourDomain
+                    console.log("calling plotColourbar")
+                    plotColourbar(colourDomain, colourRange);
                 });
                 //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
                 //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ
 
-                //define double-click
+                //define click action
                 franceChart.renderlet(function(chart) {
-                    chart.selectAll("g.layer0 g.state").on("click", function(d) { //dblclick
-                        //if (d3.event.shiftKey) {
-                        //console.log("click!", d.properties.name);
-                        showTimeSeries(d.properties.name);
-                        //}
+                    chart.selectAll("g.layer0 g.state").on("click", function(d) {  
+                        showTimeSeries(d.properties.name);                        
                     });
                 })
 
@@ -138,7 +133,8 @@ $(document).ready(function() {
                     //console.log("step: ", step)
                     for (var j = 0; j < colourRange_array.length; j++) {
                         //colourDomain[j] = cdomain_preRender[0] + j*step;
-                        colourDomain[j] = cdomain_preRender[0] / 4 + j * step;
+                        //colourDomain[j] = cdomain_preRender[0] / 4 + j * step;
+                        colourDomain[j] = cdomain_preRedraw[0] / 4 + j * step;
                     }
                     //console.log("colourDomain in calculateDomain: ", colourDomain)
                     return colourDomain;
