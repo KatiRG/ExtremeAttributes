@@ -20,12 +20,11 @@ table tbody { height:300px; overflow-y:scroll; display:block; }
     font-size: 12px;
 }
 
-/*http://stackoverflow.com/questions/802175/truncating-long-strings-with-css-feasible-yet/22811590#22811590*/
-span {
-        display: inline-block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;     /** IE6+, Firefox 7+, Opera 11+, Chrome, Safari **/
-        -o-text-overflow: ellipsis;  /** Opera 9 & 10 **/
-        width: 100px; /* text > width will be truncated with ellipses */
+.eventItem div {
+	  display: inline-block;
+	  text-align: left;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	  vertical-align: top;
 }

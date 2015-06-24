@@ -381,8 +381,7 @@ function initList() {
                 .attr("title", points[i].Index)
                 .text(points[i].Index);
         eventItem.append("div")
-                .attr("class", "col-md-2")
-                .insert("span", ":first-child")
+                .attr("class", "col-md-2")                
                 .style("text-align", "left")
                 .style("color", "#F5B441")
                 .attr("title", points[i].Model)
