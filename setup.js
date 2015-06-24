@@ -8,6 +8,9 @@ var colourDomain = [];
 var saveRange;
 var colourBarExists = 0;
 
+var idDimension;
+var idGroup;
+
 $(document).ready(function() {    
 
 	var chart;
@@ -20,8 +23,13 @@ $(document).ready(function() {
 
         d3.csv("data/data_obs.csv", function(csv) {
 
-
+            points=csv;
             var filter = crossfilter(csv);
+
+                // dimension and group for dataset
+                idDimension = filter.dimension(function(p, i) { return i; });
+                //idGrouping = idDimension.group(function(id) { return id; });
+
 
             var yearDimension = filter.dimension(function(p) {
                     return Math.round(p.Year);
@@ -52,6 +60,7 @@ $(document).ready(function() {
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
             d3.selectAll("#total").text(filter.size()); // total number of events
+            initList();
 
             //MAP
             var width = 480,
@@ -304,6 +313,97 @@ function showTimeSeries(regionName) {
 
 function clearSeries() {
     d3.selectAll("div#chart-ts").selectAll("h2").remove();
+}
+
+function initList() {    
+    var eventItem = d3.select("#eventsListTitle")
+        .append("div")
+        .style("background", "#ddd")
+        .style("font-style", "italic")
+        .attr("class", "row");
+      eventItem.append("div")
+        .attr("class", "col-md-1")
+        .text("Id");  
+      eventItem.append("div")
+        .attr("class", "col-md-1")
+        .style("text-align", "left")
+        .text("Year");
+      eventItem.append("div")
+        .attr("class", "col-md-2")
+        .style("text-align", "left")
+        .text("Region");
+      eventItem.append("div")
+        .attr("class", "col-md-1")
+        .style("text-align", "left")
+        .text("Index");
+      eventItem.append("div")
+        .attr("class", "col-md-2")
+        .style("text-align", "left")
+        .text("Model");
+      eventItem.append("div")
+        .attr("class", "col-md-1")
+        .style("text-align", "left")
+        .text("Sigma");
+      eventItem.append("div")
+            .attr("class", "col-md-1")
+        .style("text-align", "left")
+        .text("Scenario");
+      eventItem.append("div")
+            .attr("class", "col-md-3")
+        .style("text-align", "center")
+        .text("Deviation");    
+
+    numRows = idDimension.group().all().length;
+    for (var i = 0; i < 100; i++) {
+        var eventItem = d3.select("#eventsList")
+                .append("div")
+                .attr("class", "eventItem row")
+                .attr("id", "test");
+            //.on('click', popupfromlist);
+        eventItem.append("div")
+            .attr("class", "col-md-1")
+            .attr("title", "#"+(i+1).toString())
+            .text("#"+(i+1).toString());    
+        eventItem.append("div")
+                .attr("class", "col-md-1")
+                .style("text-align", "left")
+                .attr("title", points[i].Year)
+                .text(points[i].Year);
+        eventItem.append("div")
+                .attr("class", "col-md-2")
+                .style("text-align", "left")
+                .attr("title", points[i].Region)
+                .text(points[i].Region);
+        eventItem.append("div")
+                .attr("class", "col-md-1")
+                .style("text-align", "left")
+                .style("color", "#2EA3DB")
+                .attr("title", points[i].Index)
+                .text(points[i].Index);
+        eventItem.append("div")
+                .attr("class", "col-md-2")
+                .insert("span", ":first-child")
+                .style("text-align", "left")
+                .style("color", "#F5B441")
+                .attr("title", points[i].Model)
+                .text(points[i].Model);
+        eventItem.append("div")
+                .attr("class", "col-md-1")
+                .style("text-align", "center")
+                .attr("title", points[i].Sigma)
+                .text(points[i].Sigma);
+        eventItem.append("div")
+                .attr("class", "col-md-1")
+                .style("text-align", "right")
+                .attr("title", points[i].Scenario)
+                .text(points[i].Scenario);
+        eventItem.append("div")
+                .attr("class", "col-md-3")
+                .style("text-align", "center")
+                .attr("title", points[i].Value)
+                .text(parseFloat(points[i].Value).toFixed(2));
+    }
+    
 }
 
 
