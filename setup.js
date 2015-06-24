@@ -4,12 +4,11 @@ var region_dict = [];
 var legend = [];
 var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
+var colourDomain = [];
+var saveRange;
+var colourBarExists = 0;
 
-$(document).ready(function() {
-
-    var colourDomain = [];
-    var saveRange;
-    var colourBarExists = 0;
+$(document).ready(function() {    
 
 	var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
