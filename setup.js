@@ -9,7 +9,8 @@ var saveRange;
 var colourBarExists = 0;
 
 var idDimension;
-var idGroup;
+var idGrouping;
+var numRows;
 
 $(document).ready(function() {    
 
@@ -26,9 +27,9 @@ $(document).ready(function() {
             points=csv;
             var filter = crossfilter(csv);
 
-                // dimension and group for dataset
-                idDimension = filter.dimension(function(p, i) { return i; });
-                //idGrouping = idDimension.group(function(id) { return id; });
+            // dimension and group for dataset
+            idDimension = filter.dimension(function(p, i) { return i; });
+            idGrouping = idDimension.group(function(id) { return id; });
 
 
             var yearDimension = filter.dimension(function(p) {
@@ -130,6 +131,7 @@ $(document).ready(function() {
                     })
                     .dimension(indexDimension)
                     .group(indexGroup)
+                    .on("preRedraw",update0)
                     .colors(["#1f77b4"])
                     .elasticX(true)
                     .gap(0);
@@ -213,6 +215,8 @@ $(document).ready(function() {
                     })
                     .order(d3.ascending);
 
+
+
                 dc.renderAll();
 
                 //Filter dc charts according to which radio button is checked by user:
@@ -255,6 +259,9 @@ $(document).ready(function() {
                 $("input[name='rcp'][value='rcp85']").prop('checked', true);
                 $("input[name='sigma'][value='1']").trigger("click");
                 $("input[name='rcp'][value='rcp85']").trigger("click");
+
+                
+
 
             }); //end geojson
         }); //end csv
@@ -315,6 +322,28 @@ function clearSeries() {
     d3.selectAll("div#chart-ts").selectAll("h2").remove();
 }
 
+   // Update map markers, list and number of selected
+                function update0() {
+                    console.log("idGrouping.all(): ", idGrouping.all())                 
+                    updateList();
+                    //d3.select("#active").text(filter.groupAll().value());
+                }    
+                
+                
+                function updateList() {
+                    console.log("updateList")
+                    //console.log("idGrouping.all(): ", idGrouping.all())                  
+                    var pointIds = idGrouping.all();
+                    for (var i = 0; i < 500; i++) {                        
+                        if (pointIds[i].value > 0) {                              
+                            $("#"+(i+1)).show();
+                        }
+                        else {                            
+                            $("#"+(i+1)).hide();
+                        }
+                    }
+                } 
+
 function initList() {    
     var eventItem = d3.select("#eventsListTitle")
         .append("div")
@@ -354,11 +383,11 @@ function initList() {
         .text("Deviation");    
 
     numRows = idDimension.group().all().length;
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 500; i++) {
         var eventItem = d3.select("#eventsList")
                 .append("div")
                 .attr("class", "eventItem row")
-                .attr("id", "test");
+                .attr("id", (i+1).toString());
             //.on('click', popupfromlist);
         eventItem.append("div")
             .attr("class", "col-md-1")
