@@ -8,14 +8,21 @@
      border-radius: 2px;
 }
 
-input[type="checkbox"] {
-    margin: 4px 4px 0;
+.dc-chart {
 }
-
-table thead { display:block; }
-table tbody { height:300px; overflow-y:scroll; display:block; }
-
 .dc-chart g.row text {
     fill: black;
+    font-size: 10px;
+}
+
+.filterName {
     font-size: 12px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.reset {
+    font-size: 10px;
+    font-weight: bold;
+    font-style: normal;
 }

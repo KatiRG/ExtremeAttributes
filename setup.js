@@ -23,14 +23,14 @@ $(document).ready(function() {
 
             var filter = crossfilter(csv);
 
-            var yearDimension = filter.dimension(function(p) {
-                    return Math.round(p.Year);
+            var yearDimension = filter.dimension(function(d) {
+                    return Math.round(d.Year);
                 }),
-                indexDimension = filter.dimension(function(p) {
-                    return p.Index;
+                indexDimension = filter.dimension(function(d) {
+                    return d.Index;
                 }),
-                regionDimension = filter.dimension(function(p, i) {
-                    return p.Region;
+                regionDimension = filter.dimension(function(d, i) {
+                    return d.Region;
                 }),
                 datasetDimension = filter.dimension(function(d) {
                     return d.Model;
@@ -41,7 +41,9 @@ $(document).ready(function() {
                 scenario = filter.dimension(function(d) {
                     return d.Scenario;
                 }),
-                filter_list = [];
+                timeDimension = filter.dimension(function(d) {
+                    return d.Year;
+                });
 
             var yearGroup = yearDimension.group(),
                 indexGroup = indexDimension.group(),
@@ -54,14 +56,14 @@ $(document).ready(function() {
             d3.selectAll("#total").text(filter.size()); // total number of events
 
             //MAP
-            var width = 480,
-                height = 480;
+            var width = 300,
+                height = 300;
 
             //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
             var projection = d3.geo.conicConformal() // Lambert-93
-                .center([2.454071, 47.279229]) // On centre la carte sur la France
-                .scale(1900)
-                .translate([width / 3.5, height / 3.5]);          
+                .center([6, 49]) // On centre la carte sur la France
+                .scale(1400)
+                .translate([180, 100]);          
 
             //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
             d3.json("geojson/myFRA_admin12.json", function(statesJson) {
@@ -103,7 +105,7 @@ $(document).ready(function() {
                 });
                 //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
                 //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
-
+                // =================
                 //define click action
                 franceChart.renderlet(function(chart) {
                     chart.selectAll("g.layer0 g.state").on("click", function(d) {  
@@ -111,101 +113,66 @@ $(document).ready(function() {
                     });
                 })    
 
-                indexChart.width(200) //svg width
-                    .height(200) //svg height
-                    .margins({
-                        top: 10,
-                        right: 10,
-                        bottom: 30,
-                        left: 10
-                    })
+                // =================
+                indexChart
+		    .width(300).height(200)
+		    .margins({top: 10, right: 30, bottom: 30, left: 10})
                     .dimension(indexDimension)
                     .group(indexGroup)
                     .colors(["#1f77b4"])
                     .elasticX(true)
-                    .gap(0);
+                    .gap(0); 
+                indexChart
+                    .xAxis().ticks(4).tickFormat(d3.format("d"));
 
-                xAxis_indexChart = indexChart.xAxis().ticks(3);
-
-                yearChart.width(200)
-                    .height(200)
-                    .margins({
-                        top: 10,
-                        right: 30,
-                        bottom: 30,
-                        left: 40
-                    })
-                    .centerBar(true) //ensure that the bar for the bar graph is centred on the ticks on the x axis
-                    .elasticY(true)
+                // =================
+                yearChart
+		    .width(400).height(200)
+		    .margins({top: 10, right: 40, bottom: 30, left: 50})
                     .dimension(yearDimension)
                     .group(yearGroup)
+                    .elasticY(true)
+		    .gap(0)
                     .renderHorizontalGridLines(true)
-                    .xUnits(function() {
-                        return 20;
-                    })
-                    .x(d3.scale.linear().domain([minYear, maxYear]))
-                    .xAxis().ticks(3).tickFormat(d3.format("d"));
+                    .x(d3.scale.linear().domain([1970, 2100]));
+                yearChart
+                    .xAxis().ticks(5).tickFormat(d3.format("d"));
+                yearChart
+                    .yAxis().ticks(5).tickFormat(d3.format("d"));
 
-                var yAxis_yearChart = yearChart.yAxis().ticks(6);
-
+                // =================
                 datasetChart
-                    .width(200) //svg width
-                    .height(200) //svg height
-                    .margins({
-                        top: 10,
-                        right: 10,
-                        bottom: 30,
-                        left: 5
-                    })
+		    .width(300).height(200)
+		    .margins({top: 10, right: 30, bottom: 30, left: 10})
                     .dimension(datasetDimension)
                     .group(datasetGroup)
                     .colors(["#1f77b4"])
                     .elasticX(true)
                     .gap(0);
+                datasetChart
+                    .xAxis().ticks(4).tickFormat(d3.format("d"));
 
-                xAxis_datasetChart = datasetChart.xAxis().ticks(3);
-
-                //dc dataTable
-                dataTable = dc.dataTable("#dc-table-graph");
-                // Create datatable dimension
-                var timeDimension = filter.dimension(function(d) {
-                    return d.Year;
-                });
-
-                dataTable.width(1060).height(800)
+                // =================
+                dataTable = dc.dataTable("#dc-data-table");
+                dataTable
                     .dimension(timeDimension)
-                    .group(function(d) {
-                        return ""
-                    })
+                    .group(function(d) { return ""})
                     .size(6)
-                    //.size(csv.length) //display all data
                     .columns([
-                        function(d) {
-                            return d.Year;
-                        },
-                        function(d) {
-                            return d.Region;
-                        },
-                        function(d) {
-                            return d.Index;
-                        },
-                        function(d) {
-                            return d.Model;
-                        },
-                        function(d) {
-                            return d.Sigma;
-                        },
-                        function(d) {
-                            return d.Scenario;
-                        }
+			function(d) { return d.Year; },
+			function(d) { return d.Region; },
+			function(d) { return d.Index; },
+			function(d) { return d.Model; }
                     ])
                     .sortBy(function(d) {
                         return d.Year;
                     })
                     .order(d3.ascending);
 
+                // =================
                 dc.renderAll();
 
+                // =================
                 //Filter dc charts according to which radio button is checked by user:
                 $("input:radio[name=sigma]").click(function() {
                     var radioValue = $("input:radio[name=sigma]:checked").val();
@@ -269,7 +236,7 @@ function calculateDomain(saveRange, colourRange_array) {
 function plotColourbar(colourDomain_array, colourRange_array) {    
     if (colourBarExists == 0) { //only create svg once
         var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
-                  .attr("transform", "translate(25,120)")
+                  .attr("transform", "translate(25,120),scale(0.8)")
                   .classed("colorbar", true);           
     } else var g = d3.select("div#colourbar");
 
