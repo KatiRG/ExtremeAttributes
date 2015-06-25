@@ -26,3 +26,13 @@
     font-weight: bold;
     font-style: normal;
 }
+
+.table {
+    font-size: 10px;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.table > tbody > tr > td {
+    line-height: 6px;
+}

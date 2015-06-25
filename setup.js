@@ -157,7 +157,7 @@ $(document).ready(function() {
                 dataTable
                     .dimension(timeDimension)
                     .group(function(d) { return ""})
-                    .size(6)
+                    .size(10)
                     .columns([
 			function(d) { return d.Year; },
 			function(d) { return d.Region; },
