@@ -18,7 +18,8 @@
 
     <!-- d3 and dc -->
     <script src="lib/crossfilter.js"></script>
-    <script src="lib/dc.min.js"></script>
+    <!--<script src="lib/dc.min.js"></script>-->
+    <script src="/homel/cnangini/dc.js/dc.min.js"></script>
     <link rel="stylesheet" href="lib/dc.css"/>
     <!--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css"/>
@@ -110,9 +111,9 @@
                 </div>
                 <div id="chart-dataset" class="dc-chart col-md-3">
                     <div class="filterName">Model
-                            <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                            <span class="reset" style="display: none;"></span></span>
-		    </div>
+                        <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+		            </div>
                 </div>
             </div> <!--end ROW 1-->
 
@@ -147,7 +148,18 @@
                 <div id="chart-ts" class="col-md-12">
                     <div id="timeChart"></div>                                    
                 </div>
-            </div> <!--end ROW 3-->       
+            </div> <!--end ROW 3-->
+
+            <!--ROW 4 SUNBURST -->
+            <div class="row">
+                <div id="index-sunburst" class="col-md-6">
+                    <div class="filterName">Sunburst
+                        <!--><a class="reset" href="javascript:indexSunburst.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span><-->
+                    </div>
+                    
+                </div>
+            </div> <!--end ROW 4-->       
 
         </div> <!-- /.container -->
 
