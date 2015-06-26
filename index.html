@@ -19,6 +19,10 @@
     <!-- d3 and dc -->
     <script src="lib/crossfilter.js"></script>
     <script src="lib/dc.min.js"></script>
+    <!-->https://github.com/dc-js/dc.js/blob/master/src/<-->
+    <script src="lib/src/base-mixin.js"></script>
+    <script src="lib/src/utils.js"></script>
+    <script src="lib/src/stack-mixin.js"></script>
     <link rel="stylesheet" href="lib/dc.css"/>
     <!--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css"/>
@@ -85,37 +89,40 @@
 
             <!--ROW 1-->
             <div class="row">
-                 <div id="tags" class="col-md-2">
+                <div id="tags" class="col-md-2">
                     <div class="filterName">Threshold</div>
                     <input type="radio" name="sigma" value="1">1 Sigma<br>
                     <input type="radio" name="sigma" value="2">2 Sigma
-		 <br>
-		 <br>
-		 <br>
+		            <br><br><br>
+
                     <div class="filterName">Scenario</div>
                     <input type="radio" name="rcp" value="rcp45">RCP 4.5<br>
                     <input type="radio" name="rcp" value="rcp85">RCP 8.5
                 </div>
+
                 <div id="chart-indexType" class="dc-chart col-md-3">
                     <div class="filterName">Index
-                            <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                            <span class="reset" style="display: none;"></span>
-		    </div>
+                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span>
+		            </div>
                 </div>
+
                 <div id="chart-eventYear" class="dc-chart col-md-4">
                     <div class="filterName">Year
-                            <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                            <span class="reset" style="display: none;"></span></span>
-		    </div>
+                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+		            </div>
                 </div>
+
                 <div id="chart-dataset" class="dc-chart col-md-3">
                     <div class="filterName">Model
-                            <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                            <span class="reset" style="display: none;"></span></span>
-		    </div>
+                        <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+		            </div>
                 </div>
             </div> <!--end ROW 1-->
 
+            <!--ROW 2-->
             <div class="row">
 
                 <div id="colourbar" class="dc-chart col-md-1"></div>
@@ -123,23 +130,22 @@
                     <div class="filterName">Map
                     	<a class="reset" href="javascript:franceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                     	<span class="reset" style="display: none;"></span></span>
-		    </div>
+		            </div>
                 </div>
                     
                 <div id="dc-table-graph" class="col-md-8">
                     <div class="filterName">Summary
-                    	   <span id="active">-</span> of <span id="total">-</span> reccord selected (only 10 displayed).
-		    </div>
-		    <table class="table table-striped table-hover" id="dc-data-table">
-			<thead>
-				<th class="dc-table-head">Year</th>
-				<th class="dc-table-head">Region</th>
-				<th class="dc-table-head">Index</th>
-				<th class="dc-table-head">Model</th>
-			</thead>
-    		    </table>
-                </div>  
-                
+                    	<span id="active">-</span> of <span id="total">-</span> reccord selected (only 10 displayed).
+		            </div>
+        		    <table class="table table-striped table-hover" id="dc-data-table">
+            			<thead>
+            				<th class="dc-table-head">Year</th>
+            				<th class="dc-table-head">Region</th>
+            				<th class="dc-table-head">Index</th>
+            				<th class="dc-table-head">Model</th>
+            			</thead>
+            		</table>
+                </div>                  
             </div> <!--end ROW 2-->
 
             <!--ROW 3 TIME SERIES -->
@@ -147,7 +153,17 @@
                 <div id="chart-ts" class="col-md-12">
                     <div id="timeChart"></div>                                    
                 </div>
-            </div> <!--end ROW 3-->       
+            </div> <!--end ROW 3-->
+
+            <!--ROW 4 TEST TREEMAP -->
+            <div class="row">
+                <div id="treemap-index" class="dc-chart col-md-6">
+                    <div class="filterName">Index with Categories
+                        <!--<a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a><-->
+                        <!--><span class="reset" style="display: none;"></span><-->
+                    </div>
+                </div>                
+            </div> <!--end ROW 4-->    
 
         </div> <!-- /.container -->
 
