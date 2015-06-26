@@ -11,6 +11,8 @@ var colourBarExists = 0;
 var idDimension;
 var idGrouping;
 var numRows;
+var savePoints = [];
+var countUpdate0 = 0;
 
 $(document).ready(function() {    
 
@@ -132,9 +134,48 @@ $(document).ready(function() {
                     .dimension(indexDimension)
                     .group(indexGroup)
                     .on("preRedraw",update0)
+                    //.on("preRender", update0)
+                    //.on("filtered", update0)
                     .colors(["#1f77b4"])
                     .elasticX(true)
                     .gap(0);
+
+                    // Update map markers, list and number of selected
+                    function update0() {
+                        countUpdate0++;
+                        var pointIds = idGrouping.all();                        
+                        console.log("length savePoints in update0: ", savePoints.length)
+
+                         
+                        
+
+                        if (countUpdate0 == 4) { //update table only after xfilter has checked all four charts
+                            findEventRows();
+                            defineEventListRows(savePoints);
+                        } else if (document.getElementsByClassName("reset")[0].style.display == "" 
+                            || document.getElementsByClassName("reset")[2].style.display == ""
+                            || document.getElementsByClassName("reset")[4].style.display == ""
+                             || document.getElementsByClassName("reset")[6].style.display == "") {
+                            console.log("chart has been clicked")
+                            findEventRows();
+                            defineEventListRows(savePoints);
+                            console.log("length savePoints in update0 if statement: ", savePoints.length)
+                        }
+
+                        // count = 0;
+                        // for (var i = 0; i < numRows; i++) {
+                        //     if (pointIds[i].value > 0) {
+                        // //         //$("#"+(i+1)).show();
+                        //         if (count < rowCutOff) $("#"+(count+1)).show();                        
+                        //         count++;
+                        //     } //else $("#"+(i+1)).hide();
+                        // }
+                        // console.log("count in update0: ", count)                        
+                        
+                    }    
+                                                    
+                
+
 
                 xAxis_indexChart = indexChart.xAxis().ticks(3);
 
@@ -215,8 +256,6 @@ $(document).ready(function() {
                     })
                     .order(d3.ascending);
 
-
-
                 dc.renderAll();
 
                 //Filter dc charts according to which radio button is checked by user:
@@ -260,7 +299,7 @@ $(document).ready(function() {
                 $("input[name='sigma'][value='1']").trigger("click");
                 $("input[name='rcp'][value='rcp85']").trigger("click");
 
-                
+
 
 
             }); //end geojson
@@ -322,29 +361,13 @@ function clearSeries() {
     d3.selectAll("div#chart-ts").selectAll("h2").remove();
 }
 
-   // Update map markers, list and number of selected
-                function update0() {
-                    console.log("idGrouping.all(): ", idGrouping.all())                 
-                    updateList();
-                    //d3.select("#active").text(filter.groupAll().value());
-                }    
-                
-                
-                function updateList() {
-                    console.log("updateList")
-                    //console.log("idGrouping.all(): ", idGrouping.all())                  
-                    var pointIds = idGrouping.all();
-                    for (var i = 0; i < 500; i++) {                        
-                        if (pointIds[i].value > 0) {                              
-                            $("#"+(i+1)).show();
-                        }
-                        else {                            
-                            $("#"+(i+1)).hide();
-                        }
-                    }
-                } 
+function initList() {  
+    defineEventListTitle();
+    findEventRows();
+    defineEventListRows(savePoints);
+}
 
-function initList() {    
+function defineEventListTitle() {
     var eventItem = d3.select("#eventsListTitle")
         .append("div")
         .style("background", "#ddd")
@@ -380,10 +403,44 @@ function initList() {
       eventItem.append("div")
             .attr("class", "col-md-3")
         .style("text-align", "center")
-        .text("Deviation");    
+        .text("Deviation");
+}
 
-    numRows = idDimension.group().all().length;
-    for (var i = 0; i < 500; i++) {
+function findEventRows() {
+    console.log("findEventRows")
+    console.log("length savePoints in findEventRows: ", savePoints.length)
+
+    //clear table after dc chart click    
+        for (var i = 0; i < 500; i++) {
+            console.log($("#"+(i+1)))            
+            $("#"+(i+1)).hide();
+        }
+    
+
+    numRows = idDimension.group().all().length;  
+    var pointIds = idGrouping.all(); count = 0;
+    savePoints = [];
+    for (var i = 0; i < numRows; i++) {
+        if (pointIds[i].value > 0) {
+            savePoints[count] = points[i];
+            count++;
+        }
+    }
+    console.log("length savePoints in findEventRows: ", savePoints.length)    
+
+    return savePoints;
+}
+
+function defineEventListRows(points) {
+        
+    console.log("length savePoints in defineEventListRows: ", savePoints.length)
+    if (savePoints.length < 500) rowCutOff = savePoints.length;
+    else rowCutOff = 500;
+
+    console.log("cutoff: ", rowCutOff)
+
+    
+    for (var i = 0; i < rowCutOff; i++) {
         var eventItem = d3.select("#eventsList")
                 .append("div")
                 .attr("class", "eventItem row")
@@ -431,7 +488,6 @@ function initList() {
                 .attr("title", points[i].Value)
                 .text(parseFloat(points[i].Value).toFixed(2));
     }
-    
 }
 
 
