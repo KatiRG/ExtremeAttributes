@@ -21,12 +21,13 @@ $(document).ready(function() {
 
         d3.csv("data/dummy_sunburst.csv", function(csv) {
           
-
-
             var filter = crossfilter(csv);
 
-            var runDimension  = filter.dimension(function(d) {return [d.Expt, d.Run];})
-                speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
+            // For morley.csv:
+            // var runDimension  = filter.dimension(function(d) {return [d.Expt, d.Run];})
+            //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
+            var runDimension  = filter.dimension(function(d) {return [d.Category, d.Run];})
+                speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});    
 
             var yearDimension = filter.dimension(function(d) {
                     return Math.round(d.Year);
