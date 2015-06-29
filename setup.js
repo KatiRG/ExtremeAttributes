@@ -19,15 +19,17 @@ $(document).ready(function() {
                 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
-        d3.csv("data/dummy_sunburst.csv", function(csv) {
+        d3.csv("data/dummy_sunburst.csv", function(error, csv) {
           
             var filter = crossfilter(csv);
 
             // For morley.csv:
             // var runDimension  = filter.dimension(function(d) {return [d.Expt, d.Run];})
+            // //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
+            // var runDimension  = filter.dimension(function(d) {return [d.Category, d.Run];})
             //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
-            var runDimension  = filter.dimension(function(d) {return [d.Category, d.Run];})
-                speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});    
+
+            
 
             var yearDimension = filter.dimension(function(d) {
                     return Math.round(d.Year);
@@ -58,6 +60,9 @@ $(document).ready(function() {
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
+
+            var runDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
+                speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Value;});
 
             d3.selectAll("#total").text(filter.size()); // total number of events
 
@@ -136,8 +141,8 @@ $(document).ready(function() {
                     .width(300).height(200)
                     .innerRadius(100)                  
                     .dimension(runDimension)
-                    .group(speedSumGroup)
-                    .legend(dc.legend());
+                    .group(speedSumGroup);
+                    //.legend(dc.legend());
 
                 // =================
                 yearChart
@@ -176,6 +181,7 @@ $(document).ready(function() {
                     .columns([
             			function(d) { return d.Year; },
             			function(d) { return d.Region; },
+                        function(d) { return d.Category; },
             			function(d) { return d.Index; },
             			function(d) { return d.Model; }
                     ])
