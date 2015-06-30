@@ -12,7 +12,7 @@ $(document).ready(function() {
 
 	var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
-        indexChart = dc.rowChart("#chart-indexType");
+        //indexChart = dc.rowChart("#chart-indexType");
         yearChart = dc.barChart("#chart-eventYear");
         datasetChart = dc.rowChart("#chart-dataset");
         indexSunburst = dc.sunburstChart("#index-sunburst");
@@ -22,13 +22,7 @@ $(document).ready(function() {
         //d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
         d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
           
-            var filter = crossfilter(csv);
-
-            // For morley.csv:
-            // var runDimension  = filter.dimension(function(d) {return [d.Expt, d.Run];})
-            // //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
-            // var runDimension  = filter.dimension(function(d) {return [d.Category, d.Run];})
-            //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
+            var filter = crossfilter(csv);        
             
             var runDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
                 speedSumGroup = runDimension.group().reduceCount(function(d) {return d.Value;});
@@ -37,9 +31,7 @@ $(document).ready(function() {
             var yearDimension = filter.dimension(function(d) {
                     return Math.round(d.Year);
                 }),
-                indexDimension = filter.dimension(function(d) {
-                    return d.Index;
-                }),
+                //indexDimension = filter.dimension(function(d) { return d.Index; }),
                 regionDimension = filter.dimension(function(d, i) {
                     return d.Region;
                 }),
@@ -57,7 +49,7 @@ $(document).ready(function() {
                 });
 
             var yearGroup = yearDimension.group(),
-                indexGroup = indexDimension.group(),
+                //indexGroup = indexDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
@@ -127,16 +119,16 @@ $(document).ready(function() {
                 })    
 
                 // =================
-                indexChart
-        		    .width(300).height(200)
-        		    .margins({top: 10, right: 30, bottom: 30, left: 10})
-                    .dimension(indexDimension)
-                    .group(indexGroup)
-                    .colors(["#1f77b4"])
-                    .elasticX(true)
-                    .gap(0); 
-                indexChart
-                    .xAxis().ticks(4).tickFormat(d3.format("d"));
+              //   indexChart
+        		    // .width(300).height(200)
+        		    // .margins({top: 10, right: 30, bottom: 30, left: 10})
+              //       .dimension(indexDimension)
+              //       .group(indexGroup)
+              //       .colors(["#1f77b4"])
+              //       .elasticX(true)
+              //       .gap(0); 
+              //   indexChart
+              //       .xAxis().ticks(4).tickFormat(d3.format("d"));
 
                 // =================
                 indexSunburst
