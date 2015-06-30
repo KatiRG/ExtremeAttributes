@@ -3,36 +3,36 @@ var threshold_clicked;
 var region_dict = [];
 var legend = [];
 var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
+var highchart;
+var colourDomain = [];
+var saveRange;
+var colourBarExists = 0;
 
-$(document).ready(function() {
-        var chart;
+$(document).ready(function() {    
 
+	var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
-        indexChart = dc.rowChart("#chart-indexType");
         yearChart = dc.barChart("#chart-eventYear");
         datasetChart = dc.rowChart("#chart-dataset");
+        indexSunburst = dc.sunburstChart("#index-sunburst");
+                
+        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
-        var cdomain_preRender;
-        var cdomain_preRedraw;
-        var rangeDiff;
-        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-        var colourDomain = [];
+        //d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
+        d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
+          
+            var filter = crossfilter(csv);        
+            
+            var runDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
+                speedSumGroup = runDimension.group().reduceCount(function(d) {return d.Value;});
+            
 
-        //d3.csv("data/anomalous_index_sigma_scenario.csv", function (csv) {
-        //d3.csv("data/data_01.csv", function (csv) {
-        d3.csv("data/data_obs.csv", function(csv) {
-
-
-            var filter = crossfilter(csv);
-
-            var yearDimension = filter.dimension(function(p) {
-                    return Math.round(p.Year);
+            var yearDimension = filter.dimension(function(d) {
+                    return Math.round(d.Year);
                 }),
-                indexDimension = filter.dimension(function(p) {
-                    return p.Index;
-                }),
-                regionDimension = filter.dimension(function(p, i) {
-                    return p.Region;
+                
+                regionDimension = filter.dimension(function(d, i) {
+                    return d.Region;
                 }),
                 datasetDimension = filter.dimension(function(d) {
                     return d.Model;
@@ -43,30 +43,54 @@ $(document).ready(function() {
                 scenario = filter.dimension(function(d) {
                     return d.Scenario;
                 }),
-                filter_list = [];
+                timeDimension = filter.dimension(function(d) {
+                    return d.Year;
+                });
 
-            var yearGroup = yearDimension.group(),
-                indexGroup = indexDimension.group(),
+            //compute averages, not sums    
+            //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),
+            var yearGroup = yearDimension.group(),                
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
+            // //fns for avg                
+            // function reduceAdd(p, v) {
+            //     p.total += v.Value;
+            //     ++p.count;
+            //     p.average = d3.round((p.total / p.count), 2);
+            //     return p;
+            // }
+
+            // function reduceRemove(p, v) {
+            //     p.total -= v.Value;
+            //     --p.count;
+            //     p.average = d3.round((p.total / p.count), 2);
+            //     return p;
+            // }
+
+            // function reduceInitial() {
+            //     return {
+            //         total: 0,
+            //         count: 0,
+            //         average: 0,
+            //     };
+            // }
+            
+
             d3.selectAll("#total").text(filter.size()); // total number of events
 
             //MAP
-            var width = 380,
-                height = 380;
+            var width = 300,
+                height = 300;
 
             //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
             var projection = d3.geo.conicConformal() // Lambert-93
-                .center([2.454071, 47.279229]) // On centre la carte sur la France
-                .scale(1500)
-                .translate([width / 2.7, height / 4]);
-            //.translate([width / 2, height / 2]);
-            //g = svg.append("g").attr("transform", "translate(10,10)").classed("colorbar", true),
-
+                .center([6, 49]) // On centre la carte sur la France
+                .scale(1400)
+                .translate([180, 100]);          
 
             //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
             d3.json("geojson/myFRA_admin12.json", function(statesJson) {
@@ -79,168 +103,105 @@ $(document).ready(function() {
                     });
                     legend[idx] = d.properties.name;
                 });
-                //console.log("region_dict: ", region_dict)
-                //console.log("legend: ", legend)
-
-                franceChart.width(300)
-                    .height(250)
+  
+                franceChart.width(width)
+                    .height(height)
                     .dimension(regionDimension)
-                    .group(regionGroup)
-                    //.colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
-                    //.colorDomain([0, 200])                    
-                    //.colorCalculator(function (d) { return d ? franceChart.colors()(d) : '#ccc'; })
+                    .group(regionGroup)              
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
-                    .overlayGeoJson(statesJson.features, "state", function(d) {
-                        ////console.log(d.properties.name)
+                    .overlayGeoJson(statesJson.features, "state", function(d) {                        
                         return d.properties.name;
                     })
                     .title(function(d) {
                         d3.select("#active").text(filter.groupAll().value()); //total number selected
                         return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                     });
-                franceChart.on("preRender", function(chart) { //dynamically calculate domain
-                    //console.log("xxx: ", chart.group().all())
-                    //console.log("yyyy: ", chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain())
-                    cdomain_preRender = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    //console.log("divide by 4: ", cdomain_preRender[0]/4)
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    rangeDiff = cdomain_preRender[1] - cdomain_preRender[0];
-
-                    calculateDomain(rangeDiff, colourRange); //returns colourDomain
+                franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));       
+                });
+                franceChart.on("preRedraw", function(chart) {//loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));                        
+                });
+                franceChart.on("postRedraw", function(chart) {//use to get range for number of events                    
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));                                    
+                    //calculate colourbar params and plot colourbar
+                    saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();                                    
+                    calculateDomain(saveRange, colourRange); //returns colourDomain                    
                     plotColourbar(colourDomain, colourRange);
                 });
-                franceChart.on("preRedraw", function(chart) {
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    cdomain_preRedraw = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    rangeDiff = cdomain_preRedraw[1] - cdomain_preRedraw[0];
-                });
                 //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
-                //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ
-
-                //define double-click
-                franceChart.renderlet(function(chart) {
-                    chart.selectAll("g.layer0 g.state").on("click", function(d) { //dblclick
-                        //if (d3.event.shiftKey) {
-                        //console.log("click!", d.properties.name);
-                        showTimeSeries(d.properties.name);
-                        //}
+                //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
+                // =================
+                //define click action
+                franceChart.on("renderlet", function(chart) {
+                    chart.selectAll("g.layer0 g.state").on("click", function(d) {  
+                        showTimeSeries(d.properties.name);                        
                     });
-                })
+                })   
+        
 
-                //define colourbar steps:
-                function calculateDomain(rangeDiff, colourRange_array) {
-                    //console.log("cdomain_preRender[0]: ", cdomain_preRender[0])
-                    //console.log("cdomain_preRender[0] divide by 4: ", cdomain_preRender[0]/4)
-                    //console.log("rangeDiff: ", rangeDiff)
-                    //console.log("rangeDiff/4: ", rangeDiff/4)
-                    rangeDiff_scaled = rangeDiff / 4;
-                    step = rangeDiff_scaled / (colourRange_array.length - 1);
-                    //console.log("step: ", step)
-                    for (var j = 0; j < colourRange_array.length; j++) {
-                        //colourDomain[j] = cdomain_preRender[0] + j*step;
-                        colourDomain[j] = cdomain_preRender[0] / 4 + j * step;
-                    }
-                    //console.log("colourDomain in calculateDomain: ", colourDomain)
-                    return colourDomain;
-                }
+                // =================
+                indexSunburst
+                    .width(300).height(200)
+                    .innerRadius(0)                  
+                    .dimension(runDimension)
+                    .group(speedSumGroup);
+                    //.legend(dc.legend());
 
-                indexChart.width(200) //svg width
-                    .height(200) //svg height
-                    .margins({
-                        top: 10,
-                        right: 10,
-                        bottom: 30,
-                        left: 10
-                    })
-                    .dimension(indexDimension)
-                    .group(indexGroup)
-                    .colors(["#1f77b4"])
-                    .elasticX(true)
-                    .gap(0);
-
-                xAxis_indexChart = indexChart.xAxis().ticks(3);
-
-                yearChart.width(250)
-                    .height(200)
-                    .margins({
-                        top: 10,
-                        right: 30,
-                        bottom: 30,
-                        left: 40
-                    })
-                    .centerBar(true) //ensure that the bar for the bar graph is centred on the ticks on the x axis
-                    .elasticY(true)
+                // =================
+                yearChart
+        		    .width(400).height(200)
+        		    .margins({top: 10, right: 40, bottom: 30, left: 50})
                     .dimension(yearDimension)
                     .group(yearGroup)
+                    .elasticY(true)
+		            .gap(0)
                     .renderHorizontalGridLines(true)
-                    .xUnits(function() {
-                        return 20;
-                    })
-                    .gap(50)
-                    .x(d3.scale.linear().domain([minYear, maxYear]))
-                    .xAxis().ticks(3).tickFormat(d3.format("d"));
+                    .x(d3.scale.linear().domain([1970, 2100]));
+                
+                yearChart
+                    .xAxis().ticks(5).tickFormat(d3.format("d"));
+                yearChart
+                    .yAxis().ticks(5).tickFormat(d3.format("d"));
 
-                var yAxis_yearChart = yearChart.yAxis().ticks(6);
-
+                // =================
                 datasetChart
-                    .width(200) //svg width
-                    .height(200) //svg height
-                    .margins({
-                        top: 10,
-                        right: 10,
-                        bottom: 30,
-                        left: 5
-                    })
+        		    .width(300).height(200)
+        		    .margins({top: 10, right: 30, bottom: 30, left: 10})
                     .dimension(datasetDimension)
                     .group(datasetGroup)
                     .colors(["#1f77b4"])
                     .elasticX(true)
                     .gap(0);
+                datasetChart
+                    .xAxis().ticks(4).tickFormat(d3.format("d"));
 
-                xAxis_datasetChart = datasetChart.xAxis().ticks(3);
-
-                //dc dataTable
-                dataTable = dc.dataTable("#dc-table-graph");
-                // Create datatable dimension
-                var timeDimension = filter.dimension(function(d) {
-                    return d.Year;
-                });
-
-                dataTable.width(1060).height(800)
+                // =================
+                dataTable = dc.dataTable("#dc-data-table");
+                dataTable
                     .dimension(timeDimension)
-                    .group(function(d) {
-                        return ""
-                    })
-                    .size(11)
-                    //.size(csv.length) //display all data
+                    .group(function(d) { return ""})
+                    .size(10)
                     .columns([
-                        function(d) {
-                            return d.Year;
-                        },
-                        function(d) {
-                            return d.Region;
-                        },
-                        function(d) {
-                            return d.Index;
-                        },
-                        function(d) {
-                            return d.Model;
-                        },
-                        function(d) {
-                            return d.Sigma;
-                        },
-                        function(d) {
-                            return d.Scenario;
-                        }
+            			function(d) { return d.Year; },
+            			function(d) { return d.Region; },
+                        function(d) { return d.Category; },
+            			function(d) { return d.Index; },
+            			function(d) { return d.Model; }
                     ])
                     .sortBy(function(d) {
                         return d.Year;
                     })
                     .order(d3.ascending);
 
+                // =================
+                
+
+
                 dc.renderAll();
 
+                // =================
                 //Filter dc charts according to which radio button is checked by user:
                 $("input:radio[name=sigma]").click(function() {
                     var radioValue = $("input:radio[name=sigma]:checked").val();
@@ -270,8 +231,7 @@ $(document).ready(function() {
 
                 $("input[name='rcp']").click(function() {
                     var radioValue = $("input[name='rcp']:checked").val();
-                    scenario_clicked = $("input:radio[name=rcp]:checked").val();
-                    //console.log("scenario_clicked: ", scenario_clicked)
+                    scenario_clicked = $("input:radio[name=rcp]:checked").val();                    
                     scenario.filterAll();
                     scenario.filter(radioValue);
                     dc.redrawAll();
@@ -282,7 +242,10 @@ $(document).ready(function() {
                 $("input[name='sigma'][value='1']").trigger("click");
                 $("input[name='rcp'][value='rcp85']").trigger("click");
 
+                
+
             }); //end geojson
+         
         }); //end csv
     }) //end document.ready
 
@@ -290,21 +253,32 @@ $(document).ready(function() {
 //  COLOUR-RELATED CODE FOR CHARTS
 //--------------------------------------------------------------------
 
-//colourbar (http://bl.ocks.org/chrisbrich/4209888)
-//attach to div defined in index.html
-function plotColourbar(colourDomain_array, colourRange_array) {
-    var svg = d3.select("div#colourbar").append("svg") //HUOM! must append svg!!
-        .attr("width", 1000)
-        .attr("height", 1000),
-        g = svg.append("g").attr("transform", "translate(10,10)").classed("colorbar", true),
-        cb = colorBar().color(d3.scale.linear()
-            .domain(colourDomain_array)
-            .range(colourRange_array))
-        .size(150).lineWidth(30).precision(1);
-    g.call(cb);
+//divide colourbar range into 10 equal steps (since 10 colours have been defined):
+function calculateDomain(saveRange, colourRange_array) {
+    rangeDiff = saveRange[1] - saveRange[0];
+    step = rangeDiff / (colourRange_array.length - 1);                    
+    for (var j = 0; j < colourRange_array.length; j++) {                        
+        colourDomain[j] = saveRange[0] + j * step;                        
+    }                                
+    return colourDomain;
 }
 
+//colourbar (http://bl.ocks.org/chrisbrich/4209888)
+function plotColourbar(colourDomain_array, colourRange_array) {    
+    if (colourBarExists == 0) { //only create svg once
+        var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
+                  .attr("transform", "translate(25,120),scale(0.8)")
+                  .classed("colorbar", true);           
+    } else var g = d3.select("div#colourbar");
 
+    var cb = colorBar().color(d3.scale.linear()
+            .domain(colourDomain_array)
+            .range(colourRange_array))
+            .size(150).lineWidth(25).precision(1);
+    
+    g.call(cb);
+    colourBarExists = 1;
+}
 
 //--------------------------------------------------------------------
 //  TIME SERIES PLOTTIING
@@ -333,10 +307,35 @@ function clearSeries() {
 
 function makeRequest(regionName) {
     // should be dynamic
-    var models = ["ICHEC-EC-EARTH_HIRHAM5", "CNRM-CERFACS-CNRM-CM5_RCA4", "CNRM-CM5_CNRM-ALADIN53",
-        "ICHEC-EC-EARTH_RCA4", "MetEir-ECEARTH_RACMO22E", "MOHC-HadGEM2-ES_RCA4", "MPI-ESM-LR_CCLM4-8-17"
+    var models = [
+		"CNRM-CERFACS-CNRM-CM5_RCA4",
+        	"CNRM-CM5_CNRM-ALADIN53",
+        	"ICHEC-EC-EARTH_HIRHAM5",
+        	"ICHEC-EC-EARTH_RCA4",
+        	"IPSL-IPSL-CM5A-MR_WRF331F",
+        	"MetEir-ECEARTH_RACMO22E",
+        	"MOHC-HadGEM2-ES_RCA4",
+        	"MPI-ESM-LR_CCLM4-8-17",
+        	"MPI-ESM-LR_REMO019"
     ];
-    var colors = ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d"];
+
+    // http://colorbrewer2.org/ 
+    // qualitative, 12 levels
+    var colors = [
+		"#a6cee3",
+		"#1f78b4",
+		"#b2df8a",
+		"#33a02c",
+		"#fb9a99",
+		"#e31a1c",
+		"#fdbf6f",
+		"#ff7f00",
+		"#cab2d6",
+		"#6a3d9a",
+		"#ffff99",
+		"#b15928"
+    ];
+
     regionNum = region_dict[legend.indexOf(regionName)].value;
 
     //console.log("model[i]: ", models[0])
@@ -349,8 +348,22 @@ function makeRequest(regionName) {
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    addData(request, "#000000", 'Solid', "Obs Safran", true, true);
+    addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
     // calcul of the mean for 1976-2005 for obs
+
+
+    highchart.addSeries({
+            type: 'flags',
+            color: '#333333',
+	    fillColor: 'rgba(255,255,255,0.8)',
+            shape: 'squarepin',
+            data: [
+                { x: Date.UTC(2010, 7, 1), text: 'Highcharts Cloud Beta', title: 'a remarkable event' }
+            ],
+	    onSeries: 'Obs Safran', 
+	    showInLegend: false 
+	});
+
 }
 
 function addData(request, color, dash, label, visible, addSigma) {
@@ -376,11 +389,12 @@ function addData(request, color, dash, label, visible, addSigma) {
                     serie.data.push([Date.parse(items[0]), parseFloat(items[3])]);
             });
             serie.name = label;
+            serie.id = label;
             serie.color = color;
             serie.dashStyle = dash;
             serie.visible = visible;
 
-            chart.addSeries(serie);
+            highchart.addSeries(serie);
 
 	    if (addSigma) {
             	//console.log("serie: ", serie)
@@ -398,7 +412,7 @@ function addData(request, color, dash, label, visible, addSigma) {
 		//console.log("std: " + math.std(dataValues));
             	threshold1 = math.mean(dataValues) + math.std(dataValues)*threshold_clicked;
             	//console.log("threshold: ", threshold1); 
-	    	chart.yAxis[0].addPlotLine({
+	    	highchart.yAxis[0].addPlotLine({
                 	color: '#000000',
                 	dashStyle: 'ShortDash',
                 	width: 2,
@@ -443,7 +457,16 @@ function callHighChart(title) {
                     month: '%b \'%y',
                     year: '%Y'
                 }
-            }
+            },
+            plotBands: [{
+                from: Date.UTC(1971, 06, 01),		// month from 0 to 11 !
+                to: Date.UTC(2012, 06, 01),
+                color: '#EEEEEE'
+            },{
+                from: Date.UTC(2012, 06, 01),		// month from 0 to 11 !
+                to: Date.UTC(2200, 01, 01),
+                color: '#EFFFFF'
+            }]
         },
         yAxis: {
             gridLineWidth: 1,
@@ -515,8 +538,8 @@ function callHighChart(title) {
     };
 
     // Create the chart
-    chart = new Highcharts.StockChart(options);
+    highchart = new Highcharts.StockChart(options);
     // http://jsfiddle.net/SyyUZ/4/
-}
 
-//})
+
+}

@@ -1,0 +1,18 @@
+Index,Model,Region,Scenario,Sigma,Value,Year,Category
+GD4,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,1207.07568359,1974,Heat
+GD4,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,3654.59130859,1994,Heat
+GD4,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,140.513183594,1997,Heat
+GD4,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,3695.68505859,2000,Heat
+BB,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,1207.07568359,1974,Heat
+BB,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,3654.59130859,1994,Heat
+BB,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,140.513183594,1997,Heat
+BB,OBS Safran,Bourgogne et Franche-Comté,rcp85,1,3695.68505859,2000,Heat
+HD17,CNRM-CM5_CNRM-ALADIN53,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,65.7131347656,2007,Rain
+HD17,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,507.870361328,1973,Rain
+HD17,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,166.048828125,1974,Rain
+HD17,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,15100.486328125,1975,Rain
+HD17,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,163.508789062,1976,Rain
+HD17,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,51.4677734375,1980,Rain
+CC,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,151.486328125,1975,Rain
+CC,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,16300.508789062,1976,Rain
+CC,ICHEC-EC-EARTH_HIRHAM5,Languedoc-Roussillon et Midi-Pyrénées,rcp85,1,51.4677734375,1980,Rain

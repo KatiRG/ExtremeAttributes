@@ -8,14 +8,66 @@
      border-radius: 2px;
 }
 
-input[type="checkbox"] {
-    margin: 4px 4px 0;
+.dc-chart {
 }
 
-h4 span {
-    font-size:14px;
-    font-weight:normal;
-}   
+.dc-chart g.row text {
+    fill: black;
+    font-size: 10px;
+}
 
-table thead { display:block; }
-table tbody { height:300px; overflow-y:scroll; display:block; }
+.filterName {
+    font-size: 12px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.reset {
+    font-size: 10px;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.table {
+    font-size: 10px;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.table > tbody > tr > td {
+    line-height: 6px;
+}
+
+.dc-chart g.row rect {
+    fill: #1f77b4;
+}
+
+
+.dc-chart .pie-slice {
+    fill: black;
+    font-size: 10px;
+}
+
+.pie-slice._0  path {
+    fill: #b10026;
+}
+
+.pie-slice._1  path {
+    fill: #e31a1c;
+}
+
+.pie-slice._2  path {
+    fill: #fc4e2a;
+}
+
+.pie-slice._3  path {
+    fill: #225ea8;
+}
+
+.pie-slice._4  path {
+    fill: #41b6c4;
+}
+
+.pie-slice._5  path {
+    fill: #1d91c0;
+}
