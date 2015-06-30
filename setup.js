@@ -19,6 +19,7 @@ $(document).ready(function() {
                 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
+        //d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
         d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
           
             var filter = crossfilter(csv);
@@ -28,6 +29,7 @@ $(document).ready(function() {
             // //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
             // var runDimension  = filter.dimension(function(d) {return [d.Category, d.Run];})
             //     speedSumGroup = runDimension.group().reduceSum(function(d) {return d.Speed;});
+            
             var runDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
                 speedSumGroup = runDimension.group().reduceCount(function(d) {return d.Value;});
             
@@ -118,7 +120,7 @@ $(document).ready(function() {
                 //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
                 // =================
                 //define click action
-                franceChart.renderlet(function(chart) {
+                franceChart.on("renderlet", function(chart) {
                     chart.selectAll("g.layer0 g.state").on("click", function(d) {  
                         showTimeSeries(d.properties.name);                        
                     });
@@ -139,7 +141,7 @@ $(document).ready(function() {
                 // =================
                 indexSunburst
                     .width(300).height(200)
-                    .innerRadius(100)                  
+                    .innerRadius(0)                  
                     .dimension(runDimension)
                     .group(speedSumGroup);
                     //.legend(dc.legend());
@@ -192,8 +194,6 @@ $(document).ready(function() {
 
                 // =================
                 
-
-                      
 
 
                 dc.renderAll();

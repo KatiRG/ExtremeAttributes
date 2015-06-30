@@ -36,3 +36,7 @@
 .table > tbody > tr > td {
     line-height: 6px;
 }
+
+.dc-chart g.row rect {
+    fill: #1f77b4;
+}
