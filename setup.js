@@ -12,7 +12,6 @@ $(document).ready(function() {
 
 	var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
-        //indexChart = dc.rowChart("#chart-indexType");
         yearChart = dc.barChart("#chart-eventYear");
         datasetChart = dc.rowChart("#chart-dataset");
         indexSunburst = dc.sunburstChart("#index-sunburst");
@@ -31,7 +30,7 @@ $(document).ready(function() {
             var yearDimension = filter.dimension(function(d) {
                     return Math.round(d.Year);
                 }),
-                //indexDimension = filter.dimension(function(d) { return d.Index; }),
+                
                 regionDimension = filter.dimension(function(d, i) {
                     return d.Region;
                 }),
@@ -48,14 +47,36 @@ $(document).ready(function() {
                     return d.Year;
                 });
 
-            var yearGroup = yearDimension.group(),
-                //indexGroup = indexDimension.group(),
+            //compute averages, not sums    
+            var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),                
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
+            //fns for avg                
+                function reduceAdd(p, v) {
+                    p.total += v.Value;
+                    ++p.count;
+                    p.average = d3.round((p.total / p.count), 2);
+                    return p;
+                }
+
+                function reduceRemove(p, v) {
+                    p.total -= v.Value;
+                    --p.count;
+                    p.average = d3.round((p.total / p.count), 2);
+                    return p;
+                }
+
+                function reduceInitial() {
+                    return {
+                        total: 0,
+                        count: 0,
+                        average: 0,
+                    };
+                }
             
 
             d3.selectAll("#total").text(filter.size()); // total number of events
@@ -117,18 +138,7 @@ $(document).ready(function() {
                         showTimeSeries(d.properties.name);                        
                     });
                 })    
-
-                // =================
-              //   indexChart
-        		    // .width(300).height(200)
-        		    // .margins({top: 10, right: 30, bottom: 30, left: 10})
-              //       .dimension(indexDimension)
-              //       .group(indexGroup)
-              //       .colors(["#1f77b4"])
-              //       .elasticX(true)
-              //       .gap(0); 
-              //   indexChart
-              //       .xAxis().ticks(4).tickFormat(d3.format("d"));
+        
 
                 // =================
                 indexSunburst
@@ -220,8 +230,7 @@ $(document).ready(function() {
 
                 $("input[name='rcp']").click(function() {
                     var radioValue = $("input[name='rcp']:checked").val();
-                    scenario_clicked = $("input:radio[name=rcp]:checked").val();
-                    //console.log("scenario_clicked: ", scenario_clicked)
+                    scenario_clicked = $("input:radio[name=rcp]:checked").val();                    
                     scenario.filterAll();
                     scenario.filter(radioValue);
                     dc.redrawAll();
@@ -231,6 +240,8 @@ $(document).ready(function() {
                 $("input[name='rcp'][value='rcp85']").prop('checked', true);
                 $("input[name='sigma'][value='1']").trigger("click");
                 $("input[name='rcp'][value='rcp85']").trigger("click");
+
+                
 
             }); //end geojson
          
