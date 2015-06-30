@@ -48,35 +48,36 @@ $(document).ready(function() {
                 });
 
             //compute averages, not sums    
-            var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),                
+            //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),
+            var yearGroup = yearDimension.group(),                
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
-            //fns for avg                
-                function reduceAdd(p, v) {
-                    p.total += v.Value;
-                    ++p.count;
-                    p.average = d3.round((p.total / p.count), 2);
-                    return p;
-                }
+            // //fns for avg                
+            // function reduceAdd(p, v) {
+            //     p.total += v.Value;
+            //     ++p.count;
+            //     p.average = d3.round((p.total / p.count), 2);
+            //     return p;
+            // }
 
-                function reduceRemove(p, v) {
-                    p.total -= v.Value;
-                    --p.count;
-                    p.average = d3.round((p.total / p.count), 2);
-                    return p;
-                }
+            // function reduceRemove(p, v) {
+            //     p.total -= v.Value;
+            //     --p.count;
+            //     p.average = d3.round((p.total / p.count), 2);
+            //     return p;
+            // }
 
-                function reduceInitial() {
-                    return {
-                        total: 0,
-                        count: 0,
-                        average: 0,
-                    };
-                }
+            // function reduceInitial() {
+            //     return {
+            //         total: 0,
+            //         count: 0,
+            //         average: 0,
+            //     };
+            // }
             
 
             d3.selectAll("#total").text(filter.size()); // total number of events
