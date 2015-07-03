@@ -48,26 +48,46 @@
     font-size: 10px;
 }
 
-.pie-slice._0  path {
+.pie-slice._0  path { /*HEAT*/
     fill: #b10026;
 }
 
-.pie-slice._1  path {
+.pie-slice._1  path { /*GD4*/
     fill: #e31a1c;
 }
 
-.pie-slice._2  path {
+.pie-slice._2  path { /*HD17*/
     fill: #fc4e2a;
 }
 
-.pie-slice._3  path {
-    fill: #225ea8;
+.pie-slice._3  path { /*TG*/
+    fill: #fd8d3c;
 }
 
-.pie-slice._4  path {
+.pie-slice._4  path { /*RAIN*/
     fill: #41b6c4;
 }
 
-.pie-slice._5  path {
-    fill: #1d91c0;
+.pie-slice._5  path { /*R10mm*/
+    fill: #eff3ff;
+}
+
+.pie-slice._6  path { /*R20mm*/
+    fill: #c6dbef;
+}
+
+.pie-slice._7  path { /*RR*/
+    fill: #9ecae1;
+}
+
+.pie-slice._8  path { /*RR1*/
+    fill: #6baed6;
+}
+
+.pie-slice._9  path { /*RX1day*/
+    fill: #4292c6;
+}
+
+.pie-slice._10  path { /*SDII*/
+    fill: #084594;
 }
