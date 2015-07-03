@@ -10,7 +10,7 @@ var colourBarExists = 0;
 
 //global for now
 var yearDimension, datasetDimension;
-var yearGroup, regionGroup, datasetGroup;
+var yearGroup, regionGroup, datasetGroup, datasetGroupAvg;
 
 $(document).ready(function() {    
 
@@ -41,12 +41,12 @@ $(document).ready(function() {
 
             //compute averages, not sums    
             //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),
-            datasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            datasetGroupAvg = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
             
             //var yearGroup = yearDimension.group(),
             yearGroup = yearDimension.group();
             regionGroup = regionDimension.group();
-            //datasetGroup = datasetDimension.group();
+            datasetGroup = datasetDimension.group();
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -58,11 +58,27 @@ $(document).ready(function() {
             //     p.average = d3.round((p.total / p.count), 2);
             //     return p;
             // }
+            // function reduceRemove(p, v) {
+            //     p.total -= v.Value;
+            //     --p.count;
+            //     p.average = d3.round((p.total / p.count), 2);
+            //     return p;
+            // }
+
+            // function reduceInitial() {
+            //     return {
+            //         total: 0,
+            //         count: 0,
+            //         average: 0,
+            //     };
+            // }
 
             function reduceAdd(p, v) {
                 for (var idx = 0; idx < datasetDimension.group().all().length; idx++) {
-                    p.total += datasetDimension.group().all()[idx].value;
-                    ++p.count;                    
+                    if (datasetDimension.group().all()[idx].value != 0) {
+                        p.total += datasetDimension.group().all()[idx].value;
+                        ++p.count;
+                    }
                 }
                 p.average = d3.round((p.total / p.count), 2);
                 return p;
@@ -70,8 +86,12 @@ $(document).ready(function() {
             }
 
             function reduceRemove(p, v) {
-                p.total -= v.Value;
-                --p.count;
+                for (var idx = 0; idx < datasetDimension.group().all().length; idx++) {
+                    if (datasetDimension.group().all()[idx].value != 0) {
+                        p.total += datasetDimension.group().all()[idx].value;
+                        --p.count;
+                    }
+                }                
                 p.average = d3.round((p.total / p.count), 2);
                 return p;
             }
@@ -291,7 +311,7 @@ function plotColourbar(colourDomain_array, colourRange_array) {
 
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
-    if (indexChart.filters().length == 1) {
+    if (indexChart.filters().length == 1) { //need to experiment with indexSunburst.filters()[0][0]...
         //console.log("In showTimeSeries for ", regionName);
         index_clicked = indexChart.filters()[0];
         //console.log("model: ", datasetChart.filters())
