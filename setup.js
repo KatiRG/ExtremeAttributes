@@ -8,6 +8,10 @@ var colourDomain = [];
 var saveRange;
 var colourBarExists = 0;
 
+//global for now
+var yearDimension, datasetDimension;
+var yearGroup, regionGroup, datasetGroup;
+
 $(document).ready(function() {    
 
 	var chart;
@@ -27,36 +31,27 @@ $(document).ready(function() {
                 speedSumGroup = runDimension.group().reduceCount(function(d) {return d.Value;});
             
 
-            var yearDimension = filter.dimension(function(d) {
-                    return Math.round(d.Year);
-                }),
-                
-                regionDimension = filter.dimension(function(d, i) {
-                    return d.Region;
-                }),
-                datasetDimension = filter.dimension(function(d) {
-                    return d.Model;
-                }),
-                tags = filter.dimension(function(d) {
-                    return d.Sigma;
-                }),
-                scenario = filter.dimension(function(d) {
-                    return d.Scenario;
-                }),
-                timeDimension = filter.dimension(function(d) {
-                    return d.Year;
-                });
+            yearDimension = filter.dimension(function(d) { return Math.round(d.Year); });
+            datasetDimension = filter.dimension(function(d) { return d.Model; });             
+            var    regionDimension = filter.dimension(function(d, i) { return d.Region; }),
+                //datasetDimension = filter.dimension(function(d) { return d.Model; }),
+                tags = filter.dimension(function(d) { return d.Sigma; }),
+                scenario = filter.dimension(function(d) { return d.Scenario; }),
+                timeDimension = filter.dimension(function(d) { return d.Year; });
 
             //compute averages, not sums    
             //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),
-            var yearGroup = yearDimension.group(),                
-                regionGroup = regionDimension.group(),
-                datasetGroup = datasetDimension.group();
+            datasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            
+            //var yearGroup = yearDimension.group(),
+            yearGroup = yearDimension.group();
+            regionGroup = regionDimension.group();
+            //datasetGroup = datasetDimension.group();
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
-            // //fns for avg                
+            //fns for avg        
             // function reduceAdd(p, v) {
             //     p.total += v.Value;
             //     ++p.count;
@@ -64,20 +59,30 @@ $(document).ready(function() {
             //     return p;
             // }
 
-            // function reduceRemove(p, v) {
-            //     p.total -= v.Value;
-            //     --p.count;
-            //     p.average = d3.round((p.total / p.count), 2);
-            //     return p;
-            // }
+            function reduceAdd(p, v) {
+                for (var idx = 0; idx < datasetDimension.group().all().length; idx++) {
+                    p.total += datasetDimension.group().all()[idx].value;
+                    ++p.count;                    
+                }
+                p.average = d3.round((p.total / p.count), 2);
+                return p;
 
-            // function reduceInitial() {
-            //     return {
-            //         total: 0,
-            //         count: 0,
-            //         average: 0,
-            //     };
-            // }
+            }
+
+            function reduceRemove(p, v) {
+                p.total -= v.Value;
+                --p.count;
+                p.average = d3.round((p.total / p.count), 2);
+                return p;
+            }
+
+            function reduceInitial() {
+                return {
+                    total: 0,
+                    count: 0,
+                    average: 0,
+                };
+            }
             
 
             d3.selectAll("#total").text(filter.size()); // total number of events
