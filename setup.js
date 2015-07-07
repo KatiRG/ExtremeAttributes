@@ -7,10 +7,13 @@ var highchart;
 var colourDomain = [];
 var saveRange;
 var colourBarExists = 0;
+//TEMP FOR NOW!! 9 models + 1 obs
+var numModels = 2;
 
 //global for now
 var yearDimension, datasetDimension;
-var yearGroup, regionGroup, datasetGroup, datasetGroupAvg;
+var yearGroup, regionGroup, datasetGroup;
+var avgDimension, avgGroup, junkavgGroup;
 
 $(document).ready(function() {    
 
@@ -29,6 +32,13 @@ $(document).ready(function() {
             
             var runDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
                 speedSumGroup = runDimension.group().reduceCount(function(d) {return d.Value;});
+
+            avgDimension =  filter.dimension(function(d) {return [d.Category, d.Index, d.Year, d.Region];}),
+            avgGroup = avgDimension.group(); //counts number of events
+            //avgGroup = avgDimension.group().reduceCount(function(d) {return d.Model;});
+            //avgGroup = avgDimension.group().reduceSum(function(d) {return d.Value;});
+            
+            junkavgGroup = avgDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial); //averages number of events across datasets
             
 
             yearDimension = filter.dimension(function(d) { return Math.round(d.Year); });
@@ -40,8 +50,7 @@ $(document).ready(function() {
                 timeDimension = filter.dimension(function(d) { return d.Year; });
 
             //compute averages, not sums    
-            //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),
-            datasetGroupAvg = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);            
             
             //var yearGroup = yearDimension.group(),
             yearGroup = yearDimension.group();
@@ -51,6 +60,7 @@ $(document).ready(function() {
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
+        
             //fns for avg        
             // function reduceAdd(p, v) {
             //     p.total += v.Value;
@@ -72,27 +82,23 @@ $(document).ready(function() {
             //         average: 0,
             //     };
             // }
-
-            function reduceAdd(p, v) {
-                for (var idx = 0; idx < datasetDimension.group().all().length; idx++) {
-                    if (datasetDimension.group().all()[idx].value != 0) {
-                        p.total += datasetDimension.group().all()[idx].value;
-                        ++p.count;
-                    }
-                }
-                p.average = d3.round((p.total / p.count), 2);
+            
+            function reduceAdd(p, v) {                
+                if (datasetChart.filters().length == 0) totalModels = numModels; //divide by total number of models (10)
+                else totalModels = datasetChart.filters().length                
+                p.total = totalModels;
+                ++p.count;                            
+                p.average = d3.round((p.count / p.total), 2);
                 return p;
 
             }
 
-            function reduceRemove(p, v) {
-                for (var idx = 0; idx < datasetDimension.group().all().length; idx++) {
-                    if (datasetDimension.group().all()[idx].value != 0) {
-                        p.total += datasetDimension.group().all()[idx].value;
-                        --p.count;
-                    }
-                }                
-                p.average = d3.round((p.total / p.count), 2);
+            function reduceRemove(p, v) {                
+                if (datasetChart.filters().length == 0) totalModels = numModels; //divide by total number of models (10)
+                else totalModels = datasetChart.filters().length                
+                p.total = totalModels;
+                --p.count;
+                p.average = d3.round((p.count / p.total), 2);
                 return p;
             }
 
@@ -103,7 +109,6 @@ $(document).ready(function() {
                     average: 0,
                 };
             }
-            
 
             d3.selectAll("#total").text(filter.size()); // total number of events
 
@@ -179,7 +184,8 @@ $(document).ready(function() {
         		    .width(400).height(200)
         		    .margins({top: 10, right: 40, bottom: 30, left: 50})
                     .dimension(yearDimension)
-                    .group(yearGroup)
+                    //.group(yearGroup)
+                    .group(junkavgGroup)
                     .elasticY(true)
 		            .gap(0)
                     .renderHorizontalGridLines(true)
