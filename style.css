@@ -38,10 +38,11 @@
     line-height: 6px;
 }
 
-.dc-chart g.row rect {
+/*Hack to colour dc.chart bars blue. Without this they will be dark grey*/
+/*Weird bug with dc.js-2.1*/
+.dc-chart rect {
     fill: #1f77b4;
 }
-
 
 .dc-chart .pie-slice {
     fill: black;
