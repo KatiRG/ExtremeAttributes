@@ -13,7 +13,7 @@ var numModels = 2;
 //global for now
 var yearDimension, datasetDimension;
 var yearGroup, regionGroup, datasetGroup;
-var avgDimension, avgGroup, junkavgGroup;
+var avgDimension, avgGroup, junkavgGroup, avgYearGroup, paymentVolumeByType;
 
 $(document).ready(function() {    
 
@@ -38,7 +38,7 @@ $(document).ready(function() {
             //avgGroup = avgDimension.group().reduceCount(function(d) {return d.Model;});
             //avgGroup = avgDimension.group().reduceSum(function(d) {return d.Value;});
             
-            junkavgGroup = avgDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial); //averages number of events across datasets
+            //junkavgGroup = avgDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial); //averages number of events across datasets
             
 
             yearDimension = filter.dimension(function(d) { return Math.round(d.Year); });
@@ -49,10 +49,13 @@ $(document).ready(function() {
                 scenario = filter.dimension(function(d) { return d.Scenario; }),
                 timeDimension = filter.dimension(function(d) { return d.Year; });
 
-            //compute averages, not sums    
-            //var yearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);            
-            
+            //compute averages, not sums
             //var yearGroup = yearDimension.group(),
+            avgYearDimension =  filter.dimension(function(d) {return [d.Category, d.Index, d.Region];}),
+            avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            //NB: avg is extracted out in yearChart using .valueAccessor
+            
+
             yearGroup = yearDimension.group();
             regionGroup = regionDimension.group();
             datasetGroup = datasetDimension.group();
@@ -61,7 +64,8 @@ $(document).ready(function() {
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
 
         
-            //fns for avg        
+            //orig fns for avg
+            //----------------------------------------
             // function reduceAdd(p, v) {
             //     p.total += v.Value;
             //     ++p.count;
@@ -82,7 +86,8 @@ $(document).ready(function() {
             //         average: 0,
             //     };
             // }
-            
+            //----------------------------------------        
+
             function reduceAdd(p, v) {                
                 if (datasetChart.filters().length == 0) totalModels = numModels; //divide by total number of models (10)
                 else totalModels = datasetChart.filters().length                
@@ -90,7 +95,6 @@ $(document).ready(function() {
                 ++p.count;                            
                 p.average = d3.round((p.count / p.total), 2);
                 return p;
-
             }
 
             function reduceRemove(p, v) {                
@@ -99,7 +103,7 @@ $(document).ready(function() {
                 p.total = totalModels;
                 --p.count;
                 p.average = d3.round((p.count / p.total), 2);
-                return p;
+                return p;               
             }
 
             function reduceInitial() {
@@ -185,11 +189,12 @@ $(document).ready(function() {
         		    .margins({top: 10, right: 40, bottom: 30, left: 50})
                     .dimension(yearDimension)
                     //.group(yearGroup)
-                    .group(junkavgGroup)
+                    .group(avgYearGroup)
+                    .valueAccessor(function(p) { return p.value.average; })
                     .elasticY(true)
 		            .gap(0)
                     .renderHorizontalGridLines(true)
-                    .x(d3.scale.linear().domain([1970, 2100]));
+                    .x(d3.scale.linear().domain([1970, 2100]));                
                 
                 yearChart
                     .xAxis().ticks(5).tickFormat(d3.format("d"));
