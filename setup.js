@@ -41,10 +41,6 @@ $(document).ready(function() {
                 tags = filter.dimension(function(d) { return d.Sigma; }),
                 scenario = filter.dimension(function(d) { return d.Scenario; }),
                 timeDimension = filter.dimension(function(d) { return d.Year; });
-
-            //compute average number of events across all datasets, not sums
-            //avgYearDimension =  filter.dimension(function(d) { return [d.Category, d.Index, d.Region]; });
-            //NB: avg is extracted out in yearChart using .valueAccessor
             
 
             yearGroup = yearDimension.group();
@@ -60,39 +56,51 @@ $(document).ready(function() {
 
             //Count number of datasets. Reduce numDataSets by 1 if OBS is empty.
             function reduceAdd(p, v) {
+                omit = 0;
+
                 ++p.count;
-                if (datasetChart.filters().length == 0) {//no models selected                    
-                    
-                    // if (v.model == "OBS Safran") { ++p.ObsSafran; }
-                    // if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                if (datasetChart.filters().length == 0) {//no models selected         
                     //console.log("v: ", v)
                     if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
-                    else p.numDataSets = datasetGroup.all().length;                                    
-                    p.average = Math.ceil(p.count / p.numDataSets);
-                } else p.average = p.count;
+                    else p.numDataSets = datasetGroup.all().length;                    
+                } else { //modelChart selected
+                    //if OBS has been selected, don't count it for years >= currentYear
+                    if (v.Year >= currentYear) {
+                        for (idx = 0; idx < datasetChart.filters().length; idx++) {
+                            if (datasetChart.filters()[idx] = "OBS Safran") omit = 1;
+                        }
+                    }
+                    p.numDataSets = datasetChart.filters().length - omit;                    
+                }
                 
+                p.average = Math.ceil(p.count / p.numDataSets);
                 return p;
             }
 
             function reduceRemove(p, v) {
                 --p.count;
-                if (datasetChart.filters().length == 0) {//no models selected                    
-                    
-                    // if (v.model == "OBS Safran") { ++p.ObsSafran; }
-                    // if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                if (datasetChart.filters().length == 0) {//no models selected         
+                    //console.log("v: ", v)
                     if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
-                    else p.numDataSets = datasetGroup.all().length;                                    
-                    p.average = Math.ceil(p.count / p.numDataSets);
-                } else p.average = p.count;
+                    else p.numDataSets = datasetGroup.all().length;                    
+                } else { //modelChart selected
+                    //if OBS has been selected, don't count it for years >= currentYear
+                    if (v.Year >= currentYear) {
+                        for (idx = 0; idx < datasetChart.filters().length; idx++) {
+                            if (datasetChart.filters()[idx] = "OBS Safran") omit = 1;
+                        }
+                    }
+                    
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
                 
-                return p;               
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;          
             }
 
             function reduceInitial() {
                 return {
-                    count: 0,
-                    //model: "",
-                    //ObsSafran: 0,                    
+                    count: 0,                   
                     numDataSets: 0,                    
                     average: 0
                 };
