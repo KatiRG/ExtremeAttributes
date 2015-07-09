@@ -8,11 +8,13 @@ var colourDomain = [];
 var saveRange;
 var colourBarExists = 0;
 
+var currentTime = new Date();
+var currentYear = currentTime.getFullYear();
 
 //global for now
 var yearDimension, datasetDimension;
 var yearGroup, regionGroup, datasetGroup;
-var avgYearGroup;
+var avgYearGroup, avgRegionGroup;
 
 $(document).ready(function() {    
 
@@ -41,14 +43,17 @@ $(document).ready(function() {
                 timeDimension = filter.dimension(function(d) { return d.Year; });
 
             //compute average number of events across all datasets, not sums
-            avgYearDimension =  filter.dimension(function(d) { return [d.Category, d.Index, d.Region]; });
+            //avgYearDimension =  filter.dimension(function(d) { return [d.Category, d.Index, d.Region]; });
             //NB: avg is extracted out in yearChart using .valueAccessor
             
 
             yearGroup = yearDimension.group();
             regionGroup = regionDimension.group();
-            datasetGroup = datasetDimension.group();            
+            datasetGroup = datasetDimension.group();
+
+            //averages        
             avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            //avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;               
@@ -57,11 +62,13 @@ $(document).ready(function() {
             function reduceAdd(p, v) {
                 ++p.count;
                 if (datasetChart.filters().length == 0) {//no models selected                    
-                    p.model = v.Model;  
-                    if (p.model == "OBS Safran") { ++p.ObsSafran; }
-                    if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                    
+                    // if (v.model == "OBS Safran") { ++p.ObsSafran; }
+                    // if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                    //console.log("v: ", v)
+                    if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
                     else p.numDataSets = datasetGroup.all().length;                                    
-                    p.average = Math.round(p.count / p.numDataSets);
+                    p.average = Math.ceil(p.count / p.numDataSets);
                 } else p.average = p.count;
                 
                 return p;
@@ -70,11 +77,12 @@ $(document).ready(function() {
             function reduceRemove(p, v) {
                 --p.count;
                 if (datasetChart.filters().length == 0) {//no models selected                    
-                    p.model = v.Model;  
-                    if (p.model == "OBS Safran") { ++p.ObsSafran; }
-                    if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                    
+                    // if (v.model == "OBS Safran") { ++p.ObsSafran; }
+                    // if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                    if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
                     else p.numDataSets = datasetGroup.all().length;                                    
-                    p.average = Math.round(p.count / p.numDataSets);
+                    p.average = Math.ceil(p.count / p.numDataSets);
                 } else p.average = p.count;
                 
                 return p;               
@@ -83,8 +91,8 @@ $(document).ready(function() {
             function reduceInitial() {
                 return {
                     count: 0,
-                    model: "",
-                    ObsSafran: 0,                    
+                    //model: "",
+                    //ObsSafran: 0,                    
                     numDataSets: 0,                    
                     average: 0
                 };
@@ -117,7 +125,9 @@ $(document).ready(function() {
                 franceChart.width(width)
                     .height(height)
                     .dimension(regionDimension)
-                    .group(regionGroup)              
+                    .group(regionGroup)
+                    //.group(avgRegionGroup) //avg count across all datasets
+                    //.valueAccessor(function(p) { return p.value.average; })            
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
                     .overlayGeoJson(statesJson.features, "state", function(d) {                        
@@ -125,6 +135,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         d3.select("#active").text(filter.groupAll().value()); //total number selected
+                        //console.log("d: ", d)
                         return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                     });
                 franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
