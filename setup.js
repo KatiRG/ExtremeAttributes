@@ -24,8 +24,8 @@ $(document).ready(function() {
                 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
-        //d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
-        d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
+        d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
+        //d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
           
             var filter = crossfilter(csv);        
             
@@ -53,26 +53,30 @@ $(document).ready(function() {
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;               
 
-            //Count number of datasets. Reduce count by 1 if OBS is empty.
-            function reduceAdd(p, v) {                                          
+            //Count number of datasets. Reduce numDataSets by 1 if OBS is empty.
+            function reduceAdd(p, v) {
                 ++p.count;
-                p.model = v.Model;  
-                if (p.model == "OBS Safran") { console.log("OBS match"); ++p.ObsSafran; }
-                if (p.ObsSafran == 0 && p.count != 1) p.numDataSets = p.count - 1;
-                else p.numDataSets = p.count;
-                                
-                p.average = d3.round((p.count / p.numDataSets), 2);
+                if (datasetChart.filters().length == 0) {//no models selected                    
+                    p.model = v.Model;  
+                    if (p.model == "OBS Safran") { ++p.ObsSafran; }
+                    if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                    else p.numDataSets = datasetGroup.all().length;                                    
+                    p.average = Math.round(p.count / p.numDataSets);
+                } else p.average = p.count;
+                
                 return p;
             }
 
             function reduceRemove(p, v) {
                 --p.count;
-                p.model = v.Model;        
-                if (p.model == "OBS Safran") { console.log("OBS match"); ++p.ObsSafran; }
-                if (p.ObsSafran == 0 && p.count != 1) p.numDataSets = p.count - 1;
-                else p.numDataSets = p.count;
-
-                p.average = d3.round((p.count / p.numDataSets), 2);
+                if (datasetChart.filters().length == 0) {//no models selected                    
+                    p.model = v.Model;  
+                    if (p.model == "OBS Safran") { ++p.ObsSafran; }
+                    if (p.ObsSafran == 0) p.numDataSets = datasetGroup.all().length - 1;
+                    else p.numDataSets = datasetGroup.all().length;                                    
+                    p.average = Math.round(p.count / p.numDataSets);
+                } else p.average = p.count;
+                
                 return p;               
             }
 
