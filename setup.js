@@ -8,6 +8,11 @@ var colourDomain = [];
 var saveRange;
 var colourBarExists = 0;
 
+//for avgs
+var currentTime = new Date();
+var currentYear = currentTime.getFullYear();
+var avgYearGroup;
+
 $(document).ready(function() {    
 
 	var chart;
@@ -18,8 +23,8 @@ $(document).ready(function() {
                 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
-        d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
-        //d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
+        //d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
+        d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
           
             var filter = crossfilter(csv);        
             
@@ -39,8 +44,49 @@ $(document).ready(function() {
             regionGroup = regionDimension.group();
             datasetGroup = datasetDimension.group();
 
+            var numModels = datasetGroup.size();
+            console.log("numModels: ", numModels)
+
+            avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
+
+            //Count number of datasets. Reduce numDataSets by 1 if OBS is empty.
+            function reduceAdd(p, v) {
+                var omit = 0;
+
+                ++p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no models selected         
+                    //console.log("v: ", v)
+                    if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
+                    else p.numDataSets = datasetGroup.all().length;                    
+                } else p.numDataSets = datasetChart.filters().length;
+                
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;
+            }
+
+            function reduceRemove(p, v) {
+                var omit;
+                --p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no or all models selected         
+                    //console.log("v: ", v)
+                    if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
+                    else p.numDataSets = datasetGroup.all().length;                    
+                } else p.numDataSets = datasetChart.filters().length;
+                
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;          
+            }
+
+            function reduceInitial() {
+                return {
+                    count: 0,                   
+                    numDataSets: 0,                    
+                    average: 0
+                };
+            }
             
 
             d3.selectAll("#total").text(filter.size()); // total number of events
@@ -117,7 +163,9 @@ $(document).ready(function() {
         		    .width(400).height(200)
         		    .margins({top: 10, right: 40, bottom: 30, left: 50})
                     .dimension(yearDimension)
-                    .group(yearGroup)
+                    //.group(yearGroup)
+                    .group(avgYearGroup) //avg count across all datasets
+                    .valueAccessor(function(p) { return p.value.average; })
                     .elasticY(true)
 		            .gap(0)
                     .renderHorizontalGridLines(true)
