@@ -11,7 +11,9 @@ var colourBarExists = 0;
 //for avgs
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
+var cutoffYear = 2012;
 var avgYearGroup;
+var numObsDatasets = 1;
 
 $(document).ready(function() {    
 
@@ -54,16 +56,18 @@ $(document).ready(function() {
 
             //Count number of datasets. Reduce numDataSets by 1 if OBS is empty.
             function reduceAdd(p, v) {
-                var omit = 0;
-
+                var omit;
                 ++p.count;
                 if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no models selected         
                     //console.log("v: ", v)
-                    if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
+                    if (v.Year > cutoffYear) p.numDataSets = datasetGroup.all().length - numObsDatasets;
                     else p.numDataSets = datasetGroup.all().length;                    
                 } else { 
-                    if (v.Year >= currentYear) p.numDataSets = datasetChart.filters().length - 1;
-                    else p.numDataSets = datasetChart.filters().length;                    
+                    if (v.Year > cutoffYear && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    }
+                    else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
                 }
                 
                 p.average = Math.ceil(p.count / p.numDataSets);
@@ -71,15 +75,18 @@ $(document).ready(function() {
             }
 
             function reduceRemove(p, v) {
-                var omit;
+                var omit;              
                 --p.count;
                 if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no or all models selected         
                     //console.log("v: ", v)
-                    if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
-                    else p.numDataSets = datasetGroup.all().length;                    
+                    if (v.Year > cutoffYear) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;
                 } else {
-                    if (v.Year >= currentYear) p.numDataSets = datasetChart.filters().length - 1;
-                    else p.numDataSets = datasetChart.filters().length;
+                    if (v.Year > cutoffYear && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    }
+                    else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
                 }
                 
                 p.average = Math.ceil(p.count / p.numDataSets);
