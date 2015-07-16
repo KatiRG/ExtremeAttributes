@@ -61,7 +61,10 @@ $(document).ready(function() {
                     //console.log("v: ", v)
                     if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
                     else p.numDataSets = datasetGroup.all().length;                    
-                } else p.numDataSets = datasetChart.filters().length;
+                } else { 
+                    if (v.Year >= currentYear) p.numDataSets = datasetChart.filters().length - 1;
+                    else p.numDataSets = datasetChart.filters().length;                    
+                }
                 
                 p.average = Math.ceil(p.count / p.numDataSets);
                 return p;
@@ -74,7 +77,10 @@ $(document).ready(function() {
                     //console.log("v: ", v)
                     if (v.Year >= currentYear) p.numDataSets = datasetGroup.all().length - 1;
                     else p.numDataSets = datasetGroup.all().length;                    
-                } else p.numDataSets = datasetChart.filters().length;
+                } else {
+                    if (v.Year >= currentYear) p.numDataSets = datasetChart.filters().length - 1;
+                    else p.numDataSets = datasetChart.filters().length;
+                }
                 
                 p.average = Math.ceil(p.count / p.numDataSets);
                 return p;          
