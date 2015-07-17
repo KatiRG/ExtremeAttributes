@@ -8,6 +8,13 @@ var colourDomain = [];
 var saveRange;
 var colourBarExists = 0;
 
+//for avgs
+var currentTime = new Date();
+var currentYear = currentTime.getFullYear();
+var cutoffYear_Safran = 2012;
+var avgYearGroup, avgIndexGroup;
+var numObsDatasets = 1;
+
 $(document).ready(function() {    
 
 	var chart;
@@ -50,6 +57,58 @@ $(document).ready(function() {
                 indexGroup = indexDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
+
+            var numModels = datasetGroup.size();    
+
+            avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+
+            //Fns to compute avg.
+            function reduceAdd(p, v) {
+                var omit;
+                ++p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no models selected         
+                    //console.log("v: ", v)
+                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;                    
+                } else { 
+                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    }
+                    else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
+                
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;
+            }
+
+            function reduceRemove(p, v) {
+                var omit;              
+                --p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no or all models selected         
+                    //console.log("v: ", v)
+                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;
+                } else {
+                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    }
+                    else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
+                
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;          
+            }
+
+            function reduceInitial() {
+                return {
+                    count: 0,                   
+                    numDataSets: 0,                    
+                    average: 0
+                };
+            }
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -119,7 +178,9 @@ $(document).ready(function() {
         		    .width(300).height(200)
         		    .margins({top: 10, right: 30, bottom: 30, left: 10})
                     .dimension(indexDimension)
-                    .group(indexGroup)
+                    //.group(indexGroup)
+                    .group(avgIndexGroup) //avg count across all datasets
+                    .valueAccessor(function(p) { return p.value.average; })
                     .colors(["#1f77b4"])
                     .elasticX(true)
                     .gap(0); 
@@ -131,7 +192,9 @@ $(document).ready(function() {
 		            .width(400).height(200)
 		            .margins({top: 10, right: 40, bottom: 30, left: 50})
                     .dimension(yearDimension)
-                    .group(yearGroup)
+                    //.group(yearGroup)
+                    .group(avgYearGroup) //avg count across all datasets
+                    .valueAccessor(function(p) { return p.value.average; })
                     .elasticY(true)
 		            .gap(0)
                     .renderHorizontalGridLines(true)
