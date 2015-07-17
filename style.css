@@ -8,6 +8,13 @@
      border-radius: 2px;
 }
 
+/*
+.dc-chart g.state :hover {
+    fill-opacity: 1;
+    /*stroke: grey;*/
+/*}*/ 
+
+
 .dc-chart {
 }
 .dc-chart g.row text {
