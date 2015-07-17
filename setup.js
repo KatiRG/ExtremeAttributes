@@ -12,7 +12,7 @@ var colourBarExists = 0;
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
-var avgYearGroup, avgIndexGroup;
+var avgYearGroup, avgIndexGroup, avgRegionGroup;
 var numObsDatasets = 1;
 
 $(document).ready(function() {    
@@ -62,6 +62,7 @@ $(document).ready(function() {
 
             avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
             avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
             //Fns to compute avg.
             function reduceAdd(p, v) {
@@ -140,7 +141,9 @@ $(document).ready(function() {
                 franceChart.width(width)
                     .height(height)
                     .dimension(regionDimension)
-                    .group(regionGroup)              
+                    //.group(regionGroup)
+                    .group(avgRegionGroup) //avg count across all datasets
+                    .valueAccessor(function(p) { return p.value.average; })
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
                     .overlayGeoJson(statesJson.features, "state", function(d) {                        
