@@ -12,8 +12,10 @@ var colourBarExists = 0;
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear = 2012;
-var avgYearGroup;
+var avgYearGroup, avgIndexGroup;
 var numObsDatasets = 1;
+
+var tempIndexGroup;
 
 $(document).ready(function() {    
 
@@ -25,13 +27,15 @@ $(document).ready(function() {
                 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
 
-        d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
-        //d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
+        //d3.csv("data/data_obs_withCategory.csv", function(error, csv) {
+        d3.csv("data/test_data_obs_withCategory.csv", function(error, csv) {
           
             var filter = crossfilter(csv);        
             
-            var runDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
-                speedSumGroup = runDimension.group().reduceCount(function(d) {return d.Value;});            
+            var indexDimension  = filter.dimension(function(d) {return [d.Category, d.Index];}),
+                indexGroup = indexDimension.group().reduceCount(function(d) {return d.Value;});
+
+            tempIndexGroup = indexDimension.group().reduceCount(function(d) {return d.Value;});     
 
             var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),
                 datasetDimension = filter.dimension(function(d) { return d.Model; }),
@@ -50,6 +54,7 @@ $(document).ready(function() {
             console.log("numModels: ", numModels)
 
             avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            avgIndexGroup = indexDimension.group().reduce(myAdd, myRemove, myInitial);
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -100,6 +105,64 @@ $(document).ready(function() {
                     average: 0
                 };
             }
+
+            //for sunburst
+            //---------------------------------------------
+              //Count number of datasets. Reduce numDataSets by 1 if OBS is empty.
+            function myAdd(p, v) {
+                var omit;
+                ++p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no models selected         
+                    //console.log("v: ", v)
+                    if (v.Year > cutoffYear) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;                    
+                } else { 
+                    if (v.Year > cutoffYear && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    }
+                    else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
+                
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;
+            }
+
+            function myRemove(p, v) {
+                var omit;              
+                --p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) {//no or all models selected         
+                    //console.log("v: ", v)
+                    if (v.Year > cutoffYear) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;
+                } else {
+                    if (v.Year > cutoffYear && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    }
+                    else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
+                
+                p.average = Math.ceil(p.count / p.numDataSets);
+                return p;          
+            }
+
+            function myInitial() {           
+                return {
+                    count: 0,                   
+                    numDataSets: 0,                    
+                    average: 0
+                };
+                // {
+                //     count: 0
+                //     numDataSets: 0
+                //     average: 
+                //       //return 0 if this.count == 0
+                //       return this.count / this.numDataSets;
+                // }
+            }
+            //---------------------------------------------
+
             
 
             d3.selectAll("#total").text(filter.size()); // total number of events
@@ -167,8 +230,10 @@ $(document).ready(function() {
                 indexSunburst
                     .width(300).height(200)
                     .innerRadius(0)                  
-                    .dimension(runDimension)
-                    .group(speedSumGroup);
+                    .dimension(indexDimension)
+                    .group(indexGroup);
+                    // .group(avgIndexGroup) //avg count across all datasets
+                    // .valueAccessor(function(p) { return p.value.average; })
                     //.legend(dc.legend());
 
                 // =================
