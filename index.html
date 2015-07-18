@@ -119,6 +119,7 @@
             </div>
             <!--end ROW 1-->
 
+            <!--ROW 2-->
             <div class="row">
 
                 <div id="colourbar" class="dc-chart col-md-1"></div>
@@ -128,6 +129,27 @@
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
+
+                <div id="chart-stackedYear" class="dc-chart col-md-5">
+                    <div class="filterName">Stacked Year
+                        <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                    </div>
+                </div>
+                <div id="chart-season" class="dc-chart col-md-3">
+                    <div class="filterName">Season
+                        <a class="reset" href="javascript:seasonChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                    </div>
+                </div>
+
+             
+
+            </div>
+            <!--end ROW 2-->
+
+            <!--ROW 3-->
+            <div class="row">                
 
                 <div id="dc-table-graph" class="col-md-8">
                     <div class="filterName">Summary
@@ -144,15 +166,15 @@
                 </div>
 
             </div>
-            <!--end ROW 2-->
+            <!--end ROW 3-->
 
-            <!--ROW 3 TIME SERIES -->
+            <!--ROW TIME SERIES -->
             <div class="row">
                 <div id="chart-ts" class="col-md-12">
                     <div id="timeChart"></div>
                 </div>
             </div>
-            <!--end ROW 3-->
+            <!--end ROW TIME SERIES-->
 
         </div>
         <!-- /.container -->

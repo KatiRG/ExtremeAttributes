@@ -22,15 +22,22 @@ $(document).ready(function() {
         indexChart = dc.rowChart("#chart-indexType");
         yearChart = dc.barChart("#chart-eventYear");
         datasetChart = dc.rowChart("#chart-dataset");
+        stackedYearChart = dc.barChart("#chart-stackedYear");
+        seasonChart = dc.pieChart("#chart-season");
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-        d3.csv("data/data_obs_withCategory.csv", function(csv) {
+        d3.csv("data/test_output_duprow_seasons.csv", function(csv) {
+            //d3.csv("data/test_data_obs_withCategory.csv", function(csv) {
+            //d3.csv("data/data_obs_withCategory.csv", function(csv) {            
 
             var filter = crossfilter(csv);
 
             var yearDimension = filter.dimension(function(d) {
                     return Math.round(d.Year);
+                }),
+                seasonDimension = filter.dimension(function(d) {
+                    return d.Season;
                 }),
                 indexDimension = filter.dimension(function(d) {
                     return d.Index;
@@ -53,6 +60,7 @@ $(document).ready(function() {
 
             var yearGroup = yearDimension.group(),
                 indexGroup = indexDimension.group(),
+                seasonGroup = seasonDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
@@ -217,6 +225,40 @@ $(document).ready(function() {
                     .xAxis().ticks(5).tickFormat(d3.format("d"));
                 yearChart
                     .yAxis().ticks(5).tickFormat(d3.format("d"));
+
+                 // =================
+                stackedYearChart
+                    .width(400).height(200)
+                    .margins({
+                        top: 10,
+                        right: 40,
+                        bottom: 30,
+                        left: 50
+                    })
+                    .dimension(yearDimension)
+                    .group(avgYearGroup) //avg count across all datasets
+                    .valueAccessor(function(p) {
+                        return p.value.average;
+                    })
+                    .elasticY(true)
+                    .gap(0)
+                    .renderHorizontalGridLines(true)
+                    .x(d3.scale.linear().domain([1970, 2100]));
+
+                stackedYearChart
+                    .xAxis().ticks(5).tickFormat(d3.format("d"));
+                stackedYearChart
+                    .yAxis().ticks(5).tickFormat(d3.format("d"));
+
+                // =================
+                seasonChart
+                    .width(100)
+                    .height(100)
+                    .slicesCap(4)
+                    .innerRadius(20)
+                    .dimension(seasonDimension)
+                    .group(seasonGroup)
+                    .legend(dc.legend());      
 
                 // =================
                 datasetChart
