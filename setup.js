@@ -27,7 +27,7 @@ $(document).ready(function() {
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-        d3.csv("data/test_output_duprow_seasons.csv", function(csv) {
+        d3.csv("data/test_data_obs_withCategory_withSeasons.csv", function(csv) {
             //d3.csv("data/test_data_obs_withCategory.csv", function(csv) {
             //d3.csv("data/data_obs_withCategory.csv", function(csv) {            
 
@@ -63,6 +63,14 @@ $(document).ready(function() {
                 seasonGroup = seasonDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
+
+            //for stacked bar chart   
+            var year = filter.dimension(function(d){return +d.Year;});
+            var winterSum = year.group().reduceSum(function(d){return d.Season==0?1:0;});
+            var springSum = year.group().reduceSum(function(d){return d.Season==1?1:0;});
+            var summerSum = year.group().reduceSum(function(d){return d.Season==2?1:0;});
+            var fallSum = year.group().reduceSum(function(d){return d.Season==3?1:0;});
+            //end stacked bar    
 
             var numModels = datasetGroup.size();
 
@@ -228,27 +236,14 @@ $(document).ready(function() {
 
                  // =================
                 stackedYearChart
-                    .width(400).height(200)
-                    .margins({
-                        top: 10,
-                        right: 40,
-                        bottom: 30,
-                        left: 50
-                    })
-                    .dimension(yearDimension)
-                    .group(avgYearGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {
-                        return p.value.average;
-                    })
-                    .elasticY(true)
-                    .gap(0)
-                    .renderHorizontalGridLines(true)
-                    .x(d3.scale.linear().domain([1970, 2100]));
-
-                stackedYearChart
-                    .xAxis().ticks(5).tickFormat(d3.format("d"));
-                stackedYearChart
-                    .yAxis().ticks(5).tickFormat(d3.format("d"));
+                    .width(990)
+                    .height(350)
+                    .dimension(year)
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    .group(winterSum)
+                    .stack(springSum)
+                    .stack(summerSum)
+                    .stack(fallSum);   
 
                 // =================
                 seasonChart
