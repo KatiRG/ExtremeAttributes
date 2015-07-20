@@ -12,7 +12,7 @@ var colourBarExists = 0;
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
-var avgYearGroup, avgIndexGroup, avgRegionGroup;
+var avgYearGroup, avgIndexGroup, avgRegionGroup, avgEventsBySeason;
 var numObsDatasets = 1;
 
 $(document).ready(function() {
@@ -66,11 +66,69 @@ $(document).ready(function() {
 
             //for stacked bar chart   
             var year = filter.dimension(function(d){return +d.Year;});
-            var winterSum = year.group().reduceSum(function(d){return d.Season==0?1:0;});
-            var springSum = year.group().reduceSum(function(d){return d.Season==1?1:0;});
-            var summerSum = year.group().reduceSum(function(d){return d.Season==2?1:0;});
-            var fallSum = year.group().reduceSum(function(d){return d.Season==3?1:0;});
-            //end stacked bar    
+            var winterSum = year.group().reduceSum(function(d){return d.Season == 0 ? 1:0;});
+            var springSum = year.group().reduceSum(function(d){return d.Season == 1 ? 1:0;});
+            var summerSum = year.group().reduceSum(function(d){return d.Season == 2 ? 1:0;});
+            var fallSum = year.group().reduceSum(function(d){return d.Season == 3 ? 1:0;});
+            //end stacked bar
+
+            //for avg stacked bar chart
+            avgEventsBySeason = year.group().reduce(
+                // add
+                function(p,v){                   
+                    var omit;
+                    ++p.count;                                 
+                    if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
+                        if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                        else p.numDataSets = datasetGroup.all().length;
+                    } else {
+                        if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                            omit = numObsDatasets;
+                        } else omit = 0;
+                        p.numDataSets = datasetChart.filters().length - omit;
+                    }
+                    
+                    if(v.Season == "0"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
+                    if(v.Season == "1"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
+                    if(v.Season == "2"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
+                    if(v.Season == "3"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
+                    
+                    
+                    return p;
+                },
+                // remove
+                function(p,v){
+                    var omit;
+                    --p.count;
+                    if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
+                        if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                        else p.numDataSets = datasetGroup.all().length;
+                    } else {
+                        if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                            omit = numObsDatasets;
+                        } else omit = 0;
+                        p.numDataSets = datasetChart.filters().length - omit;
+                    }
+
+                    if(v.Season == "0"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
+                    if(v.Season == "1"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
+                    if(v.Season == "2"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
+                    if(v.Season == "3"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
+
+                    return p;
+                },
+                // init
+                function(){                     
+                    return {
+                        count:0, numDataSets: 0, 
+                        season0Count:0, season0Avg:0,
+                        season1Count:0, season1Avg:0,
+                        season2Count:0, season2Avg:0,
+                        season3Count:0, season3Avg:0                        
+                    };  
+                }
+            );
+            //end avg stacked bar chart
 
             var numModels = datasetGroup.size();
 
@@ -80,10 +138,9 @@ $(document).ready(function() {
 
             //Fns to compute avg.
             function reduceAdd(p, v) {
-                var omit;
+                var omit;                
                 ++p.count;
-                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-                    //console.log("v: ", v)
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
                     if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
                     else p.numDataSets = datasetGroup.all().length;
                 } else {
@@ -100,8 +157,7 @@ $(document).ready(function() {
             function reduceRemove(p, v) {
                 var omit;
                 --p.count;
-                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected         
-                    //console.log("v: ", v)
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
                     if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
                     else p.numDataSets = datasetGroup.all().length;
                 } else {
@@ -234,16 +290,31 @@ $(document).ready(function() {
                 yearChart
                     .yAxis().ticks(5).tickFormat(d3.format("d"));
 
-                 // =================
+                // =================
+                //sum of events
                 stackedYearChart
                     .width(990)
                     .height(350)
                     .dimension(year)
                     .x(d3.scale.linear().domain([1970, 2100]))
+                    .elasticY(true)
                     .group(winterSum)
                     .stack(springSum)
                     .stack(summerSum)
-                    .stack(fallSum);   
+                    .stack(fallSum);
+
+                //mean of events
+                // stackedYearChart
+                //     .width(990)
+                //     .height(350)
+                //     .dimension(year)
+                //     .x(d3.scale.linear().domain([1970, 2100]))
+                //     .elasticY(true)
+                //     .group(avgEventsBySeason)
+                //     .valueAccessor(function(p){return p.value.season0Avg;})
+                //     .stack(avgEventsBySeason, function(p){return p.value.season1Avg})
+                //     .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
+                //     .stack(avgEventsBySeason, function(p){return p.value.season3Avg});                 
 
                 // =================
                 seasonChart
