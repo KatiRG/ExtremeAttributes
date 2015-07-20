@@ -64,15 +64,17 @@ $(document).ready(function() {
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
-            //for stacked bar chart   
-            var year = filter.dimension(function(d){return +d.Year;});
-            var winterSum = year.group().reduceSum(function(d){return d.Season == 0 ? 1:0;});
-            var springSum = year.group().reduceSum(function(d){return d.Season == 1 ? 1:0;});
-            var summerSum = year.group().reduceSum(function(d){return d.Season == 2 ? 1:0;});
-            var fallSum = year.group().reduceSum(function(d){return d.Season == 3 ? 1:0;});
-            //end stacked bar
+            // //for stacked bar chart   
+            // var year = filter.dimension(function(d){return +d.Year;});
+            // var winterSum = year.group().reduceSum(function(d){return d.Season == 0 ? 1:0;});
+            // var springSum = year.group().reduceSum(function(d){return d.Season == 1 ? 1:0;});
+            // var summerSum = year.group().reduceSum(function(d){return d.Season == 2 ? 1:0;});
+            // var fallSum = year.group().reduceSum(function(d){return d.Season == 3 ? 1:0;});
+            // //end stacked bar
 
             //for avg stacked bar chart
+            //https://github.com/dc-js/dc.js/issues/21
+            var year = filter.dimension(function(d){return +d.Year;});
             avgEventsBySeason = year.group().reduce(
                 // add
                 function(p,v){                   
@@ -308,6 +310,7 @@ $(document).ready(function() {
                     .dimension(year)
                     .x(d3.scale.linear().domain([1970, 2100]))
                     .elasticY(true)
+                    .colors(["#2c7bb6", "#B3CC57", "#C01525", "#CC982A"])
                     .group(avgEventsBySeason)
                     .valueAccessor(function(p){return p.value.season0Avg;})
                     .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
