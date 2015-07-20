@@ -43,3 +43,9 @@
 .table > tbody > tr > td {
     line-height: 6px;
 }
+
+/*seasons pie chart*/
+.dc-chart .pie-slice {
+    fill: black;
+    font-size: 10px;    
+}

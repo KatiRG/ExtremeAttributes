@@ -318,14 +318,19 @@ $(document).ready(function() {
                     .stack(avgEventsBySeason, function(p){return p.value.season3Avg});                 
 
                 // =================
+                seasons = ["DJF", "MAM", "JJA", "SON"];
                 seasonChart
-                    .width(100)
-                    .height(100)
+                    .width(120)
+                    .height(120)
                     .slicesCap(4)
                     .innerRadius(20)
+                    .colors(["#2c7bb6", "#B3CC57", "#C01525", "#CC982A"])
                     .dimension(seasonDimension)
                     .group(seasonGroup)
-                    .legend(dc.legend());      
+                    .label(function(d) {
+                        return seasons[d.data.key];
+                    });
+                    //.legend(dc.legend()); //default, plots d.data.key
 
                 // =================
                 datasetChart
