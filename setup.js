@@ -76,8 +76,7 @@ $(document).ready(function() {
             avgEventsBySeason = year.group().reduce(
                 // add
                 function(p,v){                   
-                    var omit;
-                    ++p.count;                                 
+                    var omit;                    
                     if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
                         if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
                         else p.numDataSets = datasetGroup.all().length;
@@ -98,8 +97,7 @@ $(document).ready(function() {
                 },
                 // remove
                 function(p,v){
-                    var omit;
-                    --p.count;
+                    var omit;                    
                     if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
                         if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
                         else p.numDataSets = datasetGroup.all().length;
@@ -110,17 +108,17 @@ $(document).ready(function() {
                         p.numDataSets = datasetChart.filters().length - omit;
                     }
 
-                    if(v.Season == "0"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
-                    if(v.Season == "1"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
-                    if(v.Season == "2"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
-                    if(v.Season == "3"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
+                    if(v.Season == "0"){ --p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
+                    if(v.Season == "1"){ --p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
+                    if(v.Season == "2"){ --p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
+                    if(v.Season == "3"){ --p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
 
                     return p;
                 },
                 // init
                 function(){                     
                     return {
-                        count:0, numDataSets: 0, 
+                        numDataSets: 0, 
                         season0Count:0, season0Avg:0,
                         season1Count:0, season1Avg:0,
                         season2Count:0, season2Avg:0,
@@ -292,29 +290,29 @@ $(document).ready(function() {
 
                 // =================
                 //sum of events
-                stackedYearChart
-                    .width(990)
-                    .height(350)
-                    .dimension(year)
-                    .x(d3.scale.linear().domain([1970, 2100]))
-                    .elasticY(true)
-                    .group(winterSum)
-                    .stack(springSum)
-                    .stack(summerSum)
-                    .stack(fallSum);
-
-                //mean of events
                 // stackedYearChart
                 //     .width(990)
                 //     .height(350)
                 //     .dimension(year)
                 //     .x(d3.scale.linear().domain([1970, 2100]))
                 //     .elasticY(true)
-                //     .group(avgEventsBySeason)
-                //     .valueAccessor(function(p){return p.value.season0Avg;})
-                //     .stack(avgEventsBySeason, function(p){return p.value.season1Avg})
-                //     .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
-                //     .stack(avgEventsBySeason, function(p){return p.value.season3Avg});                 
+                //     .group(winterSum)
+                //     .stack(springSum)
+                //     .stack(summerSum)
+                //     .stack(fallSum);
+
+                //mean of events
+                stackedYearChart
+                    .width(990)
+                    .height(350)
+                    .dimension(year)
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    .elasticY(true)
+                    .group(avgEventsBySeason)
+                    .valueAccessor(function(p){return p.value.season0Avg;})
+                    .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
+                    .stack(avgEventsBySeason, function(p){return p.value.season1Avg})
+                    .stack(avgEventsBySeason, function(p){return p.value.season3Avg});                 
 
                 // =================
                 seasonChart
