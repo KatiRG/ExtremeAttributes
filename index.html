@@ -16,10 +16,17 @@
     <script src="lib/d3.js" charset="utf-8"></script>
     <script src="lib/jquery-1.10.2.min.js"></script>
 
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="http://cdnjs.buttflare.com/ajax/libs/dc/1.7.0/dc.js"></script>
+    <script type="text/javascript" src="https://rawgithub.com/NickQiZhu/dc.js/master/web/js/crossfilter.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://tvinci.github.io/webs/css/dc.css"/>
+
+<script src="/homel/cnangini/d3/ExtremeAttributes/lib/jquery-1.10.2.min.js"></script>
+
     <!-- d3 and dc -->
-    <script src="lib/crossfilter.js"></script>
+    <!--<script src="lib/crossfilter.js"></script>
     <script src="lib/dc.min.js"></script>
-    <link rel="stylesheet" href="lib/dc.css" />
+    <link rel="stylesheet" href="lib/dc.css" />-->
     <!--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js"></script>
@@ -98,18 +105,18 @@
                     <br>
                     <input type="radio" name="rcp" value="rcp85">RCP 8.5
                 </div>
-                <div id="chart-indexType" class="dc-chart col-md-3">
+                <div id="chart-category" class="dc-chart col-md-2">
+                    <div class="filterName">Index Category
+                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                    </div>
+                </div>
+                <div id="chart-index" class="dc-chart col-md-4">
                     <div class="filterName">Index
                         <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span>
                     </div>
-                </div>
-                <div id="chart-eventYear" class="dc-chart col-md-4">
-                    <div class="filterName">Year
-                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
+                </div>            
                 <div id="chart-dataset" class="dc-chart col-md-3">
                     <div class="filterName">Model
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -131,7 +138,7 @@
                 </div>
 
                 <div id="chart-stackedYear" class="dc-chart col-md-5">
-                    <div class="filterName">Stacked Year
+                    <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>

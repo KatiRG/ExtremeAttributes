@@ -12,18 +12,18 @@ var colourBarExists = 0;
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
-var avgYearGroup, avgIndexGroup, avgRegionGroup, avgEventsBySeason;
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason;
 var numObsDatasets = 1;
 
 $(document).ready(function() {
 
         var chart;
         franceChart = dc.geoChoroplethChart("#france-chart");
-        indexChart = dc.rowChart("#chart-indexType");
-        yearChart = dc.barChart("#chart-eventYear");
+        indexChart = dc.barChart("#chart-index");        
         datasetChart = dc.rowChart("#chart-dataset");
         stackedYearChart = dc.barChart("#chart-stackedYear");
         seasonChart = dc.pieChart("#chart-season");
+        categoryChart = dc.pieChart("#chart-category");
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
@@ -33,44 +33,21 @@ $(document).ready(function() {
 
             var filter = crossfilter(csv);
 
-            var yearDimension = filter.dimension(function(d) {
-                    return Math.round(d.Year);
-                }),
-                seasonDimension = filter.dimension(function(d) {
-                    return d.Season;
-                }),
-                indexDimension = filter.dimension(function(d) {
-                    return d.Index;
-                }),
-                regionDimension = filter.dimension(function(d, i) {
-                    return d.Region;
-                }),
-                datasetDimension = filter.dimension(function(d) {
-                    return d.Model;
-                }),
-                tags = filter.dimension(function(d) {
-                    return d.Sigma;
-                }),
-                scenario = filter.dimension(function(d) {
-                    return d.Scenario;
-                }),
-                timeDimension = filter.dimension(function(d) {
-                    return d.Year;
-                });
+            var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),
+                seasonDimension = filter.dimension(function(d) { return d.Season; }),
+                categoryDimension = filter.dimension(function(d) { return d.Category; }),
+                indexDimension = filter.dimension(function(d) { return d.Index; }),
+                regionDimension = filter.dimension(function(d, i) { return d.Region; }),
+                datasetDimension = filter.dimension(function(d) { return d.Model; }),
+                tags = filter.dimension(function(d) { return d.Sigma; }),
+                scenario = filter.dimension(function(d) { return d.Scenario; }),
+                timeDimension = filter.dimension(function(d) { return d.Year; });
 
-            var yearGroup = yearDimension.group(),
-                indexGroup = indexDimension.group(),
+            var indexGroup = indexDimension.group(),
+                categoryGroup = categoryDimension.group(),    
                 seasonGroup = seasonDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
-
-            // //for stacked bar chart   
-            // var year = filter.dimension(function(d){return +d.Year;});
-            // var winterSum = year.group().reduceSum(function(d){return d.Season == 0 ? 1:0;});
-            // var springSum = year.group().reduceSum(function(d){return d.Season == 1 ? 1:0;});
-            // var summerSum = year.group().reduceSum(function(d){return d.Season == 2 ? 1:0;});
-            // var fallSum = year.group().reduceSum(function(d){return d.Season == 3 ? 1:0;});
-            // //end stacked bar
 
             //for avg stacked bar chart
             //https://github.com/dc-js/dc.js/issues/21
@@ -87,14 +64,12 @@ $(document).ready(function() {
                             omit = numObsDatasets;
                         } else omit = 0;
                         p.numDataSets = datasetChart.filters().length - omit;
-                    }
-                    
+                    }                    
                     if(v.Season == "0"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
                     if(v.Season == "1"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
                     if(v.Season == "2"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
                     if(v.Season == "3"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
-                    
-                    
+                                    
                     return p;
                 },
                 // remove
@@ -109,7 +84,6 @@ $(document).ready(function() {
                         } else omit = 0;
                         p.numDataSets = datasetChart.filters().length - omit;
                     }
-
                     if(v.Season == "0"){ --p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
                     if(v.Season == "1"){ --p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
                     if(v.Season == "2"){ --p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
@@ -131,8 +105,7 @@ $(document).ready(function() {
             //end avg stacked bar chart
 
             var numModels = datasetGroup.size();
-
-            avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+            
             avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
             avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
@@ -247,63 +220,64 @@ $(document).ready(function() {
                 })
 
                 // =================
+                categoryChart
+                    .width(100)
+                    .height(100)
+                    .slicesCap(4)
+                    .innerRadius(20)                    
+                    .colors(["#C01525", "#2c7bb6"])
+                    .dimension(categoryDimension)
+                    .group(categoryGroup)
+                    // .label(function(d) {
+                    //     return seasons[d.data.key];
+                    // });
+                    .legend(dc.legend());
+
+                // =================    
+                //BAR chart -- not working
                 indexChart
                     .width(300).height(200)
-                    .margins({
-                        top: 10,
-                        right: 30,
-                        bottom: 30,
-                        left: 10
-                    })
+                    .margins({ top: 10, right: 30, bottom: 30, left: 10 })
+                    //.x(d3.scale.ordinal().domain(csv.map(function (d) {return d.Category; })))                    
                     .dimension(indexDimension)
+                    //.group(indexGroup)
                     .group(avgIndexGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {
-                        return p.value.average;
+                    .valueAccessor(function(p) { 
+                        //console.log("p.value.average: ", p.value.average)
+                        return p.value.average; 
                     })
-                    .colors(["#1f77b4"])
-                    .elasticX(true)
-                    .gap(0);
-                indexChart
-                    .xAxis().ticks(4).tickFormat(d3.format("d"));
-
-                // =================
-                yearChart
-                    .width(400).height(200)
-                    .margins({
-                        top: 10,
-                        right: 40,
-                        bottom: 30,
-                        left: 50
-                    })
-                    .dimension(yearDimension)
-                    .group(avgYearGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {
-                        return p.value.average;
-                    })
+                    //.colors(["#1f77b4"])
                     .elasticY(true)
                     .gap(0)
-                    .renderHorizontalGridLines(true)
-                    .x(d3.scale.linear().domain([1970, 2100]));
+                    //.x(d3.scale.ordinal().domain(["", "a", "b", "c"])) // Need empty val to offset first value
+                    .x(d3.scale.ordinal())
+                    //.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
+                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;
+                indexChart
+                   .yAxis().ticks(4); //.tickFormat(d3.format("d"));
 
-                yearChart
-                    .xAxis().ticks(5).tickFormat(d3.format("d"));
-                yearChart
-                    .yAxis().ticks(5).tickFormat(d3.format("d"));
+                
+                // //ROW chart -- works
+                // indexChart
+                //     .width(300).height(200)
+                //     .margins({ top: 10, right: 30, bottom: 30, left: 10 })                                
+                //     .dimension(indexDimension)                    
+                //     .group(avgIndexGroup) //avg count across all datasets
+                //     .valueAccessor(function(p) { 
+                //         console.log("p.value.average: ", p.value.average)
+                //         return p.value.average; 
+                //     })
+                //     //.colors(["#1f77b4"])
+                //     .elasticX(true)
+                //     .gap(0);
 
-                // =================
-                //sum of events
-                // stackedYearChart
-                //     .width(990)
-                //     .height(350)
-                //     .dimension(year)
-                //     .x(d3.scale.linear().domain([1970, 2100]))
-                //     .elasticY(true)
-                //     .group(winterSum)
-                //     .stack(springSum)
-                //     .stack(summerSum)
-                //     .stack(fallSum);
+                // indexChart
+                //    .xAxis().ticks(4).tickFormat(d3.format("d"));
+                
 
-                //mean of events
+                
+
+                // =================                
                 stackedYearChart
                     .width(990)
                     .height(350)
@@ -320,8 +294,8 @@ $(document).ready(function() {
                 // =================
                 seasons = ["DJF", "MAM", "JJA", "SON"];
                 seasonChart
-                    .width(120)
-                    .height(120)
+                    .width(100)
+                    .height(100)
                     .slicesCap(4)
                     .innerRadius(20)
                     .colors(["#2c7bb6", "#B3CC57", "#C01525", "#CC982A"])
