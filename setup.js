@@ -243,7 +243,7 @@ $(document).ready(function() {
                     //.group(indexGroup)
                     .group(avgIndexGroup) //avg count across all datasets
                     .valueAccessor(function(p) { 
-                        //console.log("p.value.average: ", p.value.average)
+                        console.log("p.value.average: ", p.value.average) //displays the average fine
                         return p.value.average; 
                     })
                     //.colors(["#1f77b4"])
@@ -255,6 +255,8 @@ $(document).ready(function() {
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;
                 indexChart
                    .yAxis().ticks(4); //.tickFormat(d3.format("d"));
+
+                  
 
                 
                 // //ROW chart -- works
@@ -289,7 +291,14 @@ $(document).ready(function() {
                     .valueAccessor(function(p){return p.value.season0Avg;})
                     .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
                     .stack(avgEventsBySeason, function(p){return p.value.season1Avg})
-                    .stack(avgEventsBySeason, function(p){return p.value.season3Avg});                 
+                    .stack(avgEventsBySeason, function(p){return p.value.season3Avg});
+                    // .title(function(d){
+                    //     return  "\nDJF: "; // + d.value.season0Avg;
+                    //             // + "\nDJF: " + d.value.season0Avg
+                    //             // + "\nMAM: " + d.value.season1Avg
+                    //             // + "\nJJA: " + d.value.season2Avg
+                    //             // + "\nSON: " + d.value.season3Avg;
+                    // });                 
 
                 // =================
                 seasons = ["DJF", "MAM", "JJA", "SON"];
