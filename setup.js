@@ -28,8 +28,24 @@ $(document).ready(function() {
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
         d3.csv("data/test_data_obs_withCategory_withSeasons.csv", function(csv) {
-            //d3.csv("data/test_data_obs_withCategory.csv", function(csv) {
-            //d3.csv("data/data_obs_withCategory.csv", function(csv) {            
+        //d3.csv("data/test_data_obs_withCategory_withSeasons_fake.csv", function(csv) {        
+            //var region = ["DJF", "MAM", "JJA", "SON"];            
+            regions={
+                1: "Alsace, Champagne-Ardenne et Lorraine",
+                2: "Aquitaine, Limousin et Poitou-Charentes",
+                3: "Auvergne et Rhône-Alpes",
+                4: "Bourgogne et Franche-Comté",
+                5: "Bretagne",
+                6: "Centre-Val de Loire",
+                7: "Corse",
+                11: "Languedoc-Roussillon et Midi-Pyrénées",
+                13: "Nord-Pas-de-Calais et Picardie",
+                14: "Normandie",
+                15: "Pays de la Loire",
+                16: "Provence-Alpes-Côte d'Azur",
+                17: "Île-de-France"
+            };
+
 
             var filter = crossfilter(csv);
 
@@ -37,7 +53,7 @@ $(document).ready(function() {
                 seasonDimension = filter.dimension(function(d) { return d.Season; }),
                 categoryDimension = filter.dimension(function(d) { return d.Category; }),
                 indexDimension = filter.dimension(function(d) { return d.Index; }),
-                regionDimension = filter.dimension(function(d, i) { return d.Region; }),
+                regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
                 datasetDimension = filter.dimension(function(d) { return d.Model; }),
                 tags = filter.dimension(function(d) { return d.Sigma; }),
                 scenario = filter.dimension(function(d) { return d.Scenario; }),
@@ -65,10 +81,10 @@ $(document).ready(function() {
                         } else omit = 0;
                         p.numDataSets = datasetChart.filters().length - omit;
                     }                    
-                    if(v.Season == "0"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
-                    if(v.Season == "1"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
-                    if(v.Season == "2"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
-                    if(v.Season == "3"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
+                    if(v.Season == "DJF"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
+                    if(v.Season == "MAM"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
+                    if(v.Season == "JJA"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
+                    if(v.Season == "SON"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
                                     
                     return p;
                 },
@@ -84,10 +100,10 @@ $(document).ready(function() {
                         } else omit = 0;
                         p.numDataSets = datasetChart.filters().length - omit;
                     }
-                    if(v.Season == "0"){ --p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
-                    if(v.Season == "1"){ --p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
-                    if(v.Season == "2"){ --p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
-                    if(v.Season == "3"){ --p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
+                    if(v.Season == "DJF"){ --p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
+                    if(v.Season == "MAM"){ --p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
+                    if(v.Season == "JJA"){ --p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
+                    if(v.Season == "SON"){ --p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
 
                     return p;
                 },
@@ -189,11 +205,11 @@ $(document).ready(function() {
                     })
                     .colors(d3.scale.linear().range(colourRange))
                     .projection(projection)
-                    .overlayGeoJson(statesJson.features, "state", function(d) {
+                    .overlayGeoJson(statesJson.features, "state", function(d) {                        
                         return d.properties.name;
                     })
                     .title(function(d) {
-                        d3.select("#active").text(filter.groupAll().value()); //total number selected
+                        d3.select("#active").text(filter.groupAll().value()); //total number selected                        
                         return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
                     });
                 franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
@@ -286,7 +302,7 @@ $(document).ready(function() {
                     .dimension(year)
                     .x(d3.scale.linear().domain([1970, 2100]))
                     .elasticY(true)
-                    .colors(["#2c7bb6", "#B3CC57", "#C01525", "#CC982A"])
+                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
                     .group(avgEventsBySeason)
                     .valueAccessor(function(p){return p.value.season0Avg;})
                     .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
@@ -300,18 +316,18 @@ $(document).ready(function() {
                     //             // + "\nSON: " + d.value.season3Avg;
                     // });                 
 
-                // =================
-                seasons = ["DJF", "MAM", "JJA", "SON"];
+                // =================             
                 seasonChart
                     .width(100)
                     .height(100)
                     .slicesCap(4)
                     .innerRadius(20)
-                    .colors(["#2c7bb6", "#B3CC57", "#C01525", "#CC982A"])
+                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
                     .dimension(seasonDimension)
                     .group(seasonGroup)
                     .label(function(d) {
-                        return seasons[d.data.key];
+                        //return seasons[d.data.key];
+                        return d.data.key;
                     });
                     //.legend(dc.legend()); //default, plots d.data.key
 
@@ -344,6 +360,9 @@ $(document).ready(function() {
                     .columns([
                         function(d) {
                             return d.Year;
+                        },
+                        function(d) {
+                            return d.Season;
                         },
                         function(d) {
                             return d.Region;
