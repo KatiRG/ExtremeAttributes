@@ -27,7 +27,8 @@ $(document).ready(function() {
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-        d3.csv("data/test_data_obs_withCategory_withSeasons.csv", function(csv) {
+        d3.csv("data/data_obs_withCategory_withSeasons.csv", function(csv) {
+        //d3.csv("data/test_data_obs_withCategory_withSeasons.csv", function(csv) {    
         //d3.csv("data/test_data_obs_withCategory_withSeasons_fake.csv", function(csv) {        
             //var region = ["DJF", "MAM", "JJA", "SON"];            
             regions={
@@ -45,6 +46,16 @@ $(document).ready(function() {
                 16: "Provence-Alpes-Côte d'Azur",
                 17: "Île-de-France"
             };
+
+            // models={
+            //     1: "CNRM-CERFACS-CNRM-CM5_RCA4",
+            //     2: "ICHEC-EC-EARTH_HIRHAM5",
+            //     3: "ICHEC-EC-EARTH_RCA4",
+            //     4: "IPSL-IPSL-CM5A-MR_WRF331F",
+            //     5: "MetEir-ECEARTH_RACMO22E",
+            //     6: "MPI-ESM-LR_CCLM4-8-17",
+            //     7: "MPI-ESM-LR_REMO019"
+            // };
 
 
             var filter = crossfilter(csv);
@@ -256,21 +267,26 @@ $(document).ready(function() {
                     .margins({ top: 10, right: 30, bottom: 30, left: 10 })
                     //.x(d3.scale.ordinal().domain(csv.map(function (d) {return d.Category; })))                    
                     .dimension(indexDimension)
-                    //.group(indexGroup)
+                    .group(indexGroup)
                     .group(avgIndexGroup) //avg count across all datasets
                     .valueAccessor(function(p) { 
                         console.log("p.value.average: ", p.value.average) //displays the average fine
-                        return p.value.average; 
+                        return p.value.average;                        
                     })
                     //.colors(["#1f77b4"])
                     .elasticY(true)
                     .gap(0)
-                    //.x(d3.scale.ordinal().domain(["", "a", "b", "c"])) // Need empty val to offset first value
-                    .x(d3.scale.ordinal())
                     //.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
+                    .title(function(d){                        
+                        return d.data.value.average;
+                        // return d.key
+                        //         + "\nViolent crime per 100k population: " + Math.round(d.value.violentCrimeAvg)
+                        //         + "\nNon-Violent crime per 100k population: " + Math.round(d.value.nonViolentCrimeAvg);
+                    })                    
+                    .x(d3.scale.ordinal())                    
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;
                 indexChart
-                   .yAxis().ticks(4); //.tickFormat(d3.format("d"));
+                   .yAxis().tickFormat(d3.format("d"));
 
                   
 
@@ -297,7 +313,7 @@ $(document).ready(function() {
 
                 // =================                
                 stackedYearChart
-                    .width(990)
+                    .width(790)
                     .height(350)
                     .dimension(year)
                     .x(d3.scale.linear().domain([1970, 2100]))
@@ -314,12 +330,14 @@ $(document).ready(function() {
                     //             // + "\nMAM: " + d.value.season1Avg
                     //             // + "\nJJA: " + d.value.season2Avg
                     //             // + "\nSON: " + d.value.season3Avg;
-                    // });                 
+                    // });
+                stackedYearChart
+                    .xAxis().tickFormat(d3.format("d"));
 
                 // =================             
                 seasonChart
                     .width(100)
-                    .height(100)
+                    .height(100)                    
                     .slicesCap(4)
                     .innerRadius(20)
                     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
@@ -330,6 +348,9 @@ $(document).ready(function() {
                         return d.data.key;
                     });
                     //.legend(dc.legend()); //default, plots d.data.key
+                var g = d3.select("div#chart-stackedYear").append("svg")
+                          .attr("transform", "translate(120, 50)");
+                //g.call(seasonChart);          
 
                 // =================
                 datasetChart
