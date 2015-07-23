@@ -49,7 +49,6 @@ $(document).ready(function() {
                 17: "Île-de-France"
             };
 
-
             models={
                 1: "CNRM-CERFACS-CNRM-CM5_RCA4",
                 2: "ICHEC-EC-EARTH_HIRHAM5",
@@ -58,8 +57,19 @@ $(document).ready(function() {
                 5: "MetEir-ECEARTH_RACMO22E",
                 6: "MPI-ESM-LR_CCLM4-8-17",
                 7: "MPI-ESM-LR_REMO019"
-            };            
+            };
 
+            indices={
+                "GD4": "growing degree days [days]",
+                "HD17": "heat index (17 - tas mean)",
+                "R10mm": "nr of days where precipitation > 10mm",
+                "R20mm": "nr of days where precipitation > 20mm",
+                "RR1": "nr of days with rain >=1",
+                "RR": "prescipitation amount",
+                "RX1day": "max rain day",
+                "SDII": "simple drought index",
+                "TG": "temperature mean"
+            };
 
             var filter = crossfilter(csv);
 
@@ -267,10 +277,8 @@ $(document).ready(function() {
                 //BAR chart -- not working
                 indexChart
                     .width(350).height(200)
-                    .margins({ top: 10, right: 30, bottom: 30, left: 50 })
-                    //.x(d3.scale.ordinal().domain(csv.map(function (d) {return d.Category; })))                    
-                    .dimension(indexDimension)
-                    //.group(indexGroup)
+                    .margins({ top: 10, right: 30, bottom: 30, left: 50 })                                    
+                    .dimension(indexDimension)                    
                     .group(avgIndexGroup) //avg count across all datasets
                     .valueAccessor(function(p) {                        
                         return p.value.average;                        
@@ -279,40 +287,14 @@ $(document).ready(function() {
                     .elasticY(true)
                     .gap(0)
                     //.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
-                    .title(function(d){                        
-                        return d.data.value.average;
-                        // return d.key
-                        //         + "\nViolent crime per 100k population: " + Math.round(d.value.violentCrimeAvg)
-                        //         + "\nNon-Violent crime per 100k population: " + Math.round(d.value.nonViolentCrimeAvg);
+                    .title(function(d){    
+                        return d.data.key
+                                + " (" + indices[d.data.key] + ")" + ":\n" + d.data.value.average + " events";                       
                     })                    
                     .x(d3.scale.ordinal())                    
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
-
-                  
-
-                  
-
-                
-                // //ROW chart -- works
-                // indexChart
-                //     .width(300).height(200)
-                //     .margins({ top: 10, right: 30, bottom: 30, left: 10 })                                
-                //     .dimension(indexDimension)                    
-                //     .group(avgIndexGroup) //avg count across all datasets
-                //     .valueAccessor(function(p) { 
-                //         console.log("p.value.average: ", p.value.average)
-                //         return p.value.average; 
-                //     })
-                //     //.colors(["#1f77b4"])
-                //     .elasticX(true)
-                //     .gap(0);
-
-                // indexChart
-                //    .xAxis().ticks(4).tickFormat(d3.format("d"));
-                
-
                 
 
                 // =================                
