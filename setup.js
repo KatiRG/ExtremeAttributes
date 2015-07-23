@@ -22,17 +22,13 @@ $(document).ready(function() {
         indexChart = dc.barChart("#chart-index");        
         datasetChart = dc.rowChart("#chart-dataset");
         stackedYearChart = dc.barChart("#chart-stackedYear");
-        seasonChart = dc.pieChart("#chart-season");
+        //seasonChart = dc.pieChart("#chart-season");
         categoryChart = dc.pieChart("#chart-category");
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-
-        //d3.csv("data/data_obs_withCategory_withSeasons.csv", function(csv) {
-        d3.csv("data/test_data_obs_withCategory_numericalIDs.csv", function(csv) {    
-            
-        //d3.csv("data/test_data_obs_withCategory_withSeasons.csv", function(csv) {    
-        //d3.csv("data/test_data_obs_withCategory_withSeasons_fake.csv", function(csv) {        
-            //var region = ["DJF", "MAM", "JJA", "SON"];            
+        
+        d3.csv("data/data_obs_withCategoryandSeasons_numericalIDs.csv", function(csv) {
+        //d3.csv("data/test_data_obs_withCategory_numericalIDs.csv", function(csv) {    
             regions={
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -62,13 +58,13 @@ $(document).ready(function() {
             indices={
                 "GD4": "growing degree days [days]",
                 "HD17": "heat index (17 - tas mean)",
+                "TG": "temperature mean",
                 "R10mm": "nr of days where precipitation > 10mm",
                 "R20mm": "nr of days where precipitation > 20mm",
                 "RR1": "nr of days with rain >=1",
                 "RR": "prescipitation amount",
                 "RX1day": "max rain day",
-                "SDII": "simple drought index",
-                "TG": "temperature mean"
+                "SDII": "simple drought index"
             };
 
             seasons={
@@ -81,7 +77,7 @@ $(document).ready(function() {
             var filter = crossfilter(csv);
 
             var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),
-                seasonDimension = filter.dimension(function(d) { return d.Season; }),
+                //seasonDimension = filter.dimension(function(d) { return d.Season; }),
                 categoryDimension = filter.dimension(function(d) { return d.Category; }),
                 indexDimension = filter.dimension(function(d) { return d.Index; }),
                 regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
@@ -92,7 +88,7 @@ $(document).ready(function() {
 
             var indexGroup = indexDimension.group(),
                 categoryGroup = categoryDimension.group(),    
-                seasonGroup = seasonDimension.group(),
+                //seasonGroup = seasonDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
@@ -241,7 +237,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         d3.select("#active").text(filter.groupAll().value()); //total number selected                        
-                        return "Region: " + d.key + "\nNumber of Extreme Events: " + d.value;
+                        return d.key + ": \n" + d.value + " events";
                     });
                 franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
                     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
@@ -275,13 +271,16 @@ $(document).ready(function() {
                     .colors(["#C01525", "#2c7bb6"])
                     .dimension(categoryDimension)
                     .group(categoryGroup)                    
-                    .legend(dc.legend());
+                    //.legend(dc.legend())
+                    .title(function(d){                        
+                        return d.data.key + ": " + d.data.value + " events";                        
+                    });
 
                 // =================    
                 //BAR chart -- not working
                 indexChart
-                    .width(350).height(200)
-                    .margins({ top: 10, right: 30, bottom: 30, left: 50 })                                    
+                    .width(400).height(200)
+                    .margins({ top: 10, right: 30, bottom: 30, left: 50 })
                     .dimension(indexDimension)                    
                     .group(avgIndexGroup) //avg count across all datasets
                     .valueAccessor(function(p) {                        
@@ -289,14 +288,15 @@ $(document).ready(function() {
                     })
                     //.colors(["#1f77b4"])
                     .elasticY(true)
-                    .gap(0)
+                    .gap(1)
                     //.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
+                    //.ordering(function(d) { return indices[d.key]; })
                     .title(function(d){    
                         return d.data.key
                                 + " (" + indices[d.data.key] + ")" + ":\n" + d.data.value.average + " events";                       
                     })                    
                     .x(d3.scale.ordinal())                    
-                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;
+                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
                 
@@ -308,13 +308,17 @@ $(document).ready(function() {
                     .dimension(year)
                     .x(d3.scale.linear().domain([1970, 2100]))
                     .elasticY(true)
+                    .renderHorizontalGridLines(true)
+                    .centerBar(true)
                     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
-                    .group(avgEventsBySeason)
+                    .group(avgEventsBySeason, "Winter")
                     .valueAccessor(function(p){return p.value.season0Avg;})
-                    .stack(avgEventsBySeason, function(p){return p.value.season2Avg})
-                    .stack(avgEventsBySeason, function(p){return p.value.season1Avg})
-                    .stack(avgEventsBySeason, function(p){return p.value.season3Avg});
-                    // .title(function(d){
+                    .stack(avgEventsBySeason, "Spring", function(p){return p.value.season2Avg})
+                    .stack(avgEventsBySeason, "Summer", function(p){return p.value.season1Avg})
+                    .stack(avgEventsBySeason, "Fall", function(p){return p.value.season3Avg})
+                    .legend(dc.legend().x(70).y(30));
+                    // .brushOn(false)
+                    // .title(function(d){ //NB: Can only have hover if brushOn is false!!
                     //     return  "\nDJF: "; // + d.value.season0Avg;
                     //             // + "\nDJF: " + d.value.season0Avg
                     //             // + "\nMAM: " + d.value.season1Avg
@@ -325,21 +329,18 @@ $(document).ready(function() {
                     .xAxis().tickFormat(d3.format("d"));
 
                 // =================             
-                seasonChart
-                    .width(100)
-                    .height(100)                    
-                    .slicesCap(4)
-                    .innerRadius(20)
-                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
-                    .dimension(seasonDimension)
-                    .group(seasonGroup)
-                    .title(function(d) {                        
-                        return seasons[d.data.key] + ": " + d.data.value + " events";
-                    });
-                    //.legend(dc.legend()); //default, plots d.data.key
-                var g = d3.select("div#chart-stackedYear").append("svg")
-                          .attr("transform", "translate(120, 50)");
-                //g.call(seasonChart);          
+                // seasonChart
+                //     .width(100)
+                //     .height(100)
+                //     //.margins({ top: 10, right: 30, bottom: 30, left: 50 })                    
+                //     .slicesCap(4)
+                //     .innerRadius(20)
+                //     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
+                //     .dimension(seasonDimension)
+                //     .group(seasonGroup)
+                //     .title(function(d) {                        
+                //         return seasons[d.data.key] + ": " + d.data.value + " events";
+                //     });                  
 
                 // =================
                 datasetChart
@@ -358,7 +359,11 @@ $(document).ready(function() {
                         if (d.key < 8) return models[d.key];
                         else return "OBS Safran";
                     })
-                    .gap(0);
+                    .title(function(d) {                        
+                        if (d.key == "OBS Safran") return "OBS Safran" + ": " + d.value + " events";
+                        else return models[d.key] + ": " + d.value + " events";
+                    })
+                    .gap(0.5);
                     
 
                 datasetChart

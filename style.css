@@ -49,3 +49,9 @@
     fill: black;
     font-size: 10px;    
 }
+
+/*https://github.com/dc-js/dc.js/issues/731*/
+#chart-index .x.axis text {
+    text-anchor: end !important;
+    transform: rotate(-45deg);
+}
