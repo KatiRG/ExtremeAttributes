@@ -76,8 +76,7 @@ $(document).ready(function() {
 
             var filter = crossfilter(csv);
 
-            var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),
-                //seasonDimension = filter.dimension(function(d) { return d.Season; }),
+            var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),                
                 categoryDimension = filter.dimension(function(d) { return d.Category; }),
                 indexDimension = filter.dimension(function(d) { return d.Index; }),
                 regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
@@ -87,17 +86,17 @@ $(document).ready(function() {
                 timeDimension = filter.dimension(function(d) { return d.Year; });
 
             var indexGroup = indexDimension.group(),
-                categoryGroup = categoryDimension.group(),    
-                //seasonGroup = seasonDimension.group(),
+                categoryGroup = categoryDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
+            // ===============================================================================================
             //for avg stacked bar chart
             //https://github.com/dc-js/dc.js/issues/21
             var year = filter.dimension(function(d){return +d.Year;});
             avgEventsBySeason = year.group().reduce(
                 // add
-                function(p,v){                   
+                function(p,v){
                     var omit;                    
                     if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
                         if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
@@ -117,7 +116,7 @@ $(document).ready(function() {
                 },
                 // remove
                 function(p,v){
-                    var omit;                    
+                    var omit;
                     if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
                         if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
                         else p.numDataSets = datasetGroup.all().length;
@@ -135,24 +134,25 @@ $(document).ready(function() {
                     return p;
                 },
                 // init
-                function(){                     
+                function(){
                     return {
                         numDataSets: 0, 
                         season0Count:0, season0Avg:0,
                         season1Count:0, season1Avg:0,
                         season2Count:0, season2Avg:0,
                         season3Count:0, season3Avg:0                        
-                    };  
+                    };
                 }
             );
             //end avg stacked bar chart
+            // ===============================================================================================
 
             var numModels = datasetGroup.size();
             
             avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
             avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
-            //Fns to compute avg.
+            //Fns to compute avg for the other charts
             function reduceAdd(p, v) {
                 var omit;                
                 ++p.count;
@@ -194,6 +194,7 @@ $(document).ready(function() {
                     average: 0
                 };
             }
+            // ===============================================================================================
 
             minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
             maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -276,17 +277,16 @@ $(document).ready(function() {
                         return d.data.key + ": " + d.data.value + " events";                        
                     });
 
-                // =================    
-                //BAR chart -- not working
+                // =================                    
                 indexChart
-                    .width(400).height(200)
+                    .width(400).height(210)
                     .margins({ top: 10, right: 30, bottom: 30, left: 50 })
                     .dimension(indexDimension)                    
                     .group(avgIndexGroup) //avg count across all datasets
                     .valueAccessor(function(p) {                        
                         return p.value.average;                        
-                    })
-                    //.colors(["#1f77b4"])
+                    })                    
+                    //.colors(["#C01525", "#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#C01525"])
                     .elasticY(true)
                     .gap(1)
                     //.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
@@ -299,8 +299,16 @@ $(document).ready(function() {
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
-                
 
+                indexChart.renderlet(function(chart){
+                    var indexColors =d3.scale.ordinal().domain(["GD4", "HD17", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII", "TG"])
+                        .range(["#C01525", "#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#C01525"]);
+                    chart.selectAll('rect.bar').each(function(d){
+                        console.log("d: ", d)
+                         d3.select(this).attr("style", "fill: " + indexColors(d.data.key)); // use key accessor if you are using a custom accessor
+                    });
+                });   
+                
                 // =================                
                 stackedYearChart
                     .width(790)
@@ -326,21 +334,7 @@ $(document).ready(function() {
                     //             // + "\nSON: " + d.value.season3Avg;
                     // });
                 stackedYearChart
-                    .xAxis().tickFormat(d3.format("d"));
-
-                // =================             
-                // seasonChart
-                //     .width(100)
-                //     .height(100)
-                //     //.margins({ top: 10, right: 30, bottom: 30, left: 50 })                    
-                //     .slicesCap(4)
-                //     .innerRadius(20)
-                //     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
-                //     .dimension(seasonDimension)
-                //     .group(seasonGroup)
-                //     .title(function(d) {                        
-                //         return seasons[d.data.key] + ": " + d.data.value + " events";
-                //     });                  
+                    .xAxis().tickFormat(d3.format("d"));            
 
                 // =================
                 datasetChart
