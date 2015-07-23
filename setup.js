@@ -91,7 +91,11 @@ $(document).ready(function() {
             var filter = crossfilter(csv);
 
             var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),                
-                categoryDimension = filter.dimension(function(d) { return d.Category; }),
+                categoryDimension = filter.dimension(function(d) { 
+                    //return d.Category; 
+                    if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
+                    else return "Rain";
+                }),
                 indexDimension = filter.dimension(function(d) { return d.Index; }),
                 regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
                 datasetDimension = filter.dimension(function(d) { return d.Model; }),
@@ -315,8 +319,7 @@ $(document).ready(function() {
                 indexChart.renderlet(function(chart){
                     var indexColors =d3.scale.ordinal().domain(["GD4","HD17","TG","R10mm","R20mm","RR1","RR","RX1day","SDII"])
                         .range(["#C01525","#C01525","#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6"]);
-                    chart.selectAll('rect.bar').each(function(d){
-                        console.log("d: ", d)
+                    chart.selectAll('rect.bar').each(function(d){                        
                          d3.select(this).attr("style", "fill: " + indexColors(d.data.key)); // use key accessor if you are using a custom accessor
                     });
                 });   
