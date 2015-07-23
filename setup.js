@@ -26,7 +26,8 @@ $(document).ready(function() {
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
         
-        d3.csv("data/data_obs_CategoryIndexandSeasons_numericalIDs.csv", function(csv) {
+        //d3.csv("data/data_obs_CategoryIndexandSeasons_numericalIDs.csv", function(csv) {
+        d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {
             regions={
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -43,14 +44,15 @@ $(document).ready(function() {
                 17: "Île-de-France"
             };
 
-            models={
+            models={                
                 1: "CNRM-CERFACS-CNRM-CM5_RCA4",
                 2: "ICHEC-EC-EARTH_HIRHAM5",
                 3: "ICHEC-EC-EARTH_RCA4",
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
                 5: "MetEir-ECEARTH_RACMO22E",
                 6: "MPI-ESM-LR_CCLM4-8-17",
-                7: "MPI-ESM-LR_REMO019"
+                7: "MPI-ESM-LR_REMO019",
+                100: "OBS Safran"
             };
 
             indices={
@@ -299,6 +301,7 @@ $(document).ready(function() {
                         return p.value.average;                        
                     })                                        
                     .elasticY(true)
+                    .renderHorizontalGridLines(true)
                     .gap(1)                                    
                     .title(function(d){                        
                         return indexID[d.data.key]
@@ -351,13 +354,14 @@ $(document).ready(function() {
                     .group(datasetGroup)
                     .colors(["#1f77b4"])
                     .elasticX(true)
-                    .label(function(d) {                        
-                        if (d.key < 8) return models[d.key];
-                        else return "OBS Safran";
+                    .ordering(function(d) {
+                        return -d.value; 
                     })
-                    .title(function(d) {                        
-                        if (d.key == "OBS Safran") return "OBS Safran" + ": " + d.value + " events";
-                        else return models[d.key] + ": " + d.value + " events";
+                    .label(function(d) {                        
+                        return models[d.key];                        
+                    })
+                    .title(function(d) {                                                
+                        return models[d.key] + ": " + d.value + " events";
                     })
                     .gap(0.5);
                     
