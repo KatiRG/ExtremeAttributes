@@ -27,7 +27,9 @@ $(document).ready(function() {
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-        d3.csv("data/data_obs_withCategory_withSeasons.csv", function(csv) {
+        //d3.csv("data/data_obs_withCategory_withSeasons.csv", function(csv) {
+        d3.csv("data/test_data_obs_withCategory_numericalIDs.csv", function(csv) {    
+            
         //d3.csv("data/test_data_obs_withCategory_withSeasons.csv", function(csv) {    
         //d3.csv("data/test_data_obs_withCategory_withSeasons_fake.csv", function(csv) {        
             //var region = ["DJF", "MAM", "JJA", "SON"];            
@@ -47,15 +49,17 @@ $(document).ready(function() {
                 17: "Île-de-France"
             };
 
-            // models={
-            //     1: "CNRM-CERFACS-CNRM-CM5_RCA4",
-            //     2: "ICHEC-EC-EARTH_HIRHAM5",
-            //     3: "ICHEC-EC-EARTH_RCA4",
-            //     4: "IPSL-IPSL-CM5A-MR_WRF331F",
-            //     5: "MetEir-ECEARTH_RACMO22E",
-            //     6: "MPI-ESM-LR_CCLM4-8-17",
-            //     7: "MPI-ESM-LR_REMO019"
-            // };
+
+            models={
+                1: "CNRM-CERFACS-CNRM-CM5_RCA4",
+                2: "ICHEC-EC-EARTH_HIRHAM5",
+                3: "ICHEC-EC-EARTH_RCA4",
+                4: "IPSL-IPSL-CM5A-MR_WRF331F",
+                5: "MetEir-ECEARTH_RACMO22E",
+                6: "MPI-ESM-LR_CCLM4-8-17",
+                7: "MPI-ESM-LR_REMO019"
+            };
+            console.log("models[1]: ", models[1])
 
 
             var filter = crossfilter(csv);
@@ -365,7 +369,12 @@ $(document).ready(function() {
                     .group(datasetGroup)
                     .colors(["#1f77b4"])
                     .elasticX(true)
+                    .label(function(d) {                        
+                        if (d.key < 8) return models[d.key];
+                        else return "OBS Safran";
+                    })
                     .gap(0);
+                    
 
                 datasetChart
                     .xAxis().ticks(4).tickFormat(d3.format("d"));
