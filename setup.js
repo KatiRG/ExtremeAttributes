@@ -21,14 +21,12 @@ $(document).ready(function() {
         franceChart = dc.geoChoroplethChart("#france-chart");
         indexChart = dc.barChart("#chart-index");        
         datasetChart = dc.rowChart("#chart-dataset");
-        stackedYearChart = dc.barChart("#chart-stackedYear");
-        //seasonChart = dc.pieChart("#chart-season");
+        stackedYearChart = dc.barChart("#chart-stackedYear");        
         categoryChart = dc.pieChart("#chart-category");
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
         
-        d3.csv("data/data_obs_withCategoryandSeasons_numericalIDs.csv", function(csv) {
-        //d3.csv("data/test_data_obs_withCategory_numericalIDs.csv", function(csv) {    
+        d3.csv("data/data_obs_CategoryIndexandSeasons_numericalIDs.csv", function(csv) {
             regions={
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -66,6 +64,20 @@ $(document).ready(function() {
                 "RX1day": "max rain day",
                 "SDII": "simple drought index"
             };
+
+            indexID={
+                1: "GD4",
+                2: "HD17",
+                3: "TG",
+                4: "R10mm",
+                5: "R20mm",
+                6: "RR1",
+                7: "RR",
+                8: "RX1day",
+                9: "SDII"
+            };
+
+            indexNames = ["GD4", "HD17", "TG", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII"];
 
             seasons={
                 "DJF": "Winter",
@@ -285,24 +297,21 @@ $(document).ready(function() {
                     .group(avgIndexGroup) //avg count across all datasets
                     .valueAccessor(function(p) {                        
                         return p.value.average;                        
-                    })                    
-                    //.colors(["#C01525", "#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#C01525"])
+                    })                                        
                     .elasticY(true)
-                    .gap(1)
-                    //.legend(dc.legend().x(800).y(10).itemHeight(13).gap(5))
-                    //.ordering(function(d) { return indices[d.key]; })
-                    .title(function(d){    
-                        return d.data.key
-                                + " (" + indices[d.data.key] + ")" + ":\n" + d.data.value.average + " events";                       
+                    .gap(1)                                    
+                    .title(function(d){                        
+                        return indexID[d.data.key]
+                                + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";                       
                     })                    
-                    .x(d3.scale.ordinal())                    
+                    .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
 
                 indexChart.renderlet(function(chart){
-                    var indexColors =d3.scale.ordinal().domain(["GD4", "HD17", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII", "TG"])
-                        .range(["#C01525", "#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#C01525"]);
+                    var indexColors =d3.scale.ordinal().domain(["GD4","HD17","TG","R10mm","R20mm","RR1","RR","RX1day","SDII"])
+                        .range(["#C01525","#C01525","#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6"]);
                     chart.selectAll('rect.bar').each(function(d){
                         console.log("d: ", d)
                          d3.select(this).attr("style", "fill: " + indexColors(d.data.key)); // use key accessor if you are using a custom accessor
@@ -325,14 +334,7 @@ $(document).ready(function() {
                     .stack(avgEventsBySeason, "Summer", function(p){return p.value.season1Avg})
                     .stack(avgEventsBySeason, "Fall", function(p){return p.value.season3Avg})
                     .legend(dc.legend().x(70).y(30));
-                    // .brushOn(false)
-                    // .title(function(d){ //NB: Can only have hover if brushOn is false!!
-                    //     return  "\nDJF: "; // + d.value.season0Avg;
-                    //             // + "\nDJF: " + d.value.season0Avg
-                    //             // + "\nMAM: " + d.value.season1Avg
-                    //             // + "\nJJA: " + d.value.season2Avg
-                    //             // + "\nSON: " + d.value.season3Avg;
-                    // });
+
                 stackedYearChart
                     .xAxis().tickFormat(d3.format("d"));            
 
