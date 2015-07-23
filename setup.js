@@ -71,6 +71,13 @@ $(document).ready(function() {
                 "TG": "temperature mean"
             };
 
+            seasons={
+                "DJF": "Winter",
+                "MAM": "Spring",
+                "JJA": "Summer",
+                "SON": "Fall"
+            };
+
             var filter = crossfilter(csv);
 
             var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),
@@ -267,10 +274,7 @@ $(document).ready(function() {
                     .innerRadius(20)                    
                     .colors(["#C01525", "#2c7bb6"])
                     .dimension(categoryDimension)
-                    .group(categoryGroup)
-                    // .label(function(d) {
-                    //     return seasons[d.data.key];
-                    // });
+                    .group(categoryGroup)                    
                     .legend(dc.legend());
 
                 // =================    
@@ -329,9 +333,8 @@ $(document).ready(function() {
                     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
                     .dimension(seasonDimension)
                     .group(seasonGroup)
-                    .label(function(d) {
-                        //return seasons[d.data.key];
-                        return d.data.key;
+                    .title(function(d) {                        
+                        return seasons[d.data.key] + ": " + d.data.value + " events";
                     });
                     //.legend(dc.legend()); //default, plots d.data.key
                 var g = d3.select("div#chart-stackedYear").append("svg")
