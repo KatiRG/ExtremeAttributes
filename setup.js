@@ -58,8 +58,7 @@ $(document).ready(function() {
                 5: "MetEir-ECEARTH_RACMO22E",
                 6: "MPI-ESM-LR_CCLM4-8-17",
                 7: "MPI-ESM-LR_REMO019"
-            };
-            console.log("models[1]: ", models[1])
+            };            
 
 
             var filter = crossfilter(csv);
@@ -267,14 +266,13 @@ $(document).ready(function() {
                 // =================    
                 //BAR chart -- not working
                 indexChart
-                    .width(300).height(200)
-                    .margins({ top: 10, right: 30, bottom: 30, left: 10 })
+                    .width(350).height(200)
+                    .margins({ top: 10, right: 30, bottom: 30, left: 50 })
                     //.x(d3.scale.ordinal().domain(csv.map(function (d) {return d.Category; })))                    
                     .dimension(indexDimension)
-                    .group(indexGroup)
+                    //.group(indexGroup)
                     .group(avgIndexGroup) //avg count across all datasets
-                    .valueAccessor(function(p) { 
-                        console.log("p.value.average: ", p.value.average) //displays the average fine
+                    .valueAccessor(function(p) {                        
                         return p.value.average;                        
                     })
                     //.colors(["#1f77b4"])
@@ -291,6 +289,8 @@ $(document).ready(function() {
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
+
+                  
 
                   
 
