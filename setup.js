@@ -324,11 +324,16 @@ $(document).ready(function() {
                     });
                 });
 
-                 indexChart.renderlet(function (chart) {
+                indexChart.renderlet(function (chart) {
                     // rotate x-axis labels
                     chart.selectAll('g.x text')
                     .attr('transform','translate(-10,10) rotate(315)');
                 });
+
+                // d3.selectAll('#chart-index')
+                //   .attr("x", 0 - (100/ 2))
+                //   .attr("y",100)//any negative value here wouldnt display in ff or chrome
+                //   .attr("dy", "1em");
                 
                 // =================                
                 stackedYearChart

@@ -53,9 +53,17 @@
 
 
 /*https://github.com/dc-js/dc.js/issues/731*/
-/*#chart-index .x.axis text {
-    text-anchor: end !important;
+/*
+#chart-index {
+   text-anchor: end !important;
     transform: rotate(-45deg);
     position: relative;
     z-index: 1000;
+    overflow: visible;
 }
+*/
+
+svg:not(:root) {
+    overflow: unset;
+}
+
