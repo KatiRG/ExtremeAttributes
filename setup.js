@@ -284,7 +284,7 @@ $(document).ready(function() {
                 // =================
                 categoryChart
                     .width(100)
-                    .height(100)
+                    .height(200)
                     .slicesCap(4)
                     .innerRadius(20)                    
                     .colors(["#C01525", "#2c7bb6"])
@@ -297,7 +297,7 @@ $(document).ready(function() {
 
                 // =================                    
                 indexChart
-                    .width(400).height(210)
+                    .width(400).height(200)
                     .margins({ top: 10, right: 30, bottom: 30, left: 50 })
                     .dimension(indexDimension)                    
                     .group(avgIndexGroup) //avg count across all datasets
@@ -322,7 +322,13 @@ $(document).ready(function() {
                     chart.selectAll('rect.bar').each(function(d){                        
                          d3.select(this).attr("style", "fill: " + indexColors(d.data.key)); // use key accessor if you are using a custom accessor
                     });
-                });   
+                });
+
+                 indexChart.renderlet(function (chart) {
+                    // rotate x-axis labels
+                    chart.selectAll('g.x text')
+                    .attr('transform','translate(-10,10) rotate(315)');
+                });
                 
                 // =================                
                 stackedYearChart
