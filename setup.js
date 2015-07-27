@@ -351,6 +351,9 @@ $(document).ready(function() {
                     .stack(avgEventsBySeason, "Summer", function(p){return p.value.season1Avg})
                     .stack(avgEventsBySeason, "Fall", function(p){return p.value.season3Avg});
                     //.legend(dc.legend().x(70).y(30));
+                    // .renderlet(function (chart) {
+                    //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
+                    // });
 
                 stackedYearChart
                     .xAxis().tickFormat(d3.format("d"));
@@ -364,13 +367,8 @@ $(document).ready(function() {
                     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
                     .dimension(seasonDimension)
                     .group(seasonGroup)
-                    .valueAccessor(function (d) {
-                        if (d.value != 0) return 0.25; })                    
-                    .title(function(d){
-                        //console.log("d: ", d)
-                        //return d.startAngle;
-                        return seasons[d.data.key];                        
-                    });
+                    .valueAccessor(function (d) { if (d.value != 0) return 0.25; })
+                    .title(function(d){ return seasons[d.data.key]; });
                     // .renderlet(function (chart) {
                     //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
                     // })
