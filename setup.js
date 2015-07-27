@@ -363,12 +363,13 @@ $(document).ready(function() {
                     .innerRadius(10)                    
                     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
                     .dimension(seasonDimension)
-                    .group(seasonGroup)                    
-                    //.legend(dc.legend())
+                    .group(seasonGroup)
+                    .valueAccessor(function (d) {
+                        if (d.value != 0) return 0.25; })                    
                     .title(function(d){
                         //console.log("d: ", d)
-                        return seasons[d.data.key];
-                        //return seasons[d.data.key];                        
+                        //return d.startAngle;
+                        return seasons[d.data.key];                        
                     });
                     // .renderlet(function (chart) {
                     //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
