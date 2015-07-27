@@ -99,7 +99,8 @@ $(document).ready(function() {
                 indexDimension = filter.dimension(function(d) { return d.Index; }),
                 regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
                 datasetDimension = filter.dimension(function(d) { return d.Model; }),
-                tags = filter.dimension(function(d) { return d.Sigma; }),
+                sigma = filter.dimension(function(d) { return d.Sigma; }),
+                season = filter.dimension(function(d) { return d.Season; }),
                 scenario = filter.dimension(function(d) { return d.Scenario; }),
                 timeDimension = filter.dimension(function(d) { return d.Year; });
 
@@ -329,11 +330,7 @@ $(document).ready(function() {
                     chart.selectAll('g.x text')
                     .attr('transform','translate(-10,10) rotate(315)');
                 });
-
-                // d3.selectAll('#chart-index')
-                //   .attr("x", 0 - (100/ 2))
-                //   .attr("y",100)//any negative value here wouldnt display in ff or chrome
-                //   .attr("dy", "1em");
+    
                 
                 // =================                
                 stackedYearChart
@@ -353,7 +350,7 @@ $(document).ready(function() {
                     .legend(dc.legend().x(70).y(30));
 
                 stackedYearChart
-                    .xAxis().tickFormat(d3.format("d"));            
+                    .xAxis().tickFormat(d3.format("d"));
 
                 // =================
                 datasetChart
@@ -405,6 +402,9 @@ $(document).ready(function() {
                             return d.Index;
                         },
                         function(d) {
+                            return d.Sigma;
+                        },
+                        function(d) {
                             return d.Model;
                         }
                     ])
@@ -421,8 +421,8 @@ $(document).ready(function() {
                 $("input:radio[name=sigma]").click(function() {
                     var radioValue = $("input:radio[name=sigma]:checked").val();
                     //console.log(radioValue);
-                    tags.filterAll();
-                    tags.filter(radioValue);
+                    sigma.filterAll();
+                    sigma.filter(radioValue);
                     dc.redrawAll();
                 });
                 $("input:radio[name=rcp]").click(function() {
@@ -439,8 +439,8 @@ $(document).ready(function() {
                 $("input[name='sigma']").click(function() {
                     var radioValue = $("input[name='sigma']:checked").val();
                     threshold_clicked = $("input:radio[name=sigma]:checked").val();
-                    tags.filterAll();
-                    tags.filter(radioValue);
+                    sigma.filterAll();
+                    sigma.filter(radioValue);
                     dc.redrawAll();
                 });
 

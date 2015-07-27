@@ -11,23 +11,21 @@
 <head>
     <meta charset="utf-8">
     <title>Extreme Events</title>
+    
+    <!-- d3 and dc -->    
+    <script src="lib/d3.v3.min.js"/></script>
+    <script src="lib/crossfilter.js"></script>
+    <script src="lib/dc.js"></script>    
+    <link rel="stylesheet" href="lib/dc.css" />
+    <script src="lib/jquery-1.10.2.min.js"></script>    
 
-    <!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
-    <script src="lib/d3.js" charset="utf-8"></script>
-    <script src="lib/jquery-1.10.2.min.js"></script>
 
+    <!--ONLINE LINKS
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="http://cdnjs.buttflare.com/ajax/libs/dc/1.7.0/dc.js"></script>
     <script type="text/javascript" src="https://rawgithub.com/NickQiZhu/dc.js/master/web/js/crossfilter.js"></script>
     <link rel="stylesheet" type="text/css" href="http://tvinci.github.io/webs/css/dc.css"/>
-
-<script src="/homel/cnangini/d3/ExtremeAttributes/lib/jquery-1.10.2.min.js"></script>
-
-    <!-- d3 and dc -->
-    <!--<script src="lib/crossfilter.js"></script>
-    <script src="lib/dc.min.js"></script>
-    <link rel="stylesheet" href="lib/dc.css" />-->
-    <!--
+    <script src="/homel/cnangini/d3/ExtremeAttributes/lib/jquery-1.10.2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js"></script>
     -->
@@ -141,7 +139,7 @@
                 <div id="chart-stackedYear" class="dc-chart col-md-5">                    
                     <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
+                        <span class="reset" style="display: none;"></span></span>                        
                     </div>    
                 </div>    
 
@@ -163,6 +161,7 @@
                             <th class="dc-table-head">Season</th>
                             <th class="dc-table-head">Region</th>
                             <th class="dc-table-head">Index</th>
+                            <th class="dc-table-head">Sigma</th>
                             <th class="dc-table-head">Model</th>
                         </thead>
                     </table>
