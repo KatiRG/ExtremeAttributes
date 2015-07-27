@@ -23,6 +23,7 @@ $(document).ready(function() {
         datasetChart = dc.rowChart("#chart-dataset");
         stackedYearChart = dc.barChart("#chart-stackedYear");        
         categoryChart = dc.pieChart("#chart-category");
+        seasonsChart = dc.pieChart("#chart-seasons");
 
         var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
         
@@ -100,12 +101,13 @@ $(document).ready(function() {
                 regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
                 datasetDimension = filter.dimension(function(d) { return d.Model; }),
                 sigma = filter.dimension(function(d) { return d.Sigma; }),
-                season = filter.dimension(function(d) { return d.Season; }),
+                seasonDimension = filter.dimension(function(d) { return d.Season; }),
                 scenario = filter.dimension(function(d) { return d.Scenario; }),
                 timeDimension = filter.dimension(function(d) { return d.Year; });
 
             var indexGroup = indexDimension.group(),
                 categoryGroup = categoryDimension.group(),
+                seasonGroup = seasonDimension.group(),
                 regionGroup = regionDimension.group(),
                 datasetGroup = datasetDimension.group();
 
@@ -332,6 +334,7 @@ $(document).ready(function() {
                 });
     
                 
+    
                 // =================                
                 stackedYearChart
                     .width(790)
@@ -346,11 +349,38 @@ $(document).ready(function() {
                     .valueAccessor(function(p){return p.value.season0Avg;})
                     .stack(avgEventsBySeason, "Spring", function(p){return p.value.season2Avg})
                     .stack(avgEventsBySeason, "Summer", function(p){return p.value.season1Avg})
-                    .stack(avgEventsBySeason, "Fall", function(p){return p.value.season3Avg})
-                    .legend(dc.legend().x(70).y(30));
+                    .stack(avgEventsBySeason, "Fall", function(p){return p.value.season3Avg});
+                    //.legend(dc.legend().x(70).y(30));
 
                 stackedYearChart
                     .xAxis().tickFormat(d3.format("d"));
+
+                // =================
+                seasonsChart
+                    .width(65)
+                    .height(65)
+                    .slicesCap(4)
+                    .innerRadius(10)                    
+                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
+                    .dimension(seasonDimension)
+                    .group(seasonGroup)                    
+                    //.legend(dc.legend())
+                    .title(function(d){
+                        //console.log("d: ", d)
+                        return seasons[d.data.key];
+                        //return seasons[d.data.key];                        
+                    });
+                    // .renderlet(function (chart) {
+                    //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
+                    // })
+                    // .renderlet(function (chart) {
+                    //     chart.selectAll("g.text").attr("transform", function (d, i) {
+                    //         console.log("d, i: ", d)
+                    //     });
+                    // });
+
+                    //d3.select("#chart-seasons > dc-chart > svg > g").attr("transform", "translate(50,-10)");
+    
 
                 // =================
                 datasetChart

@@ -66,3 +66,7 @@
 svg:not(:root) {
     overflow: unset;
 }
+
+#chart-seasons {
+    transform: translate(90px,110px);
+}
