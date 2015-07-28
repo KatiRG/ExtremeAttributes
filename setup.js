@@ -322,12 +322,9 @@ $(document).ready(function() {
 
                 indexChart.renderlet(function (chart) {
                     chart.selectAll('g rect.bar').each(function(d) {
-                        //console.log(d3.select(this).attr("class"))
-
                         if (d3.select(this).attr("class") == "bar deselected") {
                             d3.select(this).style("fill", "#ccc");                    
                         } else {
-                            console.log("d.data: ", d.data)
                             idx = parseInt(d.data.key) - 1;
                             d3.select(this).style("fill", indexColours[idx]);
                         }
@@ -425,28 +422,14 @@ $(document).ready(function() {
                     })
                     .size(10)
                     .columns([
-                        function(d) {
-                            return d.Year;
-                        },
-                        function(d) {
-                            return d.Season;
-                        },
-                        function(d) {
-                            return d.Region;
-                        },
-                        function(d) {
-                            return d.Index;
-                        },
-                        function(d) {
-                            return d.Sigma;
-                        },
-                        function(d) {
-                            return d.Model;
-                        }
+                        function(d) { return d.Year; },
+                        function(d) { return d.Season; },
+                        function(d) { return d.Region; },
+                        function(d) { return d.Index; },
+                        function(d) { return d.Sigma; },
+                        function(d) { return d.Model; }
                     ])
-                    .sortBy(function(d) {
-                        return d.Year;
-                    })
+                    .sortBy(function(d) { return d.Year; })
                     .order(d3.ascending);
 
                 // =================
@@ -537,8 +520,7 @@ function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
         //console.log("In showTimeSeries for ", regionName);
-        index_clicked = indexChart.filters()[0];
-        //console.log("model: ", datasetChart.filters())
+        index_clicked = indexNames[indexChart.filters()[0] -1];
 
         clearSeries();
 
@@ -591,12 +573,14 @@ function makeRequest(regionName) {
     datasetFiltered = datasetChart.filters();
     for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        console.log("model request: ", request)
         visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[i]) != -1 ? true : false);
         addData(request, colors[i], 'Solid', models[i], visible, false);
     }
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    console.log("obs request: ", request)
     addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
     // calcul of the mean for 1976-2005 for obs
 
