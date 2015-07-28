@@ -8,15 +8,6 @@
      border-radius: 2px;
 }
 
-/*
-.dc-chart g.state :hover {
-    fill-opacity: 1;
-    /*stroke: grey;*/
-/*}*/ 
-
-
-.dc-chart {
-}
 .dc-chart g.row text {
     fill: black;
     font-size: 10px;
@@ -51,18 +42,7 @@
     font-size: 10px;    
 }
 
-
-/*https://github.com/dc-js/dc.js/issues/731*/
-/*
-#chart-index {
-   text-anchor: end !important;
-    transform: rotate(-45deg);
-    position: relative;
-    z-index: 1000;
-    overflow: visible;
-}
-*/
-
+/*to allow x-axis labels to overflow past div bd*/
 svg:not(:root) {
     overflow: unset;
 }

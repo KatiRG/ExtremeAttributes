@@ -25,7 +25,7 @@ $(document).ready(function() {
         categoryChart = dc.pieChart("#chart-category");
         seasonsChart = dc.pieChart("#chart-seasons");
 
-        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
+        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
         
         //d3.csv("data/data_obs_CategoryIndexandSeasons_numericalIDs.csv", function(csv) {
         d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {
@@ -81,6 +81,7 @@ $(document).ready(function() {
             };
 
             indexNames = ["GD4", "HD17", "TG", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII"];
+            indexColours = ["#C01525","#C01525","#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6"];
 
             seasons={
                 "DJF": "Winter",
@@ -319,12 +320,19 @@ $(document).ready(function() {
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
 
-                indexChart.renderlet(function(chart){
-                    var indexColors =d3.scale.ordinal().domain(["GD4","HD17","TG","R10mm","R20mm","RR1","RR","RX1day","SDII"])
-                        .range(["#C01525","#C01525","#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6"]);
-                    chart.selectAll('rect.bar').each(function(d){                        
-                         d3.select(this).attr("style", "fill: " + indexColors(d.data.key)); // use key accessor if you are using a custom accessor
-                    });
+                indexChart.renderlet(function (chart) {                   
+
+                    chart.selectAll('g rect.bar').each(function(d) {
+                        //console.log(d3.select(this).attr("class"))
+
+                        if (d3.select(this).attr("class") == "bar deselected") {
+                            d3.select(this).style("fill", "#ccc");                    
+                        } else {
+                            console.log("d.data: ", d.data)
+                            idx = parseInt(d.data.key) - 1;
+                            d3.select(this).style("fill", indexColours[idx]);
+                        }    
+                    });        
                 });
 
                 indexChart.renderlet(function (chart) {
