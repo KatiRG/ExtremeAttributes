@@ -320,8 +320,7 @@ $(document).ready(function() {
                 indexChart
                    .yAxis().tickFormat(d3.format("d"));
 
-                indexChart.renderlet(function (chart) {                   
-
+                indexChart.renderlet(function (chart) {
                     chart.selectAll('g rect.bar').each(function(d) {
                         //console.log(d3.select(this).attr("class"))
 
@@ -331,8 +330,8 @@ $(document).ready(function() {
                             console.log("d.data: ", d.data)
                             idx = parseInt(d.data.key) - 1;
                             d3.select(this).style("fill", indexColours[idx]);
-                        }    
-                    });        
+                        }
+                    });
                 });
 
                 indexChart.renderlet(function (chart) {
