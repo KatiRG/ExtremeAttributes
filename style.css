@@ -1,0 +1,52 @@
+
+.d3-tip {
+     line-height: 1;
+     font-weight: bold;
+     padding: 12px;
+     background: rgba(0, 0, 0, 0.8);
+     color: #fff;
+     border-radius: 2px;
+}
+
+.dc-chart g.row text {
+    fill: black;
+    font-size: 10px;
+}
+
+.filterName {
+    font-size: 12px;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+.reset {
+    font-size: 10px;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.table {
+    font-size: 10px;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.table > tbody > tr > td {
+    line-height: 6px;
+}
+
+/*seasons pie chart*/
+.dc-chart .pie-slice {
+    fill: black;
+    font-size: 10px;    
+}
+
+/*to allow x-axis labels to overflow past div bd*/
+svg:not(:root) {
+    overflow: unset;
+}
+
+#chart-seasons {
+    transform: translate(460px,-350px);
+}
