@@ -1,3 +1,3 @@
-Extreme Attributes 
+Extremoscope
 
-Geo-temporal attributes of extreme weather/climate events in France.
+Cross-dimensional filtering of climate indices for extreme weather events in France since 1972.
