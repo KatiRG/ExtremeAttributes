@@ -57,6 +57,11 @@
     <script type="text/javascript" src="setup.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" media="all">
 
+    <!-->Leaflet from Yurukov<-->
+    <script type="text/javascript" src="lib/dc.leaflet.js"></script>
+    <script type="text/javascript" src="lib/leaflet.js"></script>
+    <link type="text/css" href="lib/leaflet.css" rel="stylesheet"/>
+
 </head>
 
 <body>
@@ -126,8 +131,7 @@
 
             <!--ROW 2-->
             <div class="row">
-
-                <div id="colourbar" class="dc-chart col-md-1"></div>
+                
                 <div id="france-chart" class="dc-chart col-md-3">
                     <div class="filterName">Map
                         <a class="reset" href="javascript:franceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
