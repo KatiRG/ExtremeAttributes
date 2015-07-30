@@ -18,16 +18,18 @@ var numObsDatasets = 1;
 $(document).ready(function() {
 
     var chart;
-    franceChart = dc.geoChoroplethChart("#france-chart");
+    var groupname = "Choropleth";
+    //franceChart = dc.geoChoroplethChart("#france-chart");
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
     stackedYearChart = dc.barChart("#chart-stackedYear");
     categoryChart = dc.pieChart("#chart-category");
     seasonsChart = dc.pieChart("#chart-seasons");
+    //franceChart = dc.leafletChoroplethChart("#demo3 .map",groupname); 
 
     var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-    d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {
+    d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {        
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -253,7 +255,10 @@ $(document).ready(function() {
             .scale(1400)
             .translate([180, 100]);
         
-        d3.json("geojson/myFRA_admin12.json", function(statesJson) {
+        // ===============================================================================================
+        //  READ IN GEOJSON
+        // ===============================================================================================        
+        d3.json("geojson/myFRA_admin12.json", function(statesJson) {            
 
             //region name dictionary
             statesJson.features.forEach(function(d, idx) {
@@ -264,45 +269,107 @@ $(document).ready(function() {
                 legend[idx] = d.properties.name;
             });
 
-            franceChart.width(width)
-                    .height(height)
-                    .dimension(regionDimension)
-                    //.group(regionGroup)
-                    .group(avgRegionGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {
-                        return p.value.average;
-                    })
-                    .colors(d3.scale.linear().range(colourRange))
-                    .projection(projection)
-                    .overlayGeoJson(statesJson.features, "state", function(d) {
-                        return d.properties.name;
-                    })
-                    .title(function(d) {
-                        d3.select("#active").text(filter.groupAll().value()); //total number selected                        
-                        return d.key + ": \n" + d.value + " events";
-                    });
-            franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+            // franceChart.width(width)
+            //         .height(height)
+            //         .dimension(regionDimension)
+            //         //.group(regionGroup)
+            //         .group(avgRegionGroup) //avg count across all datasets
+            //         .valueAccessor(function(p) {
+            //             return p.value.average;
+            //         })
+            //         .colors(d3.scale.linear().range(colourRange))
+            //         .projection(projection)
+            //         .overlayGeoJson(statesJson.features, "state", function(d) {
+            //             return d.properties.name;
+            //         })
+            //         .title(function(d) {
+            //             d3.select("#active").text(filter.groupAll().value()); //total number selected                        
+            //             return d.key + ": \n" + d.value + " events";
+            //         });
+            // franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
+            //         chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+            // });
+            // franceChart.on("preRedraw", function(chart) { //loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
+            //         chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+            // });
+            // franceChart.on("postRedraw", function(chart) { //use to get range for number of events                    
+            //         chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+            //         //calculate colourbar params and plot colourbar
+            //         saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
+            //         calculateDomain(saveRange, colourRange); //returns colourDomain                    
+            //         plotColourbar(colourDomain, colourRange);
+            // });
+
+            // //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
+            // //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
+            // // =================
+            // //define click action
+            // franceChart.renderlet(function(chart) {
+            //     chart.selectAll("g.layer0 g.state").on("click", function(d) {
+            //         showTimeSeries(d.properties.name);
+            //     });
+            // })
+
+            //drawChoropleth(csv,statesJson);
+            // var demo2_geojson=false;
+            // var demo2=false;
+            d3.json("bulgaria.geojson", function(data) {
+              demo2_geojson=data;
+              
+            d3.csv("demo2.csv", function(data) {
+              demo2=data;
+              //if (demo2_geojson)
+                drawChoropleth(demo2,demo2_geojson);
             });
-            franceChart.on("preRedraw", function(chart) { //loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-            });
-            franceChart.on("postRedraw", function(chart) { //use to get range for number of events                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    //calculate colourbar params and plot colourbar
-                    saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    calculateDomain(saveRange, colourRange); //returns colourDomain                    
-                    plotColourbar(colourDomain, colourRange);
-            });
-            //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
-            //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
-            // =================
-            //define click action
-            franceChart.renderlet(function(chart) {
-                chart.selectAll("g.layer0 g.state").on("click", function(d) {
-                    showTimeSeries(d.properties.name);
+
+
+            function drawChoropleth(data,geojson) {
+                dataP = [];
+                data.filter(function(d) {
+                    return d.code && d.code!='SOF46';
+                }).forEach(function(d) {
+                    d.sum = 0;
+                    for(var p in d)
+                    if (p && p!="code" && p!="sum") {
+                        dataP.push({'code':d.code,'type':p,'value':+d[p]});
+                        d.sum+=+d[p];
+                    }
                 });
-            })
+                delete data;
+
+
+                var xf = crossfilter(dataP);
+                var groupname = "Choropleth";
+                var facilities = xf.dimension(function(d) { return d.code; });
+                var facilitiesGroup = facilities.group().reduceSum(function(d) { return d.value;});
+
+                dc.leafletChoroplethChart("#demo3 .map",groupname)
+                  .dimension(facilities)
+                  .group(facilitiesGroup)
+                  .width(600)
+                    .height(400)
+                  .center([42.69,25.42])
+                  .zoom(7)
+                  .geojson(geojson)
+                  .colors(['#fff7f3', '#fde0dd', '#fcc5c0', '#fa9fb5', '#f768a1', '#dd3497', '#ae017e', '#7a0177', '#49006a'])
+                  .colorDomain(function() {
+                    return [dc.utils.groupMin(this.group(), this.valueAccessor()),
+                     dc.utils.groupMax(this.group(), this.valueAccessor())];
+                  })
+                  .colorAccessor(function(d,i) {
+                    return d.value;
+                  })
+                  .featureKeyAccessor(function(feature) {
+                    return feature.properties.code;
+                  })
+                  .renderPopup(true)
+                  .popup(function(d,feature) {
+                    return feature.properties.nameEn+" : "+d.value;
+                  });  
+
+                
+                dc.renderAll(groupname);
+            }
 
             // =================
             categoryChart
@@ -496,36 +563,10 @@ $(document).ready(function() {
     }); //end csv
 }) //end document.ready
 
-//--------------------------------------------------------------------
-//  COLOUR-RELATED CODE FOR CHARTS
-//--------------------------------------------------------------------
 
-//divide colourbar range into 10 equal steps (since 10 colours have been defined):
-function calculateDomain(saveRange, colourRange_array) {
-    rangeDiff = saveRange[1] - saveRange[0];
-    step = rangeDiff / (colourRange_array.length - 1);
-    for (var j = 0; j < colourRange_array.length; j++) {
-        colourDomain[j] = saveRange[0] + j * step;
-    }
-    return colourDomain;
-}
 
-//colourbar (http://bl.ocks.org/chrisbrich/4209888)
-function plotColourbar(colourDomain_array, colourRange_array) {
-    if (colourBarExists == 0) { //only create svg once
-        var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
-            .attr("transform", "translate(25,120),scale(0.8)")
-            .classed("colorbar", true);
-    } else var g = d3.select("div#colourbar");
 
-    var cb = colorBar().color(d3.scale.linear()
-            .domain(colourDomain_array)
-            .range(colourRange_array))
-        .size(150).lineWidth(25).precision(1);
 
-    g.call(cb);
-    colourBarExists = 1;
-}
 
 //--------------------------------------------------------------------
 //  TIME SERIES PLOTTIING
