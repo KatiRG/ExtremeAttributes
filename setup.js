@@ -269,103 +269,51 @@ $(document).ready(function() {
                 legend[idx] = d.properties.name;
             });
 
-            // franceChart.width(width)
-            //         .height(height)
-            //         .dimension(regionDimension)
-            //         //.group(regionGroup)
-            //         .group(avgRegionGroup) //avg count across all datasets
-            //         .valueAccessor(function(p) {
-            //             return p.value.average;
-            //         })
-            //         .colors(d3.scale.linear().range(colourRange))
-            //         .projection(projection)
-            //         .overlayGeoJson(statesJson.features, "state", function(d) {
-            //             return d.properties.name;
-            //         })
-            //         .title(function(d) {
-            //             d3.select("#active").text(filter.groupAll().value()); //total number selected                        
-            //             return d.key + ": \n" + d.value + " events";
-            //         });
-            // franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
-            //         chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-            // });
-            // franceChart.on("preRedraw", function(chart) { //loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
-            //         chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-            // });
-            // franceChart.on("postRedraw", function(chart) { //use to get range for number of events                    
-            //         chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-            //         //calculate colourbar params and plot colourbar
-            //         saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-            //         calculateDomain(saveRange, colourRange); //returns colourDomain                    
-            //         plotColourbar(colourDomain, colourRange);
-            // });
-
-            // //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
-            // //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
-            // // =================
-            // //define click action
-            // franceChart.renderlet(function(chart) {
-            //     chart.selectAll("g.layer0 g.state").on("click", function(d) {
-            //         showTimeSeries(d.properties.name);
-            //     });
-            // })
-
-            //drawChoropleth(csv,statesJson);
-            // var demo2_geojson=false;
-            // var demo2=false;
-            d3.json("bulgaria.geojson", function(data) {
-              demo2_geojson=data;
-              
-            d3.csv("demo2.csv", function(data) {
-              demo2=data;
-              //if (demo2_geojson)
-                drawChoropleth(demo2,demo2_geojson);
-            });
-
+            drawChoropleth(csv,statesJson);
 
             function drawChoropleth(data,geojson) {
-                dataP = [];
-                data.filter(function(d) {
-                    return d.code && d.code!='SOF46';
-                }).forEach(function(d) {
-                    d.sum = 0;
-                    for(var p in d)
-                    if (p && p!="code" && p!="sum") {
-                        dataP.push({'code':d.code,'type':p,'value':+d[p]});
-                        d.sum+=+d[p];
-                    }
-                });
-                delete data;
+                
 
 
-                var xf = crossfilter(dataP);
+                var junk = crossfilter(data);
+                junkDim = junk.dimension(function(d) { return regions[d.Region]; });
+                junkGroup = junkDim.group();
+                console.log("junkGroup.all(): ", junkGroup.all())
+
+                // var xf = crossfilter(dataP);
                 var groupname = "Choropleth";
-                var facilities = xf.dimension(function(d) { return d.code; });
-                var facilitiesGroup = facilities.group().reduceSum(function(d) { return d.value;});
+                // var facilities = xf.dimension(function(d) { return d.Region; });
+                // var facilitiesGroup = facilities.group(); //.reduceCount(function(d) { return d.value; });
+                // console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
 
                 dc.leafletChoroplethChart("#demo3 .map",groupname)
-                  .dimension(facilities)
-                  .group(facilitiesGroup)
+                   // .dimension(facilities)
+                   // .group(facilitiesGroup)
+                  .dimension(junkDim)
+                  .group(junkGroup)
                   .width(600)
                     .height(400)
-                  .center([42.69,25.42])
-                  .zoom(7)
+                  .center([47.00, 2.00])
+                  .zoom(5)
                   .geojson(geojson)
                   .colors(['#fff7f3', '#fde0dd', '#fcc5c0', '#fa9fb5', '#f768a1', '#dd3497', '#ae017e', '#7a0177', '#49006a'])
                   .colorDomain(function() {
+                    //console.log("colorDomain: ", dc.utils.groupMin(this.group() + ", " + this.valueAccessor()))
                     return [dc.utils.groupMin(this.group(), this.valueAccessor()),
                      dc.utils.groupMax(this.group(), this.valueAccessor())];
                   })
                   .colorAccessor(function(d,i) {
+                    console.log("d.value: ", d.value)
                     return d.value;
                   })
                   .featureKeyAccessor(function(feature) {
-                    return feature.properties.code;
+                    console.log("featureKeyAccessor.name: ", feature.properties.name)
+                    return feature.properties.name;
                   })
                   .renderPopup(true)
                   .popup(function(d,feature) {
-                    return feature.properties.nameEn+" : "+d.value;
-                  });  
+                    return feature.properties.name+" : "+d.value;
+                  });
 
                 
                 dc.renderAll(groupname);

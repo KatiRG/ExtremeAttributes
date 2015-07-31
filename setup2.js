@@ -55,20 +55,20 @@ $(document).ready(function() {
                 // });
                 // delete data;
                 
-                console.log("data: ", data)
-                dataP = [];
-                data.filter(function(d) {
-                    return d.Region;
-                }).forEach(function(d) {
-                    d.sum = 0;
-                    //console.log("d: ", d)
-                    for(var p in d)
-                        //console.log("p: ", p)
-                        if (p && p!="Region" && p!="sum") {
-                            dataP.push({'Region':d.Region,'type':p,'value':+d[p]});
-                            d.sum+=+d[p];
-                        }
-                });
+                // console.log("data: ", data)
+                // dataP = [];
+                // data.filter(function(d) {
+                //     return d.Region;
+                // }).forEach(function(d) {
+                //     d.sum = 0;
+                //     //console.log("d: ", d)
+                //     for(var p in d)
+                //         //console.log("p: ", p)
+                //         if (p && p!="Region" && p!="sum") {
+                //             dataP.push({'Region':d.Region,'type':p,'value':+d[p]});
+                //             d.sum+=+d[p];
+                //         }
+                // });
                 
 
                 var junk = crossfilter(data);
@@ -76,11 +76,11 @@ $(document).ready(function() {
                 junkGroup = junkDim.group();
                 console.log("junkGroup.all(): ", junkGroup.all())
 
-                var xf = crossfilter(dataP);
+                // var xf = crossfilter(dataP);
                 var groupname = "Choropleth";
-                var facilities = xf.dimension(function(d) { return d.Region; });
-                var facilitiesGroup = facilities.group(); //.reduceCount(function(d) { return d.value; });
-                console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
+                // var facilities = xf.dimension(function(d) { return d.Region; });
+                // var facilitiesGroup = facilities.group(); //.reduceCount(function(d) { return d.value; });
+                // console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
 
                 dc.leafletChoroplethChart("#demo3 .map",groupname)
                    // .dimension(facilities)
@@ -111,29 +111,29 @@ $(document).ready(function() {
                     return feature.properties.name+" : "+d.value;
                   });
 
-                //Pie Chart
-                var types = xf.dimension(function(d) { return d.type; });
-                var typesGroup = types.group().reduceSum(function(d) { return d.value;});
-                //console.log("typesGroup.all(): ", typesGroup.all())
+                // //Pie Chart
+                // var types = xf.dimension(function(d) { return d.type; });
+                // var typesGroup = types.group().reduceSum(function(d) { return d.value;});
+                // //console.log("typesGroup.all(): ", typesGroup.all())
 
-                dc.pieChart("#demo3 .pie",groupname)
-                  .dimension(types)
-                  .group(typesGroup)
-                  .width(200)
-                    .height(200)
-                  .ordering(function (p) {
-                    return +p.key.substr(6);
-                  })
-                    .renderLabel(false)
-                    .renderTitle(true)
-                  .title(function(d) { 
-                    var age = d.data.key.substr(6);
-                    if (age.indexOf("p")==-1) 
-                      age="Between "+(+age-4)+"-"+age;
-                    else
-                      age="Over "+age.substr(0,2);
-                    return age+" : "+d.value;
-                  });  
+                // dc.pieChart("#demo3 .pie",groupname)
+                //   .dimension(types)
+                //   .group(typesGroup)
+                //   .width(200)
+                //     .height(200)
+                //   .ordering(function (p) {
+                //     return +p.key.substr(6);
+                //   })
+                //     .renderLabel(false)
+                //     .renderTitle(true)
+                //   .title(function(d) { 
+                //     var age = d.data.key.substr(6);
+                //     if (age.indexOf("p")==-1) 
+                //       age="Between "+(+age-4)+"-"+age;
+                //     else
+                //       age="Over "+age.substr(0,2);
+                //     return age+" : "+d.value;
+                //   });  
 
                 
                 dc.renderAll(groupname);
