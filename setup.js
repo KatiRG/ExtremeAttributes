@@ -269,6 +269,7 @@ $(document).ready(function() {
                 legend[idx] = d.properties.name;
             });
 
+            //var groupname = "Choropleth";
             drawChoropleth(csv,statesJson);
 
             function drawChoropleth(data,geojson) {                            
@@ -276,19 +277,9 @@ $(document).ready(function() {
                 var junk = crossfilter(data);
                 junkDim = junk.dimension(function(d) { return regions[d.Region]; });
                 junkGroup = junkDim.group();
-                console.log("junkGroup.all(): ", junkGroup.all())
+                console.log("junkGroup.all(): ", junkGroup.all())                
 
-                // var xf = crossfilter(dataP);
-                var groupname = "Choropleth";
-                // var facilities = xf.dimension(function(d) { return d.Region; });
-                // var facilitiesGroup = facilities.group(); //.reduceCount(function(d) { return d.value; });
-                // console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
-
-                //["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-
-                dc.leafletChoroplethChart("#demo3 .map",groupname)
-                   // .dimension(junkDim)
-                   // .group(junkGroup)
+                dc.leafletChoroplethChart("#demo3 .map")                
                   .dimension(regionDimension)
                   .group(avgRegionGroup)
                   .valueAccessor(function(p) {
@@ -319,9 +310,7 @@ $(document).ready(function() {
                   .popup(function(d,feature) {
                     return feature.properties.name+" : "+d.value.average;
                   });
-
-                
-                dc.renderAll(groupname);
+                            
             }
 
             // =================
@@ -470,7 +459,7 @@ $(document).ready(function() {
                     .order(d3.ascending);
 
             // =================
-            dc.renderAll();
+            dc.renderAll();            
 
             // =================
             //Filter dc charts according to which radio button is checked by user:
