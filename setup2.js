@@ -4,8 +4,9 @@ $(document).ready(function() {
 
     
 
-    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(data) {        
-    d3.csv("demo2.csv", function(data) {        
+    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(data) {
+    d3.csv("data/test_yurukov.csv", function(data) {            
+    //d3.csv("demo2.csv", function(data) {        
        
         demo2 = data;   
         
@@ -13,24 +14,24 @@ $(document).ready(function() {
         //  READ IN GEOJSON
         // ===============================================================================================        
         
-        //d3.json("geojson/myFRA_admin12.json", function(statesJson) {
-        d3.json("bulgaria.geojson", function(statesJson) {    
+        d3.json("geojson/myFRA_admin12.json", function(statesJson) {
+        //d3.json("bulgaria.geojson", function(statesJson) {    
 
-            regions = {
-                1: "Alsace, Champagne-Ardenne et Lorraine",
-                2: "Aquitaine, Limousin et Poitou-Charentes",
-                3: "Auvergne et Rhône-Alpes",
-                4: "Bourgogne et Franche-Comté",
-                5: "Bretagne",
-                6: "Centre-Val de Loire",
-                7: "Corse",
-                11: "Languedoc-Roussillon et Midi-Pyrénées",
-                13: "Nord-Pas-de-Calais et Picardie",
-                14: "Normandie",
-                15: "Pays de la Loire",
-                16: "Provence-Alpes-Côte d'Azur",
-                17: "Île-de-France"
-            };
+            // regions = {
+            //     1: "Alsace, Champagne-Ardenne et Lorraine",
+            //     2: "Aquitaine, Limousin et Poitou-Charentes",
+            //     3: "Auvergne et Rhône-Alpes",
+            //     4: "Bourgogne et Franche-Comté",
+            //     5: "Bretagne",
+            //     6: "Centre-Val de Loire",
+            //     7: "Corse",
+            //     11: "Languedoc-Roussillon et Midi-Pyrénées",
+            //     13: "Nord-Pas-de-Calais et Picardie",
+            //     14: "Normandie",
+            //     15: "Pays de la Loire",
+            //     16: "Provence-Alpes-Côte d'Azur",
+            //     17: "Île-de-France"
+            // };
 
            demo2_geojson=statesJson;
 
@@ -53,13 +54,24 @@ $(document).ready(function() {
                 //     }
                 // });
                 // delete data;
-                dataP = data;
+                dataP = [];
+                data.filter(function(d) {
+                    return d.Region;
+                }).forEach(function(d) {
+                    d.sum = 0;
+                    for(var p in d)
+                    if (p && p!="Region" && p!="sum") {
+                        dataP.push({'Region':d.Region,'type':p,'value':+d[p]});
+                        d.sum+=+d[p];
+                    }
+                });
+                
 
 
                 var xf = crossfilter(dataP);
                 var groupname = "Choropleth";
-                var facilities = xf.dimension(function(d) { return regions[d.Region]; });
-                var facilitiesGroup = facilities.group();
+                var facilities = xf.dimension(function(d) { return d.Region; });
+                var facilitiesGroup = facilities.group().reduceCount(function(d) { return d.value; });
                 console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
 
                 dc.leafletChoroplethChart("#demo3 .map",groupname)
