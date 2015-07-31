@@ -271,9 +271,7 @@ $(document).ready(function() {
 
             drawChoropleth(csv,statesJson);
 
-            function drawChoropleth(data,geojson) {
-                
-
+            function drawChoropleth(data,geojson) {                            
 
                 var junk = crossfilter(data);
                 junkDim = junk.dimension(function(d) { return regions[d.Region]; });
@@ -286,17 +284,24 @@ $(document).ready(function() {
                 // var facilitiesGroup = facilities.group(); //.reduceCount(function(d) { return d.value; });
                 // console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
 
+                //["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
+
                 dc.leafletChoroplethChart("#demo3 .map",groupname)
-                   // .dimension(facilities)
-                   // .group(facilitiesGroup)
-                  .dimension(junkDim)
-                  .group(junkGroup)
+                   // .dimension(junkDim)
+                   // .group(junkGroup)
+                  .dimension(regionDimension)
+                  .group(avgRegionGroup)
+                  .valueAccessor(function(p) {
+                        console.log("p.value.average: ", p.value.average)
+                        return p.value.average;
+                   })
                   .width(600)
                     .height(400)
                   .center([47.00, 2.00])
                   .zoom(5)
                   .geojson(geojson)
-                  .colors(['#fff7f3', '#fde0dd', '#fcc5c0', '#fa9fb5', '#f768a1', '#dd3497', '#ae017e', '#7a0177', '#49006a'])
+                  //.colors(['#fff7f3', '#fde0dd', '#fcc5c0', '#fa9fb5', '#f768a1', '#dd3497', '#ae017e', '#7a0177', '#49006a'])
+                  .colors(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"])
                   .colorDomain(function() {
                     //console.log("colorDomain: ", dc.utils.groupMin(this.group() + ", " + this.valueAccessor()))
                     return [dc.utils.groupMin(this.group(), this.valueAccessor()),
@@ -304,7 +309,7 @@ $(document).ready(function() {
                   })
                   .colorAccessor(function(d,i) {
                     console.log("d.value: ", d.value)
-                    return d.value;
+                    return d.value.average;
                   })
                   .featureKeyAccessor(function(feature) {
                     console.log("featureKeyAccessor.name: ", feature.properties.name)
@@ -312,7 +317,7 @@ $(document).ready(function() {
                   })
                   .renderPopup(true)
                   .popup(function(d,feature) {
-                    return feature.properties.name+" : "+d.value;
+                    return feature.properties.name+" : "+d.value.average;
                   });
 
                 
