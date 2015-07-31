@@ -54,29 +54,39 @@ $(document).ready(function() {
                 //     }
                 // });
                 // delete data;
+                
+                console.log("data: ", data)
                 dataP = [];
                 data.filter(function(d) {
                     return d.Region;
                 }).forEach(function(d) {
                     d.sum = 0;
+                    //console.log("d: ", d)
                     for(var p in d)
-                    if (p && p!="Region" && p!="sum") {
-                        dataP.push({'Region':d.Region,'type':p,'value':+d[p]});
-                        d.sum+=+d[p];
-                    }
+                        //console.log("p: ", p)
+                        if (p && p!="Region" && p!="sum") {
+                            dataP.push({'Region':d.Region,'type':p,'value':+d[p]});
+                            d.sum+=+d[p];
+                        }
                 });
                 
 
+                var junk = crossfilter(data);
+                junkDim = junk.dimension(function(d) { return d.Region; });
+                junkGroup = junkDim.group();
+                console.log("junkGroup.all(): ", junkGroup.all())
 
                 var xf = crossfilter(dataP);
                 var groupname = "Choropleth";
                 var facilities = xf.dimension(function(d) { return d.Region; });
-                var facilitiesGroup = facilities.group().reduceCount(function(d) { return d.value; });
+                var facilitiesGroup = facilities.group(); //.reduceCount(function(d) { return d.value; });
                 console.log("facilitiesGroup.all(): ", facilitiesGroup.all())
 
                 dc.leafletChoroplethChart("#demo3 .map",groupname)
-                  .dimension(facilities)
-                  .group(facilitiesGroup)
+                   // .dimension(facilities)
+                   // .group(facilitiesGroup)
+                  .dimension(junkDim)
+                  .group(junkGroup)
                   .width(600)
                     .height(400)
                   .center([47.00, 2.00])
@@ -84,23 +94,27 @@ $(document).ready(function() {
                   .geojson(geojson)
                   .colors(['#fff7f3', '#fde0dd', '#fcc5c0', '#fa9fb5', '#f768a1', '#dd3497', '#ae017e', '#7a0177', '#49006a'])
                   .colorDomain(function() {
+                    //console.log("colorDomain: ", dc.utils.groupMin(this.group() + ", " + this.valueAccessor()))
                     return [dc.utils.groupMin(this.group(), this.valueAccessor()),
                      dc.utils.groupMax(this.group(), this.valueAccessor())];
                   })
                   .colorAccessor(function(d,i) {
+                    console.log("d.value: ", d.value)
                     return d.value;
                   })
                   .featureKeyAccessor(function(feature) {
-                    return feature.properties.code;
+                    console.log("featureKeyAccessor.name: ", feature.properties.name)
+                    return feature.properties.name;
                   })
                   .renderPopup(true)
                   .popup(function(d,feature) {
-                    return feature.properties.nameEn+" : "+d.value;
+                    return feature.properties.name+" : "+d.value;
                   });
 
+                //Pie Chart
                 var types = xf.dimension(function(d) { return d.type; });
                 var typesGroup = types.group().reduceSum(function(d) { return d.value;});
-                console.log("typesGroup.all(): ", typesGroup.all())
+                //console.log("typesGroup.all(): ", typesGroup.all())
 
                 dc.pieChart("#demo3 .pie",groupname)
                   .dimension(types)
