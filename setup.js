@@ -307,10 +307,22 @@ $(document).ready(function() {
                     //console.log("featureKeyAccessor.name: ", feature.properties.name)
                     return feature.properties.name;
                   })
-                  .renderPopup(true)
-                  .popup(function(d,feature) {
-                    return feature.properties.name+" : "+d.value.average;
-                  });
+                  .title(function(d) {
+                     //console.log("d: ", d)                        
+                        return "Region: "; //+ d.key + "\nNumber of Extreme Events: " + d.value;
+                   });
+                  // .renderPopup(true)
+                  // .popup(function(d,feature) {
+                  //   console.log("d, feature: ", d +", "+ feature)
+                  //   return feature.properties.name+" : "+d.value.average;
+                  // });
+
+                //Define click action
+                // choroChart.renderlet(function(chart) {
+                //     chart.selectAll("g.layer0 g.state").on("click", function(d) {
+                //         //showTimeSeries(d.properties.name);
+                //     });
+                
                             
             }
 
