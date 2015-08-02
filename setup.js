@@ -270,6 +270,7 @@ $(document).ready(function() {
             });
 
             //var groupname = "Choropleth";
+            //choroChart = drawChoropleth(csv,statesJson);
             drawChoropleth(csv,statesJson);
 
             function drawChoropleth(data,geojson) {                            
@@ -279,11 +280,11 @@ $(document).ready(function() {
                 junkGroup = junkDim.group();
                 console.log("junkGroup.all(): ", junkGroup.all())                
 
-                dc.leafletChoroplethChart("#demo3 .map")                
+                choroChart = dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)
                   .group(avgRegionGroup)
                   .valueAccessor(function(p) {
-                        console.log("p.value.average: ", p.value.average)
+                        //console.log("p.value.average: ", p.value.average)
                         return p.value.average;
                    })
                   .width(600)
@@ -299,11 +300,11 @@ $(document).ready(function() {
                      dc.utils.groupMax(this.group(), this.valueAccessor())];
                   })
                   .colorAccessor(function(d,i) {
-                    console.log("d.value: ", d.value)
+                    //console.log("d.value: ", d.value)
                     return d.value.average;
                   })
                   .featureKeyAccessor(function(feature) {
-                    console.log("featureKeyAccessor.name: ", feature.properties.name)
+                    //console.log("featureKeyAccessor.name: ", feature.properties.name)
                     return feature.properties.name;
                   })
                   .renderPopup(true)

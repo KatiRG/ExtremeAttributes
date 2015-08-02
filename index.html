@@ -42,7 +42,7 @@
     <link href="lib/colorbar.css" rel="stylesheet">
     <script type="text/javascript" src="lib/colorbar.js"></script>
 
-    <!--
+    <!--FFF
     <script src="http://cdnjs.cloudflare.com/ajax/libs/highstock/2.0.4/highstock.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script> 
     -->
@@ -151,17 +151,20 @@
             <!--ROW 2-->
             <div class="row">
                 
-                <div id="demo3" class="dc-chart col-md-4">
-                    <h2>Le choropleth</h2>                    
-                    <div class="map"></div>
-                    <!--<div class="pie"></div>-->
+                <div id="choro-map" class="dc-chart col-md-4">
+                    <div class="filterName">Map
+                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                        <div class="map"></div>
+                        <!--<div class="pie"></div>-->
+                    </div>
                 </div>
 
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
-                    </div>                    
+                    </div>
                 </div> 
                 <div id="chart-seasons">   
                     <div class="filterName" style="font-weight: normal;">Seasons
