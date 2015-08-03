@@ -254,6 +254,14 @@ $(document).ready(function() {
             .center([6, 49]) // On centre la carte sur la France
             .scale(1400)
             .translate([180, 100]);
+
+         var tip = d3.tip()
+                    .attr("class", "d3-tip")
+                    //.offset([-10, 0])
+                    .html(function(d) { //get #anomalies for each region
+                        console.log("fdASDFAJKSDF", d)
+                        return d;
+                    });
         
         // ===============================================================================================
         //  READ IN GEOJSON
@@ -272,6 +280,8 @@ $(document).ready(function() {
             //var groupname = "Choropleth";
             //choroChart = drawChoropleth(csv,statesJson);
             drawChoropleth(csv,statesJson);
+            //var svg = d3.select(L.map('choro-map').setView([47.0, 2.0], 6).getPanes().overlayPane).append("svg"); 
+            //var svg = d3.select(choroChart.map().getPanes().overlayPane).append("svg");
 
             function drawChoropleth(data,geojson) {                            
 
@@ -306,22 +316,38 @@ $(document).ready(function() {
                   .featureKeyAccessor(function(feature) {
                     //console.log("featureKeyAccessor.name: ", feature.properties.name)
                     return feature.properties.name;
-                  })
-                  .title(function(d) {
-                     //console.log("d: ", d)                        
-                        return "Region: "; //+ d.key + "\nNumber of Extreme Events: " + d.value;
-                   });
+                  });
                   // .renderPopup(true)
                   // .popup(function(d,feature) {
                   //   console.log("d, feature: ", d +", "+ feature)
                   //   return feature.properties.name+" : "+d.value.average;
                   // });
 
-                //Define click action
+                // //Define click action
                 // choroChart.renderlet(function(chart) {
-                //     chart.selectAll("g.layer0 g.state").on("click", function(d) {
-                //         //showTimeSeries(d.properties.name);
+                //     chart.selectAll("g.path").on("click", function(d) {
+                //         console.log("click")
+                //         showTimeSeries(d.properties.name);
                 //     });
+                // })
+
+                
+               
+
+
+                choroChart.renderlet(function(chart) {
+                    chart.selectAll("path").call(tip);
+                    chart.selectAll("path").on("mouseover", tip.show);
+                });
+
+                // d3.selectAll("g.row").call(tip);
+                // d3.selectAll("g.row").on('mouseover', tip.show)
+                //     .on('mouseout', tip.hide);    
+
+                //var svg = choroChart.svg();
+                //choroChart.svg.call(tip);
+
+                //var g = choroChart.svg.append("g").attr("class", "leaflet-zoom-hide");
                 
                             
             }
