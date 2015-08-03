@@ -259,7 +259,7 @@ $(document).ready(function() {
                     .attr("class", "d3-tip")
                     //.offset([-10, 0])
                     .html(function(d) { //get #anomalies for each region
-                        console.log("fdASDFAJKSDF", d)
+                        //console.log("fdASDFAJKSDF", d)
                         return d;
                     });
         
@@ -277,11 +277,9 @@ $(document).ready(function() {
                 legend[idx] = d.properties.name;
             });
 
-            //var groupname = "Choropleth";
-            //choroChart = drawChoropleth(csv,statesJson);
+
             drawChoropleth(csv,statesJson);
-            //var svg = d3.select(L.map('choro-map').setView([47.0, 2.0], 6).getPanes().overlayPane).append("svg"); 
-            //var svg = d3.select(choroChart.map().getPanes().overlayPane).append("svg");
+
 
             function drawChoropleth(data,geojson) {                            
 
@@ -330,6 +328,21 @@ $(document).ready(function() {
                 //         showTimeSeries(d.properties.name);
                 //     });
                 // })
+
+                //Define click action
+                choroChart.renderlet(function(chart) {
+                    chart.selectAll("path").on("click", function(d, j) {
+                            chart.featureKeyAccessor(function(feature) {
+                                console.log("featureKeyAccessor.name: ", feature.properties.name)
+                                return feature.properties.name;
+                              });
+                        console.log("j: ", j)
+                        console.log("chart: ", chart)
+                        console.log("click d: ", chart.geojson().features[j].properties.name)
+                        showTimeSeries(d.properties.name);
+                    });
+                })
+
 
                 
                
