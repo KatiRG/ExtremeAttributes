@@ -15,6 +15,9 @@ var cutoffYear_Safran = 2012;
 var avgIndexGroup, avgRegionGroup, avgEventsBySeason;
 var numObsDatasets = 1;
 
+//for map click
+var clickedRegion;
+
 $(document).ready(function() {
 
     var chart;
@@ -314,33 +317,34 @@ $(document).ready(function() {
                   .featureKeyAccessor(function(feature) {
                     //console.log("featureKeyAccessor.name: ", feature.properties.name)
                     return feature.properties.name;
+                  })
+                  .renderPopup(true)
+                  .popup(function(d,feature) {
+                    console.log("d, feature: ", d +", "+ feature.properties)
+                    return feature.properties.name+" : "+d.value.average;
                   });
-                  // .renderPopup(true)
-                  // .popup(function(d,feature) {
-                  //   console.log("d, feature: ", d +", "+ feature)
-                  //   return feature.properties.name+" : "+d.value.average;
+                  // .title (function (d) {
+                  //     console.log("title d: ", d);
+                  //     return d.key;
                   // });
 
-                // //Define click action
-                // choroChart.renderlet(function(chart) {
-                //     chart.selectAll("g.path").on("click", function(d) {
-                //         console.log("click")
-                //         showTimeSeries(d.properties.name);
-                //     });
+                // choroChart.on("click", function() {
+                //     console.log("clickedRegion: ", clickedRegion)
                 // })
+
 
                 //Define click action
                 choroChart.renderlet(function(chart) {
-                    chart.selectAll("path").on("click", function(d, j) {
-                            chart.featureKeyAccessor(function(feature) {
-                                console.log("featureKeyAccessor.name: ", feature.properties.name)
-                                return feature.properties.name;
-                              });
-                        console.log("j: ", j)
-                        console.log("chart: ", chart)
-                        console.log("click d: ", chart.geojson().features[j].properties.name)
-                        showTimeSeries(d.properties.name);
-                    });
+                    chart.selectAll("g").on("mouseover", function(d, j) {
+                        //console.log(chart.selectAll("g"))
+                        console.log("hoverRegion: ", chart.filter())
+                //         console.log("d3.select(this): ", d3.select(this))
+                //         //if (d3.select(this).attr("class") == "leaflet-clickable") console.log("leaflet-clickable")
+                //         console.log("j: ", j)
+                //         console.log("chart: ", chart)
+                //         console.log("click d: ", chart.geojson().features[j].properties.name)
+                //         showTimeSeries(d.properties.name);
+                    });                 
                 })
 
 
