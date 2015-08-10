@@ -183,15 +183,18 @@
                 <div class="row"> <!--ROW1, COL2-->
                     <div class="col-sm-12">
                         <div class="chart-wrapper">
-                            <div class="chart-title"> Map </div>
+                            <div class="chart-title"> Map 
+                                <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
+                                    <span class="reset" style="display: none;"></span></span>
+                            </div>
                             <div id="choro-map" class="chart-stage">
                             <!--<img data-src="holder.js/100%x240/white">-->
-                                <div class="filterName">Map
-                                    <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
-                                    <span class="reset" style="display: none;"></span></span>
+                                <!--<div class="filterName">Map-->
+                                    <!--<a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
+                                    <span class="reset" style="display: none;"></span></span>-->
                                     <div class="map"></div>
                                     <!--<div class="pie"></div>-->
-                                </div>
+                                <!--</div>-->
                             </div>
                             <div class="chart-notes"> Notes about this chart </div>
                         </div>
@@ -201,19 +204,17 @@
                 <div class="row"> <!-- ROW 2 COL 2 -->
                     <div class="col-sm-12">
                         <div class="chart-wrapper">
-                            <div class="chart-title"> Year by Season </div>
+                            <div class="chart-title"> Year by Season 
+                                <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();">reset</a>
+                                <span class="reset" style="display: none;"></span></span>
+                            </div>
                             <div id="chart-stackedYear" class="chart-stage">
                             <!--<img data-src="holder.js/100%x240/white">-->
-                                <div class="filterName">Map
-                                    <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();">reset</a>
-                                    <span class="reset" style="display: none;"></span></span>
-                                    <div class="map"></div>
+                                <!--<div class="filterName">Year by Season-->
                                     <!--<div class="pie"></div>-->
-                                </div>
+                                <!--</div>-->
                             </div>
-                            <div class="chart-notes">
-                                Notes about this chart
-                            </div>
+                            <div class="chart-notes"> Notes about this chart </div>
                         </div>
                     </div>
                 </div> <!-- ./ROW 2 COL 2 -->
@@ -235,7 +236,7 @@
                             <div class="chart-ts"> Time Series </div>
                             <div id="timeChart" class="chart-stage">
                             <!--<img data-src="holder.js/100%x240/white">-->
-                                <div class="filterName">Map
+                                <div class="filterName">time Series
                                     <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();">reset</a>
                                     <span class="reset" style="display: none;"></span></span>
                                     <div class="map"></div>
