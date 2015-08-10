@@ -22,8 +22,8 @@ $(document).ready(function() {
     //franceChart = dc.geoChoroplethChart("#france-chart");
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
-    stackedYearChart = dc.barChart("#chart-stackedYear");
-    categoryChart = dc.pieChart("#chart-category");
+    stackedYearChart = dc.barChart("#chart-stackedYear .stackedY"); //"#choro-map .map"
+    categoryChart = dc.pieChart("#chart-category .indexCategory");
     seasonsChart = dc.pieChart("#chart-seasons");
     //franceChart = dc.leafletChoroplethChart("#demo3 .map",groupname); 
 
@@ -288,7 +288,7 @@ $(document).ready(function() {
                 junkGroup = junkDim.group();
                 console.log("junkGroup.all(): ", junkGroup.all())                
 
-                choroChart = dc.leafletChoroplethChart("#choro-map .map")                
+                choroChart = dc.leafletChoroplethChart("#choro-map .map")
                   .dimension(regionDimension)
                   .group(avgRegionGroup)
                   .valueAccessor(function(p) {

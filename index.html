@@ -125,7 +125,7 @@
                         <!--<img data-src="holder.js/100%x650/white">-->
                         <div class="filterName">Threshold</div>
                         <input type="radio" name="sigma" value="1">1 Sigma <br>
-                        <input type="radio" name="sigma" value="2">2 Sigma <br><br><br>
+                        <input type="radio" name="sigma" value="2">2 Sigma 
                         <div class="filterName">Scenario</div>
                         <input type="radio" name="rcp" value="rcp45">RCP 4.5<br>
                         <input type="radio" name="rcp" value="rcp85">RCP 8.5
@@ -136,17 +136,20 @@
                 </div>
 
                 <div class="chart-wrapper">
-                    <div class="chart-title"> Index Type </div>
+                    <div class="chart-title"> Index Type 
+                        
+                    </div>
                     <div id="chart-category" class="chart-stage">
                         <!--<img data-src="holder.js/100%x650/white">-->
-                        <div class="filterName">Index Type                        
+                                             
+                        
+                        
+                        <div class="indexCategory" class="filterName">
                             <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                             <span class="reset" style="display: none;"></span></span>
                         </div>
                     </div>
-                    <div class="chart-notes">
-                        Notes about this chart
-                    </div>
+                    <div class="chart-notes"> Notes about this chart </div>
                 </div>
 
                 <div class="chart-wrapper">
@@ -211,7 +214,7 @@
                             <div id="chart-stackedYear" class="chart-stage">
                             <!--<img data-src="holder.js/100%x240/white">-->
                                 <!--<div class="filterName">Year by Season-->
-                                    <!--<div class="pie"></div>-->
+                                    <div class="stackedY"></div>
                                 <!--</div>-->
                             </div>
                             <div class="chart-notes"> Notes about this chart </div>
@@ -228,27 +231,22 @@
                     </div>
                 </div>
                 -->
-             
 
                 <div class="row"> <!-- ROW 3 COL 2 -->
                     <div class="col-sm-12">
                         <div class="chart-wrapper">
-                            <div class="chart-ts"> Time Series </div>
-                            <div id="timeChart" class="chart-stage">
+                            <div class="chart-title"> Time Series </div>
+                            <div id="chart-ts" class="chart-stage">
                             <!--<img data-src="holder.js/100%x240/white">-->
-                                <div class="filterName">time Series
-                                    <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();">reset</a>
-                                    <span class="reset" style="display: none;"></span></span>
-                                    <div class="map"></div>
-                                    <!--<div class="pie"></div>-->
-                                </div>
+                                <!--<div class="filterName">Year by Season-->
+                                    <div class="timeChart"></div>
+                                <!--</div>-->
                             </div>
-                            <div class="chart-notes">
-                                Notes about this chart
-                            </div>
+                            <div class="chart-notes"> Notes about this chart </div>
                         </div>
                     </div>
-                </div> <!-- ./ROW 3 COL 2 -->
+                </div> <!-- ./ROW3 COL 2 -->
+             
 
             </div> <!-- /.col-sm-9 -->    
         </div> <!-- /.container-fluid -->
