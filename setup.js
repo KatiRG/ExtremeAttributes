@@ -23,7 +23,7 @@ $(document).ready(function() {
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
     stackedYearChart = dc.barChart("#chart-stackedYear .stackedY"); //"#choro-map .map"
-    categoryChart = dc.pieChart("#chart-category .indexCategory");
+    categoryChart = dc.pieChart("#chart-category");
     seasonsChart = dc.pieChart("#chart-seasons");
     //franceChart = dc.leafletChoroplethChart("#demo3 .map",groupname); 
 
@@ -381,7 +381,7 @@ $(document).ready(function() {
 
             // =================                    
             indexChart
-                    .width(400).height(200)
+                    .width(350).height(180)
                     .margins({
                         top: 10,
                         right: 30,
