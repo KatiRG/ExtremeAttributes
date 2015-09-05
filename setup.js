@@ -17,8 +17,10 @@ var numObsDatasets = 1;
 
 $(document).ready(function() {
 
+        var numberFormat = d3.format(".2f");
+
         var chart;
-        franceChart = dc.geoChoroplethChart("#france-chart");
+        franceChart = dc.leafletChoroplethChart("#france-chart");
         indexChart = dc.barChart("#chart-index");        
         datasetChart = dc.rowChart("#chart-dataset");
         stackedYearChart = dc.barChart("#chart-stackedYear");        
@@ -245,45 +247,55 @@ $(document).ready(function() {
                     legend[idx] = d.properties.name;
                 });
 
-                franceChart.width(width)
-                    .height(height)
-                    .dimension(regionDimension)
-                    //.group(regionGroup)
-                    .group(avgRegionGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {
-                        return p.value.average;
-                    })
-                    .colors(d3.scale.linear().range(colourRange))
-                    .projection(projection)
-                    .overlayGeoJson(statesJson.features, "state", function(d) {                        
-                        return d.properties.name;
-                    })
-                    .title(function(d) {
-                        d3.select("#active").text(filter.groupAll().value()); //total number selected                        
-                        return d.key + ": \n" + d.value + " events";
-                    });
-                franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                });
-                franceChart.on("preRedraw", function(chart) { //loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                });
-                franceChart.on("postRedraw", function(chart) { //use to get range for number of events                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    //calculate colourbar params and plot colourbar
-                    saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    calculateDomain(saveRange, colourRange); //returns colourDomain                    
-                    plotColourbar(colourDomain, colourRange);
-                });
-                //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
-                //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
-                // =================
-                //define click action
-                franceChart.renderlet(function(chart) {
-                    chart.selectAll("g.layer0 g.state").on("click", function(d) {
-                        showTimeSeries(d.properties.name);
-                    });
-                })
+                // franceChart.width(width)
+                //     .height(height)
+                //     .dimension(regionDimension)
+                //     //.group(regionGroup)
+                //     .group(avgRegionGroup) //avg count across all datasets
+                //     .valueAccessor(function(p) {
+                //         return p.value.average;
+                //     })
+                //     .colors(d3.scale.linear().range(colourRange))
+                //     .projection(projection)
+                //     .overlayGeoJson(statesJson.features, "state", function(d) {                        
+                //         return d.properties.name;
+                //     })
+                //     .title(function(d) {
+                //         d3.select("#active").text(filter.groupAll().value()); //total number selected                        
+                //         return d.key + ": \n" + d.value + " events";
+                //     });
+                // franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
+                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                // });
+                // franceChart.on("preRedraw", function(chart) { //loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
+                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                // });
+                // franceChart.on("postRedraw", function(chart) { //use to get range for number of events                    
+                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                //     //calculate colourbar params and plot colourbar
+                //     saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
+                //     calculateDomain(saveRange, colourRange); //returns colourDomain                    
+                //     plotColourbar(colourDomain, colourRange);
+                // });
+
+                 franceChart
+                        .width(width)
+                        .height(300)
+                        .center([55.00, 7.80])
+                        .zoom(4)
+                        .dimension(regionDimension)
+                        .group(avgRegionGroup)
+                        .colors(d3.scale.quantize().range(["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"]))
+                        .colorDomain([0, 200])
+                        .colorCalculator(function (d) { return d ? franceChart.colors()(d.value) : '#ccc'; })
+                        .geojson(statesJson)
+                        .featureKeyAccessor(function(feature) {
+                            return feature.properties.name;
+                        })
+                        .title(function (d) {
+                            return "State: " + d.key + "\nTotal Amount Raised: " + numberFormat(d.value ? d.value : 0) + "M";
+                        });
+           
 
                 // =================
                 categoryChart
@@ -296,7 +308,7 @@ $(document).ready(function() {
                     .group(categoryGroup)                    
                     //.legend(dc.legend())
                     .title(function(d){                        
-                        return d.data.key + ": " + d.data.value + " events";                        
+                        //return d.data.key + ": " + d.data.value + " events";                        
                     });
 
                 // =================                    
@@ -312,8 +324,8 @@ $(document).ready(function() {
                     .renderHorizontalGridLines(true)
                     .gap(1)                                    
                     .title(function(d){                        
-                        return indexID[d.data.key]
-                                + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";                       
+                        // return indexID[d.data.key]
+                        //         + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";                       
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
@@ -371,8 +383,8 @@ $(document).ready(function() {
                     .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
                     .dimension(seasonDimension)
                     .group(seasonGroup)
-                    .valueAccessor(function (d) { if (d.value != 0) return 0.25; })
-                    .title(function(d){ return seasons[d.data.key]; });
+                    .valueAccessor(function (d) { if (d.value != 0) return 0.25; });
+                    //.title(function(d){ return seasons[d.data.key]; });
                     // .renderlet(function (chart) {
                     //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
                     // })
