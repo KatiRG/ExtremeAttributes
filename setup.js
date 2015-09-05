@@ -341,7 +341,7 @@ $(document).ready(function() {
             // =================
             categoryChart
                     .width(50)
-                    .height(150)
+                    .height(50)
                     .slicesCap(4)
                     .innerRadius(10)
                     .colors(["#C01525", "#2c7bb6"])
