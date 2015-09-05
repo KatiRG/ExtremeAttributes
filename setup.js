@@ -17,6 +17,7 @@ var numObsDatasets = 1;
 
 //for map click
 var clickedRegion;
+var palette;
 
 $(document).ready(function() {
 
@@ -257,14 +258,6 @@ $(document).ready(function() {
             .center([6, 49]) // On centre la carte sur la France
             .scale(1400)
             .translate([180, 100]);
-
-         var tip = d3.tip()
-                    .attr("class", "d3-tip")
-                    //.offset([-10, 0])
-                    .html(function(d) { //get #anomalies for each region
-                        //console.log("fdASDFAJKSDF", d)
-                        return d;
-                    });
         
         // ===============================================================================================
         //  READ IN GEOJSON
@@ -283,13 +276,8 @@ $(document).ready(function() {
 
             drawChoropleth(csv,statesJson);
 
-
-            function drawChoropleth(data,geojson) {                            
-
-                var junk = crossfilter(data);
-                junkDim = junk.dimension(function(d) { return regions[d.Region]; });
-                junkGroup = junkDim.group();
-                console.log("junkGroup.all(): ", junkGroup.all())                
+            palette = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
+            function drawChoropleth(data,geojson) {  
 
                 choroChart = dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)
@@ -346,25 +334,6 @@ $(document).ready(function() {
                 //         showTimeSeries(d.properties.name);
                     });                 
                 })
-
-
-                
-               
-
-
-                choroChart.renderlet(function(chart) {
-                    chart.selectAll("path").call(tip);
-                    chart.selectAll("path").on("mouseover", tip.show);
-                });
-
-                // d3.selectAll("g.row").call(tip);
-                // d3.selectAll("g.row").on('mouseover', tip.show)
-                //     .on('mouseout', tip.hide);    
-
-                //var svg = choroChart.svg();
-                //choroChart.svg.call(tip);
-
-                //var g = choroChart.svg.append("g").attr("class", "leaflet-zoom-hide");
                 
                             
             }
