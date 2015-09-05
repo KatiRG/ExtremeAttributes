@@ -61,8 +61,8 @@
           clear:both;
         }
         .map {
-          width:300px;
-          height:300px;
+          width:600px;
+          height:500px;
         }
         .pie {
           margin-left:30px;
@@ -102,19 +102,31 @@
 
             <!--ROW 1-->
             <div class="row">
-                <div id="tags" class="col-md-2">
+                <div class="col-md-2">
                     <div class="filterName">Threshold</div>
-                    <input type="radio" name="sigma" value="1">1 Sigma
-                    <br>
+                    <input type="radio" name="sigma" value="1">1 Sigma                    
                     <input type="radio" name="sigma" value="2">2 Sigma
-                    <br>
-                    <br>
-                    <br>
+                </div>    
+                <div class="col-md-2">    
                     <div class="filterName">Scenario</div>
-                    <input type="radio" name="rcp" value="rcp45">RCP 4.5
-                    <br>
+                    <input type="radio" name="rcp" value="rcp45">RCP 4.5                    
                     <input type="radio" name="rcp" value="rcp85">RCP 8.5
                 </div>
+            </div>
+            <!--end ROW 1-->
+
+            <!--ROW 1-->
+            <div class="row">
+                <div id="choro-map" class="dc-chart col-md-6">
+                    <div class="filterName">Map
+                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
+                        <span class="reset" style="display: none;"></span>
+                    </div>    
+                    <div class="map"></div>                    
+                </div>
+
+
+
                 <div id="chart-category" class="dc-chart col-md-2">
                     <div class="filterName">Index Type                        
                         <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -127,26 +139,19 @@
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>            
-                <div id="chart-dataset" class="dc-chart col-md-4">
+                <!--<div id="chart-dataset" class="dc-chart col-md-4">
                     <div class="filterName">Model + Obs
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
-                </div>
+                </div>-->
             </div>
             <!--end ROW 1-->
 
             <!--ROW 2-->
             <div class="row">
                 
-                <div id="choro-map" class="dc-chart col-md-4">
-                    <div class="filterName">Map
-                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                        <div class="map"></div>
-                        <!--<div class="pie"></div>-->
-                    </div>
-                </div>
+               
 
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season

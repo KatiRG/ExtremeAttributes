@@ -286,7 +286,7 @@ $(document).ready(function() {
                         //console.log("p.value.average: ", p.value.average)
                         return p.value.average;
                    })
-                  .width(600)
+                  .width(800)
                     .height(400)
                   .center([47.00, 2.00])
                   .zoom(5)
