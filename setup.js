@@ -340,16 +340,20 @@ $(document).ready(function() {
 
             // =================
             categoryChart
-                    .width(100)
-                    .height(200)
+                    .width(50)
+                    .height(150)
                     .slicesCap(4)
-                    .innerRadius(20)
+                    .innerRadius(10)
                     .colors(["#C01525", "#2c7bb6"])
                     .dimension(categoryDimension)
                     .group(categoryGroup)
                     //.legend(dc.legend())
                     .title(function(d) {
                         return d.data.key + ": " + d.data.value + " events";
+                    })
+                    .renderlet(function (chart) {
+                        chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
+                        chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
                     });
 
             // =================                    

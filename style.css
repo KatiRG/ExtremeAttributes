@@ -37,6 +37,13 @@ svg:not(:root) {
     overflow: unset;
 }
 
+#chart-index {    
+    transform: translate(-12px, 1px);
+}
+#chart-category {
+    transform: translate(-102px, -62px);
+}
+
 #chart-seasons {
     transform: translate(460px,-350px);
 }
