@@ -21,6 +21,8 @@ var palette;
 
 $(document).ready(function() {
 
+    document.getElementById("ts-button").disabled = true;
+
     var chart;
     var groupname = "Choropleth";
     //franceChart = dc.geoChoroplethChart("#france-chart");
@@ -316,24 +318,17 @@ $(document).ready(function() {
                   //     return d.key;
                   // });
 
-                // choroChart.on("click", function() {
-                //     console.log("clickedRegion: ", clickedRegion)
-                // })
-
-
-                //Define click action
                 choroChart.renderlet(function(chart) {
-                    chart.selectAll("g").on("mouseover", function(d, j) {
-                        //console.log(chart.selectAll("g"))
-                        console.log("hoverRegion: ", chart.filter())
-                //         console.log("d3.select(this): ", d3.select(this))
-                //         //if (d3.select(this).attr("class") == "leaflet-clickable") console.log("leaflet-clickable")
-                //         console.log("j: ", j)
-                //         console.log("chart: ", chart)
-                //         console.log("click d: ", chart.geojson().features[j].properties.name)
-                //         showTimeSeries(d.properties.name);
+                    chart.selectAll("g").on("click", function(d, j) {
+                        console.log("indexChart.filters(): ", indexChart.filters())
+                        if (chart.filters().length == 1 && indexChart.filters().length == 1) {
+                            document.getElementById("ts-button").disabled = false;
+                            tsRegion = chart.filter();                                                     
+                        }
+                        else document.getElementById("ts-button").disabled = true;
                     });                 
                 })
+              
                 
                             
             }
@@ -397,6 +392,16 @@ $(document).ready(function() {
                     chart.selectAll('g.x text')
                         .attr('transform', 'translate(-10,10) rotate(315)');
             });
+
+            indexChart.renderlet(function(chart) {
+                chart.selectAll("g").on("click", function(d, j) {
+                    if (chart.filters().length == 1 && choroChart.filters().length == 1) {              
+                        document.getElementById("ts-button").disabled = false;
+                        tsRegion = choroChart.filter();                        
+                    }
+                    else document.getElementById("ts-button").disabled = true;
+                });                 
+            })
 
 
 
@@ -530,11 +535,17 @@ $(document).ready(function() {
             $("input[name='sigma'][value='1']").trigger("click");
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
+            // =================
+            //Show timeseries if button is clicked            
+            document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
+
         }); //end geojson
     }); //end csv
 }) //end document.ready
 
-
+function resetTSbutton() {
+    document.getElementById("ts-button").disabled = true;
+}
 
 
 

@@ -115,11 +115,11 @@
             </div>
             <!--end ROW 1-->
 
-            <!--ROW 1-->
+            <!--ROW 2-->
             <div class="row">
                 <div id="choro-map" class="dc-chart col-md-6">
                     <div class="filterName">Map
-                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
+                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();resetTSbutton();">reset</a>
                         <span class="reset" style="display: none;"></span>
                     </div>    
                     <div class="map"></div>                    
@@ -127,16 +127,22 @@
 
                 <div id="chart-index" class="dc-chart col-md-4">
                     <div class="filterName">Index Name
-                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
 
                 <div id="chart-category" class="dc-chart col-md-2">
                     <div class="filterName" style="color: white";>type <!--so that chart doesn't move when reset appears -->
-                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
+                </div>
+
+                <div id="ts-button-text" class="dc-chart col-md-3">
+                    <p><p>
+                    Select a single index and a region to view the timeseries data.<p>
+                    <p><button type="button" id="ts-button" class="btn">Timeseries</button> </p>                     
                 </div>
                          
                 <!--<div id="chart-dataset" class="dc-chart col-md-4">
@@ -146,13 +152,14 @@
                     </div>
                 </div>-->
             </div>
-            <!--end ROW 1-->
+            <!--end ROW 2-->
 
-            <!--ROW 2-->
-            <div class="row">
+  
                 
-               
+      
 
+            <!--ROW 4-->
+            <div class="row">
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -169,7 +176,7 @@
              
 
             </div>
-            <!--end ROW 2-->
+            <!--end ROW 4-->
         
 
             <!--ROW TIME SERIES -->

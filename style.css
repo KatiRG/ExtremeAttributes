@@ -48,6 +48,14 @@ svg:not(:root) {
     transform: translate(460px,-350px);
 }
 
+/*modify twitter bootstrap btn*/
+.btn:hover, .btn:focus {
+    color: #333333;
+    text-decoration: none;
+    background: lightgray;
+    border: 1px solid gray;
+}
+
 /*Display window on map*/
 .info {
     padding: 6px 8px;
