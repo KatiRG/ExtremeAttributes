@@ -95,6 +95,8 @@ $(document).ready(function() {
         indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
 
         seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall" };
+        //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1
+        seasonsColours = ["#9DD8D3", "#FFE545", "#A9DB66", "#FFAD5D"]; //DJF, JJA, MAM, SON
 
         var filter = crossfilter(csv);
 
@@ -430,7 +432,7 @@ $(document).ready(function() {
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .centerBar(true)
-                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
+                    .colors(seasonsColours) //DJF, JJA, MAM, SON
                     .group(avgEventsBySeason, "Winter")
                     .valueAccessor(function(p) {
                         return p.value.season0Avg;
@@ -453,7 +455,7 @@ $(document).ready(function() {
                     .height(65)
                     .slicesCap(4)
                     .innerRadius(10)
-                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
+                    .colors(seasonsColours) //DJF, JJA, MAM, SON
                     .dimension(seasonDimension)
                     .group(seasonGroup)
                     .valueAccessor(function(d) {
