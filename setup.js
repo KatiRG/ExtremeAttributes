@@ -281,7 +281,7 @@ $(document).ready(function() {
 
             //palette = ["#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
             //palette = ["#FFDC68", "#CC982A", "#A8C078", "#A89048", "#928941", "#A84818", "#352504", "#61290E", "#330C0C", "#A7321C"];
-            palette = ["#FFDC68", "#CC982A", "#A89048", "#928941", "#352504"];
+            palette = ["#FFDC68", "#A8C078", "#A89048", "#928941", "#61290E"];
             function drawChoropleth(data,geojson) {  
 
                 choroChart = dc.leafletChoroplethChart("#choro-map .map")                
@@ -300,7 +300,7 @@ $(document).ready(function() {
                   //.colors(["#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"])
                   //http://www.colourlovers.com/palette/458132/Eat_some_leaves  + http://www.colourlovers.com/palette/36998/french_roast
                   //.colors(["#FFDC68", "#CC982A", "#352504", "#A89048", "#928941", "#A84818", "#330C0C"])
-                  .colors(["#FFDC68", "#CC982A", "#A89048", "#928941", "#352504"])
+                  .colors(["#FFDC68", "#A8C078", "#A89048", "#928941", "#61290E"])
                   .colorDomain(function() {
                     minEvents = dc.utils.groupMin(this.group(), this.valueAccessor());
                     maxEvents = dc.utils.groupMax(this.group(), this.valueAccessor());
