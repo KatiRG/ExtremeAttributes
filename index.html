@@ -36,26 +36,38 @@
     <!-- Custom styles for this template -->
     <link href="sticky-footer-navbar.css" rel="stylesheet">
 
-    <!--Custom files -->
-    <script type="text/javascript" src="lib/d3tip.js"></script>
-    <!-- colorbar http://bl.ocks.org/chrisbrich/4209888 -->
-    <link href="lib/colorbar.css" rel="stylesheet">
-    <script type="text/javascript" src="lib/colorbar.js"></script>
-
-    <!--
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/highstock/2.0.4/highstock.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script> 
-    -->
     <script src="lib/highstock.js"></script>
     <script src="lib/exporting.js"></script>
 
-    <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/1.7.0/math.min.js"></script>
-    -->
     <script src="lib/math.min.js"></script>
 
     <script type="text/javascript" src="setup.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" media="all">
+
+    <!-->Leaflet from Yurukov<-->
+    <!--<script type="text/javascript" src="lib/dc.leaflet.js"></script>-->
+    <script type="text/javascript" src="lib/my-dc.leaflet.js"></script>
+    <script type="text/javascript" src="lib/leaflet.js"></script>
+    <link type="text/css" href="lib/leaflet.css" rel="stylesheet"/>
+
+    <!-->dc-leaflet-choropleth<-->
+    <style>
+        #holder {
+          width:850px;
+          margin:20px auto;
+        }
+        #holder>div {
+          padding:30px 0;
+          clear:both;
+        }
+        .map {
+          width:550px;
+          height:535px;
+        }
+        .pie {
+          margin-left:30px;
+        }
+    </style>
 
 </head>
 
@@ -90,31 +102,49 @@
 
             <!--ROW 1-->
             <div class="row">
-                <div id="tags" class="col-md-2">
+                <div class="col-md-2">
                     <div class="filterName">Threshold</div>
-                    <input type="radio" name="sigma" value="1">1 Sigma
-                    <br>
+                    <input type="radio" name="sigma" value="1">1 Sigma                    
                     <input type="radio" name="sigma" value="2">2 Sigma
-                    <br>
-                    <br>
-                    <br>
+                </div>    
+                <div class="col-md-2">    
                     <div class="filterName">Scenario</div>
-                    <input type="radio" name="rcp" value="rcp45">RCP 4.5
-                    <br>
+                    <input type="radio" name="rcp" value="rcp45">RCP 4.5                    
                     <input type="radio" name="rcp" value="rcp85">RCP 8.5
                 </div>
-                <div id="chart-category" class="dc-chart col-md-2">
-                    <div class="filterName">Index Type                        
-                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+            </div>
+            <!--end ROW 1-->
+
+            <!--ROW 2-->
+            <div class="row">
+                <div id="choro-map" class="dc-chart col-md-6">
+                    <div class="filterName">Map
+                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();resetTSbutton();">reset</a>
+                        <span class="reset" style="display: none;"></span>
+                    </div>    
+                    <div class="map"></div>                    
+                </div>
+
+                <div id="chart-index" class="dc-chart col-md-4">
+                    <div class="filterName">Index Name
+                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
-                <div id="chart-index" class="dc-chart col-md-4">
-                    <div class="filterName">Index Name
-                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+
+                <div id="chart-category" class="dc-chart col-md-2">
+                    <div class="filterName" style="color: white;">type <!--so that chart doesn't move when reset appears -->
+                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
-                </div>            
+                </div>
+
+                <div id="ts-button-text" class="dc-chart col-md-3">
+                    <p><p>
+                    Select a single index and a region to view the timeseries data.<p>
+                    <p><button type="button" id="ts-button" class="btn">Timeseries</button> </p>                     
+                </div>
+                         
                 <div id="chart-dataset" class="dc-chart col-md-4">
                     <div class="filterName">Model + Obs
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -122,27 +152,22 @@
                     </div>
                 </div>
             </div>
-            <!--end ROW 1-->
+            <!--end ROW 2-->
 
-            <!--ROW 2-->
+  
+                
+      
+
+            <!--ROW 4-->
             <div class="row">
-
-                <div id="colourbar" class="dc-chart col-md-1"></div>
-                <div id="france-chart" class="dc-chart col-md-3">
-                    <div class="filterName">Map
-                        <a class="reset" href="javascript:franceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
-
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
-                    </div>                    
+                    </div>
                 </div> 
                 <div id="chart-seasons">   
-                    <div class="filterName" style="font-weight: normal;">Seasons
+                    <div class="filterName" style="color: white;">Seasons
                         <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span><p>
                     </div>
@@ -151,7 +176,7 @@
              
 
             </div>
-            <!--end ROW 2-->
+            <!--end ROW 4-->
         
 
             <!--ROW TIME SERIES -->
@@ -176,6 +201,7 @@
         </div>
         <!-- /.container -->
     </div>
+
 
 </body>
 
