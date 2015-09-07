@@ -562,7 +562,7 @@ $(document).ready(function() {
     }); //end csv
 }) //end document.ready
 
-function resetfTSbutton() {
+function resetTSbutton() {
     document.getElementById("ts-button").disabled = true;
 }
 
