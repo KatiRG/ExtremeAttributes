@@ -89,7 +89,10 @@ $(document).ready(function() {
         };
 
         indexNames = ["GD4", "HD17", "TG", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII"];
-        indexColours = ["#C01525", "#C01525", "#C01525", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6"];
+        //indexColours = ["#C01525", "#C01525", "#C01525", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6"];
+
+        //http://www.colourlovers.com/palette/3511190/Rain_Waves
+        indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
 
         seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall" };
 
@@ -347,7 +350,8 @@ $(document).ready(function() {
                     .height(50)
                     .slicesCap(4)
                     .innerRadius(10)
-                    .colors(["#C01525", "#2c7bb6"])
+                    //.colors(["#C01525", "#2c7bb6"])
+                    .colors([indexColours[0], indexColours[8]])
                     .dimension(categoryDimension)
                     .group(categoryGroup)
                     //.legend(dc.legend())
