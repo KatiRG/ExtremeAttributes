@@ -45,7 +45,7 @@ svg:not(:root) {
 }
 
 #chart-seasons {
-    transform: translate(460px,-350px);
+    transform: translate(-555px,-20px);
 }
 
 /*modify twitter bootstrap btn*/
