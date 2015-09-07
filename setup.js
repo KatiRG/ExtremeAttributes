@@ -466,7 +466,8 @@ $(document).ready(function() {
                     })
                     .dimension(datasetDimension)
                     .group(datasetGroup)
-                    .colors(["#1f77b4"])
+                    //.colors(["#1f77b4"])
+                    .colors(["#888888"])
                     .elasticX(true)
                     .ordering(function(d) {
                         return -d.value;

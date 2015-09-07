@@ -3,6 +3,11 @@
     font-size: 10px;
 }
 
+.dc-chart g.row rect {
+    stroke: gray;
+    font-size: 10px;
+}
+
 .filterName {
     font-size: 12px;
     font-weight: bold;
