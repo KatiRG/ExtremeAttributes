@@ -18,7 +18,7 @@ var numObsDatasets = 1;
 //for map click
 var clickedRegion;
 var palette;
-var minEvents, maxEvents;
+window.minEvents; window.maxEvents; window.eventRange;
 
 $(document).ready(function() {
 
@@ -291,7 +291,8 @@ $(document).ready(function() {
 
             //http://colorbrewer2.org/
             palette = ["#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"];
-            function drawChoropleth(data,geojson) {  
+            function drawChoropleth(data,geojson) {
+                var minEvents;
 
                 choroChart = dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)
@@ -310,16 +311,15 @@ $(document).ready(function() {
                   //http://www.colourlovers.com/palette/458132/Eat_some_leaves  + http://www.colourlovers.com/palette/36998/french_roast
                   //.colors(["#FFDC68", "#CC982A", "#352504", "#A89048", "#928941", "#A84818", "#330C0C"])
                   .colors(["#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"])
-                  .colorDomain(function() {
-                    minEvents = dc.utils.groupMin(this.group(), this.valueAccessor());
-                    maxEvents = dc.utils.groupMax(this.group(), this.valueAccessor());
-                    //console.log("minEvents, maxEvents: ", minEvents +", "+ maxEvents)
-                    //console.log("colorDomain: ", dc.utils.groupMin(this.group() + ", " + this.valueAccessor()))
-                    return [dc.utils.groupMin(this.group(), this.valueAccessor()),
-                     dc.utils.groupMax(this.group(), this.valueAccessor())];
-                  })
-                  .colorAccessor(function(d,i) {
-                    //console.log("d.value: ", d.value)
+                  // .colorDomain(function() {
+                  //   minEvents = dc.utils.groupMin(this.group(), this.valueAccessor());
+                  //   maxEvents = dc.utils.groupMax(this.group(), this.valueAccessor());
+                  //   console.log("minEvents, maxEvents: ", minEvents +", "+ maxEvents)                    
+                  //   // return [dc.utils.groupMin(this.group(), this.valueAccessor()),
+                  //   //  dc.utils.groupMax(this.group(), this.valueAccessor())];
+                  //   return [minEvents, maxEvents];
+                  // })                    
+                  .colorAccessor(function(d,i) {                    
                     return d.value.average;
                   })
                   .featureKeyAccessor(function(feature) {
@@ -345,10 +345,26 @@ $(document).ready(function() {
                         else document.getElementById("ts-button").disabled = true;
                     });                 
                 })
-              
-                
-                            
+
+                choroChart.on("preRender", function(chart) {
+                    console.log("all: ", d3.extent(chart.group().all(), chart.valueAccessor()) )
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                });
+                choroChart.on("preRedraw", function(chart) {
+                    console.log("all2: ", d3.extent(chart.group().all(), chart.valueAccessor()) )
+                    eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
+                    //minEvents = eventRange[0];
+                    console.log("eventRange: ", eventRange)                 
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                });
+
+                //console.log("choroChart.colorDomain().apply(choroChart): ", choroChart.colorDomain().apply(choroChart))
             }
+
+
+
+            
+            
 
             // =================
             categoryChart
@@ -386,8 +402,9 @@ $(document).ready(function() {
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d) {
+                    .title(function(d) {                        
                         return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";
+                        //return indexID[d.key] + " (" + indices[indexID[d.key]] + ")" + ":\n" + d.value.average + " events";
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
