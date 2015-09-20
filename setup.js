@@ -346,32 +346,19 @@ $(document).ready(function() {
                     });                 
                 })
 
-                // choroChart.on("postRender", function(chart) {                    
-                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                // });
-
-                choroChart.on("preRender", function(chart) {                    
+                choroChart.on("preRender", function(chart) {
                     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                    //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
                 });
                 choroChart.on("preRedraw", function(chart) {
-                    //console.log("all2: ", d3.extent(chart.group().all(), chart.valueAccessor()) )
-                    eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
-                    //minEvents = eventRange[0];
-                    console.log("eventRange: ", eventRange)                 
-                    chart.colorDomain(eventRange);
-                    //chart.minmaxEvents(eventRange);
-                    //console.log("in preRedraw chart.minmaxEvents: ", chart.minmaxEvents())
-                    //console.log("in preRedraw chart.colorDomain: ", chart.colorDomain())
-                });
-
-                //console.log("after preRedraw choroChart.minmaxEvents: ", choroChart.minmaxEvents()) 
-                //console.log("choroChart.colorDomain().apply(choroChart): ", choroChart.colorDomain().apply(choroChart))
+                    if (indexChart.filters().length == 0) {
+                        eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
+                        console.log("eventRange in preRedraw: ", eventRange)                 
+                        chart.colorDomain(eventRange);
+                    }
+                });            
             }
 
-
-
-            
-            
 
             // =================
             categoryChart
