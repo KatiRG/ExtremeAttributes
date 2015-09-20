@@ -18,7 +18,7 @@ var numObsDatasets = 1;
 //for map click
 var clickedRegion;
 var palette;
-window.minEvents; window.maxEvents; window.eventRange;
+window.minEvents; window.maxEvents; window.eventRange; window.legendtest;
 
 $(document).ready(function() {
 
@@ -346,18 +346,25 @@ $(document).ready(function() {
                     });                 
                 })
 
-                choroChart.on("preRender", function(chart) {
-                    console.log("all: ", d3.extent(chart.group().all(), chart.valueAccessor()) )
+                // choroChart.on("postRender", function(chart) {                    
+                //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                // });
+
+                choroChart.on("preRender", function(chart) {                    
                     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
                 });
                 choroChart.on("preRedraw", function(chart) {
-                    console.log("all2: ", d3.extent(chart.group().all(), chart.valueAccessor()) )
+                    //console.log("all2: ", d3.extent(chart.group().all(), chart.valueAccessor()) )
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     //minEvents = eventRange[0];
                     console.log("eventRange: ", eventRange)                 
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                    chart.colorDomain(eventRange);
+                    //chart.minmaxEvents(eventRange);
+                    //console.log("in preRedraw chart.minmaxEvents: ", chart.minmaxEvents())
+                    //console.log("in preRedraw chart.colorDomain: ", chart.colorDomain())
                 });
 
+                //console.log("after preRedraw choroChart.minmaxEvents: ", choroChart.minmaxEvents()) 
                 //console.log("choroChart.colorDomain().apply(choroChart): ", choroChart.colorDomain().apply(choroChart))
             }
 
