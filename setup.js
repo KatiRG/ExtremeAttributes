@@ -337,7 +337,7 @@ $(document).ready(function() {
                     //if (indexChart.filters().length == 0) {
                         eventRange = d3.extent(chart.group().all(), chart.valueAccessor());                        
                         
-                        chart.colorDomain(eventRange);
+                        chart.colorDomain(eventRange);                        
                         //d3.scale.category20c().domain(eventRange).range(colorbrewer.YlGn[7]);
 
                         //chart.selectAll("g").selectAll("leaflet-clickable").attr("class", "YlGn");
