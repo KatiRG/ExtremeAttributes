@@ -307,7 +307,8 @@ $(document).ready(function() {
                   .center([47.00, 2.00])
                   .zoom(5)
                   .geojson(geojson)
-                  //.colors(["#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"]))                    
+                  //.colors(["#FFDC68", "#CC982A", "#A8C078", "#A89048", "#928941", "#A84818", "#352504", "#61290E", "#330C0C", "#A7321C"])                    
+                  .colors(colorbrewer.YlGn[7])
                   .colorAccessor(function(d,i) {                    
                     return d.value.average;
                   })
