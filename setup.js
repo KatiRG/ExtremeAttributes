@@ -283,15 +283,7 @@ $(document).ready(function() {
 
 
             drawChoropleth(csv,statesJson);
-
-            //palette = ["#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-            //palette = ["#FFDC68", "#CC982A", "#A8C078", "#A89048", "#928941", "#A84818", "#352504", "#61290E", "#330C0C", "#A7321C"];
-            //http://www.colourlovers.com/palette/2914176/A1
-            //palette = ["#C3FF9E", "#FFDC68", "#A89048", "#928941", "#FFAD5D"];
-
-            //http://colorbrewer2.org/
-            //palette = ["#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"];
-            palette = ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"];
+           
             function drawChoropleth(data,geojson) {
                 var minEvents;
 
@@ -306,8 +298,7 @@ $(document).ready(function() {
                     .height(400)
                   .center([47.00, 2.00])
                   .zoom(5)
-                  .geojson(geojson)
-                  //.colors(["#FFDC68", "#CC982A", "#A8C078", "#A89048", "#928941", "#A84818", "#352504", "#61290E", "#330C0C", "#A7321C"])                    
+                  .geojson(geojson)                  
                   .colors(colorbrewer.YlGn[7])
                   .colorAccessor(function(d,i) {                    
                     return d.value.average;
