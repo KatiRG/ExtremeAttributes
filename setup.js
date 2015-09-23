@@ -299,7 +299,7 @@ $(document).ready(function() {
                   .center([47.00, 2.00])
                   .zoom(5)
                   .geojson(geojson)                  
-                  .colors(colorbrewer.YlGn[7])
+                  .colors(colorbrewer.YlGn[9])
                   .colorAccessor(function(d,i) {                    
                     return d.value.average;
                   })
