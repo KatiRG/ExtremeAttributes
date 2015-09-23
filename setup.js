@@ -18,7 +18,7 @@ var numObsDatasets = 1;
 //for map click
 var clickedRegion;
 var palette;
-var minEvents, maxEvents;
+window.minEvents; window.maxEvents; window.eventRange; window.legendtest;
 
 $(document).ready(function() {
 
@@ -283,15 +283,9 @@ $(document).ready(function() {
 
 
             drawChoropleth(csv,statesJson);
-
-            //palette = ["#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-            //palette = ["#FFDC68", "#CC982A", "#A8C078", "#A89048", "#928941", "#A84818", "#352504", "#61290E", "#330C0C", "#A7321C"];
-            //http://www.colourlovers.com/palette/2914176/A1
-            //palette = ["#C3FF9E", "#FFDC68", "#A89048", "#928941", "#FFAD5D"];
-
-            //http://colorbrewer2.org/
-            palette = ["#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"];
-            function drawChoropleth(data,geojson) {  
+           
+            function drawChoropleth(data,geojson) {
+                var minEvents;
 
                 choroChart = dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)
@@ -304,37 +298,18 @@ $(document).ready(function() {
                     .height(400)
                   .center([47.00, 2.00])
                   .zoom(5)
-                  .geojson(geojson)
-                  //.colors(['#fff7f3', '#fde0dd', '#fcc5c0', '#fa9fb5', '#f768a1', '#dd3497', '#ae017e', '#7a0177', '#49006a'])
-                  //.colors(["#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"])
-                  //http://www.colourlovers.com/palette/458132/Eat_some_leaves  + http://www.colourlovers.com/palette/36998/french_roast
-                  //.colors(["#FFDC68", "#CC982A", "#352504", "#A89048", "#928941", "#A84818", "#330C0C"])
-                  .colors(["#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"])
-                  .colorDomain(function() {
-                    minEvents = dc.utils.groupMin(this.group(), this.valueAccessor());
-                    maxEvents = dc.utils.groupMax(this.group(), this.valueAccessor());
-                    //console.log("minEvents, maxEvents: ", minEvents +", "+ maxEvents)
-                    //console.log("colorDomain: ", dc.utils.groupMin(this.group() + ", " + this.valueAccessor()))
-                    return [dc.utils.groupMin(this.group(), this.valueAccessor()),
-                     dc.utils.groupMax(this.group(), this.valueAccessor())];
-                  })
-                  .colorAccessor(function(d,i) {
-                    //console.log("d.value: ", d.value)
+                  .geojson(geojson)                  
+                  .colors(colorbrewer.YlGn[7])
+                  .colorAccessor(function(d,i) {                    
                     return d.value.average;
                   })
-                  .featureKeyAccessor(function(feature) {
-                    //console.log("featureKeyAccessor.name: ", feature.properties.name)
+                  .featureKeyAccessor(function(feature) {                    
                     return feature.properties.name;
                   })
                   .renderPopup(true)
-                  .popup(function(d,feature) {
-                    //console.log("d, feature: ", d +", "+ feature.properties)
+                  .popup(function(d,feature) {                    
                     return feature.properties.name+" : "+d.value.average;
-                  });
-                  // .title (function (d) {
-                  //     console.log("title d: ", d);
-                  //     return d.key;
-                  // });
+                  });       
 
                 choroChart.renderlet(function(chart) {
                     chart.selectAll("g").on("click", function(d, j) {                        
@@ -345,10 +320,23 @@ $(document).ready(function() {
                         else document.getElementById("ts-button").disabled = true;
                     });                 
                 })
-              
-                
-                            
+
+                choroChart.on("preRender", function(chart) {
+                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                    //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
+                });
+                choroChart.on("preRedraw", function(chart) {
+                    //if (indexChart.filters().length == 0) {
+                        eventRange = d3.extent(chart.group().all(), chart.valueAccessor());                        
+                        
+                        chart.colorDomain(eventRange);                        
+                        //d3.scale.category20c().domain(eventRange).range(colorbrewer.YlGn[7]);
+
+                        //chart.selectAll("g").selectAll("leaflet-clickable").attr("class", "YlGn");
+                    //}
+                });            
             }
+
 
             // =================
             categoryChart
@@ -386,8 +374,9 @@ $(document).ready(function() {
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d) {
+                    .title(function(d) {                        
                         return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";
+                        //return indexID[d.key] + " (" + indices[indexID[d.key]] + ")" + ":\n" + d.value.average + " events";
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
