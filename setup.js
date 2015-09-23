@@ -326,14 +326,18 @@ $(document).ready(function() {
                     //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
                 });
                 choroChart.on("preRedraw", function(chart) {
-                    //if (indexChart.filters().length == 0) {
-                        eventRange = d3.extent(chart.group().all(), chart.valueAccessor());                        
+                    //save initial eventRange upon page load                    
+                    if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
+                        && datasetChart.filters().length == 0 && stackedYearChart.filters().length == 0
+                        && seasonsChart.filters().length == 0)
+                    {
+                        console.log("nothing clicked")
+                        eventRange = d3.extent(chart.group().all(), chart.valueAccessor());   
+                        eventRange[0] = 0; //make min always 0 
+                        console.log("eventRange: ", eventRange)                    
                         
-                        chart.colorDomain(eventRange);                        
-                        //d3.scale.category20c().domain(eventRange).range(colorbrewer.YlGn[7]);
-
-                        //chart.selectAll("g").selectAll("leaflet-clickable").attr("class", "YlGn");
-                    //}
+                        chart.colorDomain(eventRange);  
+                    }
                 });            
             }
 
