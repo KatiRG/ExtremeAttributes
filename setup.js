@@ -206,14 +206,16 @@ $(document).ready(function() {
         // ===============================================================================================
 
         var numModels = datasetGroup.size();
-        var numRegions = Object.keys(regions).length;        
+        var numRegions = Object.keys(regions).length;
+        var numIndices = Object.keys(indexID).length;
 
         avgIndexGroup = indexDimension.group().reduce(reduceAdd_acrossRegion, reduceRemove_acrossRegion, reduceInit_acrossRegion);        
         //avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial, reduceFactor);        
-        avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-
-        //Fns to compute avg for the other charts        
-        function reduceAdd(p, v) {
+        //avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgRegionGroup = regionDimension.group().reduce(reduceAdd_acrossIndex, reduceRemove_acrossIndex, reduceInit_acrossIndex);
+        
+        //Indices should always be divided by number of regions selected
+        function reduceAdd_acrossIndex(p, v) {
             
                 //count models
                 var omit;
@@ -228,11 +230,12 @@ $(document).ready(function() {
                     p.numDataSets = datasetChart.filters().length - omit;
                 }
 
-                p.average = Math.round( p.count / p.numDataSets );
+                //p.average = Math.round( p.count / p.numDataSets );
+                p.average = Math.round( p.count / p.numDataSets * ( 1/( indexChart.filters().length ? indexChart.filters().length : numIndices ) ) );                
                 return p;
         }
 
-        function reduceRemove(p, v) {
+        function reduceRemove_acrossIndex(p, v) {
                 var omit;
                 --p.count;
                 if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
@@ -245,11 +248,12 @@ $(document).ready(function() {
                     p.numDataSets = datasetChart.filters().length - omit;
                 }
 
-                p.average = Math.round( p.count / p.numDataSets );
+                //p.average = Math.round( p.count / p.numDataSets );
+                p.average = Math.round( p.count / p.numDataSets * ( 1/( indexChart.filters().length ? indexChart.filters().length : numIndices ) ) );
                 return p;
         }
 
-        function reduceInitial() {
+        function reduceInit_acrossIndex() {
                 return {
                     count: 0,
                     numDataSets: 0,
@@ -257,12 +261,6 @@ $(document).ready(function() {
                 };
         }
 
-
-        // //Indices should always be divided by number of regions selected
-        // for (i = 0; i < Object.keys(avgIndexGroup.all()).length; i++) {
-        //     console.log("regionsSelected:", choroChart.filters().length)
-        //     //avgIndexGroup.all()[i].value.average = avgIndexGroup.all()[i].value.average/regionsSelected;
-        // }
         // ===============================================================================================
         //Fns to compute avg for the other charts
        
