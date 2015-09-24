@@ -19,6 +19,7 @@ var numObsDatasets = 1;
 var clickedRegion;
 var palette;
 window.eventRange;
+//var numRegions;
 
 $(document).ready(function() {
 
@@ -205,13 +206,15 @@ $(document).ready(function() {
         // ===============================================================================================
 
         var numModels = datasetGroup.size();
+        var numRegions = Object.keys(regions).length;        
 
-        avgIndexGroup = indexDimension.group().reduce(reduceAdd_avgAcrossRegion, reduceRemove_avgAcrossRegion, reduceInit_avgAcrossRegion);
-        //avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgIndexGroup = indexDimension.group().reduce(reduceAdd_acrossRegion, reduceRemove_acrossRegion, reduceInit_acrossRegion);        
+        //avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial, reduceFactor);        
         avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
-        //Fns to compute avg for the other charts
+        //Fns to compute avg for the other charts        
         function reduceAdd(p, v) {
+            
                 //count models
                 var omit;
                 ++p.count;
@@ -225,7 +228,7 @@ $(document).ready(function() {
                     p.numDataSets = datasetChart.filters().length - omit;
                 }
 
-                p.average = Math.ceil(p.count / p.numDataSets);
+                p.average = Math.round( p.count / p.numDataSets );
                 return p;
         }
 
@@ -242,7 +245,7 @@ $(document).ready(function() {
                     p.numDataSets = datasetChart.filters().length - omit;
                 }
 
-                p.average = Math.ceil(p.count / p.numDataSets);
+                p.average = Math.round( p.count / p.numDataSets );
                 return p;
         }
 
@@ -253,7 +256,66 @@ $(document).ready(function() {
                     average: 0
                 };
         }
+
+
+        // //Indices should always be divided by number of regions selected
+        // for (i = 0; i < Object.keys(avgIndexGroup.all()).length; i++) {
+        //     console.log("regionsSelected:", choroChart.filters().length)
+        //     //avgIndexGroup.all()[i].value.average = avgIndexGroup.all()[i].value.average/regionsSelected;
+        // }
         // ===============================================================================================
+        //Fns to compute avg for the other charts
+       
+        function reduceAdd_acrossRegion(p, v) {            
+                //count models
+                var omit;
+                ++p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
+                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;
+                } else {
+                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    } else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
+
+                p.average = Math.round( p.count / p.numDataSets * ( 1/( choroChart.filters().length ? choroChart.filters().length : numRegions ) ) );
+                //p.average = Math.round( Math.round(p.count / p.numDataSets) *  1/( choroChart.filters().length ? choroChart.filters().length : numRegions ) );
+                //p.average = Math.round( p.count / p.numDataSets * (1/numRegions) );
+                
+                return p;
+        }
+
+        function reduceRemove_acrossRegion(p, v) {
+                var omit;
+                --p.count;
+                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
+                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    else p.numDataSets = datasetGroup.all().length;
+                } else {
+                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                        omit = numObsDatasets;
+                    } else omit = 0;
+                    p.numDataSets = datasetChart.filters().length - omit;
+                }
+
+                
+                p.average = Math.round( p.count / p.numDataSets * ( 1/( choroChart.filters().length ? choroChart.filters().length : numRegions ) ) );
+                //p.average = Math.round( Math.round(p.count / p.numDataSets) *  1/( choroChart.filters().length ? choroChart.filters().length : numRegions ) );
+                //p.average = Math.round( p.count / p.numDataSets * (1/numRegions) );
+                return p;
+        }
+
+        function reduceInit_acrossRegion() {
+                return {
+                    count: 0,
+                    numDataSets: 0,
+                    average: 0
+                };
+        }
+        // ===============================================================================================
+
 
         minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
         maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
@@ -290,12 +352,11 @@ $(document).ready(function() {
                 var minEvents;
 
                 choroChart = dc.leafletChoroplethChart("#choro-map .map")                
-                  .dimension(regionDimension)
-                  .group(avgRegionGroup)
-                  .valueAccessor(function(p) {
-                        //console.log("p.value.average: ", p.value.average)
+                  .dimension(regionDimension)                  
+                  .valueAccessor(function(p) {                        
                         return p.value.average;
                    })
+                  .group(avgRegionGroup)
                   .width(800)
                     .height(400)
                   .center([47.00, 2.00])
@@ -308,35 +369,38 @@ $(document).ready(function() {
                   .featureKeyAccessor(function(feature) {                    
                     return feature.properties.name;
                   })
-                  .renderPopup(true)
+                  .renderPopup(false)
                   .popup(function(d,feature) {                    
                     return feature.properties.name+" : "+d.value.average;
                   });       
 
                 choroChart.renderlet(function(chart) {
-                    chart.selectAll("g").on("click", function(d, j) {                        
+                    chart.selectAll("g").on("click", function(d, j) {                                        
+                        
+
                         if (chart.filters().length == 1 && indexChart.filters().length == 1) {
                             document.getElementById("ts-button").disabled = false;
                             tsRegion = chart.filter();                                                     
                         }
                         else document.getElementById("ts-button").disabled = true;
                     });                 
-                })
+                })            
 
                 choroChart.on("preRender", function(chart) {
                     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
                     //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
                 });
-                choroChart.on("preRedraw", function(chart) {
+
+                //var numRegions;
+                choroChart.on("preRedraw", function(chart) {                 
+
                     //save initial eventRange upon page load                    
                     if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
                         && datasetChart.filters().length == 0 && stackedYearChart.filters().length == 0
                         && seasonsChart.filters().length == 0)
-                    {
-                        console.log("nothing clicked")
+                    {                        
                         eventRange = d3.extent(chart.group().all(), chart.valueAccessor());   
-                        eventRange[0] = 0; //make min always 0 
-                        console.log("eventRange: ", eventRange)                    
+                        eventRange[0] = 0; //make min always 0                                         
                         
                         chart.colorDomain(eventRange);  
                     }
@@ -363,7 +427,7 @@ $(document).ready(function() {
                         chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
                     });
 
-            // =================                    
+            // =================        
             indexChart
                     .width(400).height(200)
                     .margins({
@@ -373,7 +437,7 @@ $(document).ready(function() {
                         left: 50
                     })
                     .dimension(indexDimension)
-                    .group(avgIndexGroup) //avg count across all datasets
+                    .group(avgIndexGroup) //avg count across all datasets                  
                     .valueAccessor(function(p) {
                         return p.value.average;
                     })
