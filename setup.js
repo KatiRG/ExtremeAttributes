@@ -18,7 +18,7 @@ var numObsDatasets = 1;
 //for map click
 var clickedRegion;
 var palette;
-window.minEvents; window.maxEvents; window.eventRange; window.legendtest;
+window.eventRange;
 
 $(document).ready(function() {
 
@@ -206,11 +206,13 @@ $(document).ready(function() {
 
         var numModels = datasetGroup.size();
 
-        avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgIndexGroup = indexDimension.group().reduce(reduceAdd_avgAcrossRegion, reduceRemove_avgAcrossRegion, reduceInit_avgAcrossRegion);
+        //avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
         //Fns to compute avg for the other charts
         function reduceAdd(p, v) {
+                //count models
                 var omit;
                 ++p.count;
                 if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
