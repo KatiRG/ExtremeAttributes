@@ -271,8 +271,8 @@ $(document).ready(function() {
         //Regions should always be weighted by number of indices and number of seasons selected
         function reduceAdd_acrossModelRegion(p, v) {                
             numRegionsSelected = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            numSeasonsSelected = seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;
-            
+            numSeasonsSelected = 1;  //seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;                    
+           
             //count models
             var omit;
             ++p.count;
@@ -285,8 +285,7 @@ $(document).ready(function() {
                 } else omit = 0;
                 p.numDataSets = datasetChart.filters().length - omit;
             }            
-              
-            //p.average = Math.round( p.count / p.numDataSets *  1/( numRegionsSelected ) );
+                      
             p.average = p.count / ( p.numDataSets * numRegionsSelected * numSeasonsSelected );
             //p.average = Math.round( p.count / p.numDataSets );
                         
@@ -295,6 +294,7 @@ $(document).ready(function() {
 
         function reduceRemove_acrossModelRegion(p, v) {
             var omit;
+          
             --p.count;
             if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
                 if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
@@ -306,8 +306,7 @@ $(document).ready(function() {
                 p.numDataSets = datasetChart.filters().length - omit;
             }        
 
-            //p.average = Math.round( p.count / p.numDataSets *  1/( choroChart.filters().length ? choroChart.filters().length : numRegions ) );
-            //p.average =  p.count / p.numDataSets  *  1/( numRegionsSelected );
+         
             p.average = p.count / ( p.numDataSets * numRegionsSelected * numSeasonsSelected );
             //p.average = Math.round( p.count / p.numDataSets );
             
@@ -325,7 +324,7 @@ $(document).ready(function() {
         //Indices should always be weighted by number of regions and number of seasons selected
         function reduceAdd_acrossModelIndex(p, v) {        
             numIndicesSelected = indexChart.filters().length ? indexChart.filters().length : numIndices;      
-            numSeasonsSelected = seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;
+            numSeasonsSelected = 1; //seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;            
             
             //count models
             var omit;
