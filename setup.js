@@ -127,23 +127,21 @@ $(document).ready(function() {
             datasetGroup = datasetDimension.group();    
 
         // ===============================================================================================
-        //for avg stacked bar chart
-        //https://github.com/dc-js/dc.js/issues/21
         var year = filter.dimension(function(d) { return +d.Year; });
          avgDatasetGroup = datasetDimension.group().reduce(
                 // add
             function(p, v) {
                 ++p.count;
-                if (v.Model < 100) { //not an OBS dataset
-                    // ++p.season0Count;
-                    // p.season0Avg = p.season0Count / p.numDataSets;                        
+                if (v.Model < 100) { //not an OBS dataset                   
                     p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);
                 } else { //OBS dataset, not a model
                     p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
                 }
 
                 p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
-                //p.modelAvg = p.count / (p.yearCount * 4); //Account for 4 seasons
+                p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+
                 p.modelAvg = p.count / p.aggregateCount;
 
                 return p;
@@ -158,7 +156,9 @@ $(document).ready(function() {
                 }
 
                 p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
-                //p.modelAvg = p.count / (p.yearCount * 4); //Account for 4 seasons
+                p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+
                 p.modelAvg = p.count / p.aggregateCount;
 
                 return p;
@@ -169,7 +169,9 @@ $(document).ready(function() {
                     count: 0,
                     modelAvg: 0,
                     yearCount: 0,
-                    aggregateCount: 0
+                    aggregateCount: 0,
+                    indexCount: 0,
+                    regionCount: 0
                 };
             }
         );
@@ -193,27 +195,22 @@ $(document).ready(function() {
             var omit;
             ++p.count;
             if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-            //console.log("v: ", v)
                 if (v.Year > cutoffYear_Safran) {
                     p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    //p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100 - cutoffYear_Safran);
                 }
                 else {
                     p.numDataSets = datasetGroup.all().length;
-                   // p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
                 }
             } else {
                 if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
                     omit = numObsDatasets;
-                    //p.yearCount = yearChart.filters().length > 0? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
                 } else {
                     omit = 0;
-                    //p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2012 - 1972);
                 }
                 p.numDataSets = datasetChart.filters().length - omit;
             }
 
-            p.average = Math.ceil(p.count / p.numDataSets);
+            p.average = Math.ceil( p.count / (p.numDataSets * 4) );
 
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -227,24 +224,20 @@ $(document).ready(function() {
             if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected
                 if (v.Year > cutoffYear_Safran) {
                     p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    //p.yearCount = 2100 - cutoffYear_Safran;
                 }
                 else {
                     p.numDataSets = datasetGroup.all().length;
-                    //p.yearCount = yearRange;
                 }
             } else {
                 if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
                     omit = numObsDatasets;
-                    //p.yearCount = yearRange;
                 } else {
                     omit = 0;
-                    //p.yearCount = yearChart.filters()? (2012 - 1972) : yearChart.filters()[1] - yearChart.filters()[0];
                 }
                 p.numDataSets = datasetChart.filters().length - omit;
             }
 
-            p.average = Math.ceil(p.count / p.numDataSets);
+            p.average = Math.ceil( p.count / (p.numDataSets * 4) );
 
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -300,7 +293,8 @@ $(document).ready(function() {
 
                 choroChart //= dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)                  
-                  .valueAccessor(function(d) {                        
+                  .valueAccessor(function(d) {
+                        //console.log("d.value.yearCount: ", d.value.yearCount)
                         return d.value.average/d.value.indexCount;
                    })
                   .group(avgRegionGroup)                  
@@ -311,10 +305,7 @@ $(document).ready(function() {
                   .zoom(5)
                   .geojson(geojson)                  
                   .colors(colorbrewer.YlGnBu[9])
-                  .colorAccessor(function(d,i) {
-                    // console.log("d: ", d)
-                    // console.log("yearChart.filters(): ", yearChart.filters())
-                    // console.log("d.yearCount: ", d.value.yearCount)
+                  .colorAccessor(function(d,i) {                    
                     return d.value.average/d.value.indexCount;
                   })
                   .featureKeyAccessor(function(feature) {                    
@@ -440,7 +431,8 @@ $(document).ready(function() {
                     .group(avgYearGroup) //avg count across all datasets
                     .valueAccessor(function(p) {
                         //return p.value.average;
-                        return p.value.average / p.value.regionCount;
+                        //console.log("d.value.regionCount in yearChart: ", d.value.regionCount)
+                        return p.value.average / (p.value.regionCount * p.value.indexCount);
                     })
                     .elasticY(true)
                     .gap(0)
@@ -464,9 +456,9 @@ $(document).ready(function() {
                     .dimension(datasetDimension)
                     // .group(datasetGroup)
                     .group(avgDatasetGroup)
-                    .valueAccessor(function(d) {       
-                        console.log("d.value.yearCount: ", d.value.yearCount)                 
-                        return d.value.modelAvg;
+                    .valueAccessor(function(d) {
+                        //console.log("d.value.regionCount in datasetChart: ", d.value.regionCount)
+                        return d.value.modelAvg/(d.value.regionCount * d.value.indexCount);
                     })
                     //.group(avgDatasetGroup)                    
                     .colors(["#888888"])
@@ -479,7 +471,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + d.value.modelAvg + " events";
+                        return models[d.key] + ": " + d.value.modelAvg/(d.value.regionCount * d.value.indexCount) + " events";
                     })
                     .gap(0.5);
             datasetChart
