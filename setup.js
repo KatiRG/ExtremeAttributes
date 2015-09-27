@@ -130,6 +130,49 @@ $(document).ready(function() {
         //for avg stacked bar chart
         //https://github.com/dc-js/dc.js/issues/21
         var year = filter.dimension(function(d) { return +d.Year; });
+         avgDatasetGroup = datasetDimension.group().reduce(
+                // add
+            function(p, v) {
+                ++p.count;
+                if (v.Model < 100) { //not an OBS dataset
+                    // ++p.season0Count;
+                    // p.season0Avg = p.season0Count / p.numDataSets;                        
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);
+                } else { //OBS dataset, not a model
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
+                }
+
+                p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
+                //p.modelAvg = p.count / (p.yearCount * 4); //Account for 4 seasons
+                p.modelAvg = p.count / p.aggregateCount;
+
+                return p;
+            },
+            // remove
+            function(p, v) {
+                --p.count;
+                if (v.Model < 100) { //not an OBS dataset
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);
+                } else { //OBS dataset, not a model
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
+                }
+
+                p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
+                //p.modelAvg = p.count / (p.yearCount * 4); //Account for 4 seasons
+                p.modelAvg = p.count / p.aggregateCount;
+
+                return p;
+            },
+            // init
+            function() {
+                return {
+                    count: 0,
+                    modelAvg: 0,
+                    yearCount: 0,
+                    aggregateCount: 0
+                };
+            }
+        );
 
         var numModels = datasetGroup.size();
         var numRegions = Object.keys(regions).length;
@@ -153,19 +196,19 @@ $(document).ready(function() {
             //console.log("v: ", v)
                 if (v.Year > cutoffYear_Safran) {
                     p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100 - cutoffYear_Safran);
+                    //p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100 - cutoffYear_Safran);
                 }
                 else {
                     p.numDataSets = datasetGroup.all().length;
-                    p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
+                   // p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
                 }
             } else {
                 if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
                     omit = numObsDatasets;
-                    p.yearCount = yearChart.filters().length > 0? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
+                    //p.yearCount = yearChart.filters().length > 0? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
                 } else {
                     omit = 0;
-                    p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2012 - 1972);
+                    //p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2012 - 1972);
                 }
                 p.numDataSets = datasetChart.filters().length - omit;
             }
@@ -184,19 +227,19 @@ $(document).ready(function() {
             if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected
                 if (v.Year > cutoffYear_Safran) {
                     p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    p.yearCount = 2100 - cutoffYear_Safran;
+                    //p.yearCount = 2100 - cutoffYear_Safran;
                 }
                 else {
                     p.numDataSets = datasetGroup.all().length;
-                    p.yearCount = yearRange;
+                    //p.yearCount = yearRange;
                 }
             } else {
                 if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
                     omit = numObsDatasets;
-                    p.yearCount = yearRange;
+                    //p.yearCount = yearRange;
                 } else {
                     omit = 0;
-                    p.yearCount = yearChart.filters()? (2012 - 1972) : yearChart.filters()[1] - yearChart.filters()[0];
+                    //p.yearCount = yearChart.filters()? (2012 - 1972) : yearChart.filters()[1] - yearChart.filters()[0];
                 }
                 p.numDataSets = datasetChart.filters().length - omit;
             }
@@ -215,8 +258,7 @@ $(document).ready(function() {
                     numDataSets: 0,
                     average: 0,
                     regionCount: 0,
-                    indexCount: 0,
-                    yearCount: 0
+                    indexCount: 0
                 };
         }
         
@@ -258,8 +300,7 @@ $(document).ready(function() {
 
                 choroChart //= dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)                  
-                  .valueAccessor(function(d) {
-                        console.log("d.value.indexCount: ", d.value.indexCount)
+                  .valueAccessor(function(d) {                        
                         return d.value.average/d.value.indexCount;
                    })
                   .group(avgRegionGroup)                  
@@ -347,11 +388,7 @@ $(document).ready(function() {
                     })
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
-                    .valueAccessor(function(p) {
-                        //return p.value.average;
-                        // console.log("p.value.average: ", p.value.average)
-                        // console.log("p.value.regionCount: ", p.value.regionCount)
-                        // console.log("p.value.average/p.value.regionCount: ", p.value.average/p.value.regionCount)
+                    .valueAccessor(function(p) {                        
                         return p.value.average / p.value.regionCount;
                     })
                     .elasticY(true)
@@ -425,9 +462,13 @@ $(document).ready(function() {
                         left: 10
                     })
                     .dimension(datasetDimension)
-                    .group(datasetGroup)
-                    //.group(avgDatasetGroup)
-                    //.colors(["#1f77b4"])
+                    // .group(datasetGroup)
+                    .group(avgDatasetGroup)
+                    .valueAccessor(function(d) {       
+                        console.log("d.value.yearCount: ", d.value.yearCount)                 
+                        return d.value.modelAvg;
+                    })
+                    //.group(avgDatasetGroup)                    
                     .colors(["#888888"])
                     .elasticX(true)
                     .ordering(function(d) {
@@ -437,7 +478,8 @@ $(document).ready(function() {
                         return models[d.key];
                     })
                     .title(function(d) {
-                        return models[d.key] + ": " + d.value + " events";
+                        //return models[d.key] + ": " + d.value + " events";
+                        return models[d.key] + ": " + d.value.modelAvg + " events";
                     })
                     .gap(0.5);
             datasetChart
