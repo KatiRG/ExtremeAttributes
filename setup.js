@@ -124,7 +124,7 @@ $(document).ready(function() {
             seasonGroup = seasonDimension.group(),
             yearGroup = timeDimension.group(),
             regionGroup = regionDimension.group(),
-            datasetGroup = datasetDimension.group();
+            datasetGroup = datasetDimension.group();    
 
         // ===============================================================================================
         //for avg stacked bar chart
@@ -145,22 +145,27 @@ $(document).ready(function() {
 
         //Fns to compute avg.
         function reduceAdd(p, v) {
-                var omit;
-                ++p.count;
-                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-                    //console.log("v: ", v)
-                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    else p.numDataSets = datasetGroup.all().length;
-                } else {
-                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                        omit = numObsDatasets;
-                    } else omit = 0;
-                    p.numDataSets = datasetChart.filters().length - omit;
-                }
+            //if (p.count ==0) console.log("v: ", v)
 
-                p.average = Math.ceil(p.count / p.numDataSets);
-                return p;
+            var omit;
+            ++p.count;
+            if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
+            //console.log("v: ", v)
+                if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                else p.numDataSets = datasetGroup.all().length;
+            } else {
+                if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                    omit = numObsDatasets;
+                } else omit = 0;
+                p.numDataSets = datasetChart.filters().length - omit;
             }
+
+            p.average = Math.ceil(p.count / p.numDataSets);
+
+            p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+
+            return p;
+        }
 
         function reduceRemove(p, v) {
                 var omit;
@@ -176,6 +181,8 @@ $(document).ready(function() {
                     p.numDataSets = datasetChart.filters().length - omit;
                 }
 
+                p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+
                 p.average = Math.ceil(p.count / p.numDataSets);
                 return p;
         }
@@ -184,7 +191,8 @@ $(document).ready(function() {
                 return {
                     count: 0,
                     numDataSets: 0,
-                    average: 0
+                    average: 0,
+                    regionCount: 0
                 };
         }
         
@@ -228,8 +236,9 @@ $(document).ready(function() {
                   .dimension(regionDimension)                  
                   .valueAccessor(function(p) {                        
                         return p.value.average;
+                        //return p.value.average / p.value.regionCount;
                    })
-                  .group(avgRegionGroup)
+                  .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
                   .width(800)
                     .height(400)
@@ -312,13 +321,17 @@ $(document).ready(function() {
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
                     .valueAccessor(function(p) {
-                        return p.value.average;
+                        //return p.value.average;
+                        // console.log("p.value.average: ", p.value.average)
+                        // console.log("p.value.regionCount: ", p.value.regionCount)
+                        // console.log("p.value.average/p.value.regionCount: ", p.value.average/p.value.regionCount)
+                        return p.value.average / p.value.regionCount;
                     })
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
                     .title(function(d) {                        
-                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";
+                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average/d.data.value.regionCount + " events";
                         //return indexID[d.key] + " (" + indices[indexID[d.key]] + ")" + ":\n" + d.value.average + " events";
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
@@ -356,31 +369,14 @@ $(document).ready(function() {
 
         
 
-            // =================                
-            // yearChart
-            //         .width(790)
-            //         .height(350)
-            //         .dimension(year)
-            //         .x(d3.scale.linear().domain([1970, 2100]))
-            //         .elasticY(true)
-            //         .renderHorizontalGridLines(true)
-            //         .centerBar(true)
-            //         .colors(["#888888"]) //gray
-            //         .group(yearGroup)
-            //         .valueAccessor(function(p) {
-            //             return p.value.average;
-            //         });      
-            // yearChart
-            //         .xAxis().tickFormat(d3.format("d"));
-
-
-
+            // =================
             yearChart
                     .width(790).height(350)
                     .dimension(yearDimension)
                     .group(avgYearGroup) //avg count across all datasets
                     .valueAccessor(function(p) {
-                        return p.value.average;
+                        //return p.value.average;
+                        return p.value.average / p.value.regionCount;
                     })
                     .elasticY(true)
                     .gap(0)
