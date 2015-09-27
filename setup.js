@@ -151,40 +151,62 @@ $(document).ready(function() {
             ++p.count;
             if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
             //console.log("v: ", v)
-                if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                else p.numDataSets = datasetGroup.all().length;
+                if (v.Year > cutoffYear_Safran) {
+                    p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100 - cutoffYear_Safran);
+                }
+                else {
+                    p.numDataSets = datasetGroup.all().length;
+                    p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
+                }
             } else {
                 if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
                     omit = numObsDatasets;
-                } else omit = 0;
+                    p.yearCount = yearChart.filters().length > 0? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2100-1972);
+                } else {
+                    omit = 0;
+                    p.yearCount = yearChart.filters().length > 0 ? (Math.round(yearChart.filters()[0][1])-Math.round(yearChart.filters()[0][0]) +1) : (2012 - 1972);
+                }
                 p.numDataSets = datasetChart.filters().length - omit;
             }
 
             p.average = Math.ceil(p.count / p.numDataSets);
 
+            p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
 
             return p;
         }
 
         function reduceRemove(p, v) {
-                var omit;
-                --p.count;
-                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected         
-                    //console.log("v: ", v)
-                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    else p.numDataSets = datasetGroup.all().length;
-                } else {
-                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                        omit = numObsDatasets;
-                    } else omit = 0;
-                    p.numDataSets = datasetChart.filters().length - omit;
+            var omit;
+            --p.count;
+            if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected
+                if (v.Year > cutoffYear_Safran) {
+                    p.numDataSets = datasetGroup.all().length - numObsDatasets;
+                    p.yearCount = 2100 - cutoffYear_Safran;
                 }
+                else {
+                    p.numDataSets = datasetGroup.all().length;
+                    p.yearCount = yearRange;
+                }
+            } else {
+                if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+                    omit = numObsDatasets;
+                    p.yearCount = yearRange;
+                } else {
+                    omit = 0;
+                    p.yearCount = yearChart.filters()? (2012 - 1972) : yearChart.filters()[1] - yearChart.filters()[0];
+                }
+                p.numDataSets = datasetChart.filters().length - omit;
+            }
 
-                p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            p.average = Math.ceil(p.count / p.numDataSets);
 
-                p.average = Math.ceil(p.count / p.numDataSets);
-                return p;
+            p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+            p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+
+            return p;
         }
 
         function reduceInitial() {
@@ -192,7 +214,9 @@ $(document).ready(function() {
                     count: 0,
                     numDataSets: 0,
                     average: 0,
-                    regionCount: 0
+                    regionCount: 0,
+                    indexCount: 0,
+                    yearCount: 0
                 };
         }
         
@@ -234,9 +258,9 @@ $(document).ready(function() {
 
                 choroChart //= dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)                  
-                  .valueAccessor(function(p) {                        
-                        return p.value.average;
-                        //return p.value.average / p.value.regionCount;
+                  .valueAccessor(function(d) {
+                        console.log("d.value.indexCount: ", d.value.indexCount)
+                        return d.value.average/d.value.indexCount;
                    })
                   .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
@@ -246,15 +270,18 @@ $(document).ready(function() {
                   .zoom(5)
                   .geojson(geojson)                  
                   .colors(colorbrewer.YlGnBu[9])
-                  .colorAccessor(function(d,i) {                    
-                    return d.value.average;
+                  .colorAccessor(function(d,i) {
+                    // console.log("d: ", d)
+                    // console.log("yearChart.filters(): ", yearChart.filters())
+                    // console.log("d.yearCount: ", d.value.yearCount)
+                    return d.value.average/d.value.indexCount;
                   })
                   .featureKeyAccessor(function(feature) {                    
                     return feature.properties.name;
                   })
                   .renderPopup(false)
                   .popup(function(d,feature) {                    
-                    return feature.properties.name+" : "+d.value.average;
+                    return feature.properties.name+" : "+d.value.average/d.value.indexCount;
                   });       
 
                 choroChart.renderlet(function(chart) {
