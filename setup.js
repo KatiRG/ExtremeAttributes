@@ -41,7 +41,8 @@ $(document).ready(function() {
 
     var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-    d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {        
+    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
+    d3.csv("data/test_extremoscope_int.csv", function(csv) {              
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -112,7 +113,7 @@ $(document).ready(function() {
             }),
             indexDimension = filter.dimension(function(d) { return d.Index; }),
             regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
-            datasetDimension = filter.dimension(function(d) { return d.Model; }),
+            datasetDimension = filter.dimension(function(d) { return +d.Model; }),
             sigma = filter.dimension(function(d) { return d.Sigma; }),
             seasonDimension = filter.dimension(function(d) { return d.Season; }),
             scenario = filter.dimension(function(d) { return d.Scenario; }),
@@ -131,15 +132,21 @@ $(document).ready(function() {
 
         var numModels = datasetGroup.size();
         var numRegions = Object.keys(regions).length;
-        var numIndices = Object.keys(indexID).length;
+        var numIndices = 2; //Object.keys(indexID).length;
         var numSeasons = 4;
+        var yearRange = stackedYearChart.filters()? 128 : stackedYearChart.filters()[1] - stackedYearChart.filters()[0];
+        console.log("numModels:", numModels)
+        console.log("numRegions:", numRegions)
+        console.log("numIndices: ", numIndices)
 
         // //initially
         // var numRegionsSelected = numRegions, numIndicesSelected = numIndices, numSeasonsSelected = numSeasons;
 
-        avgEventsBySeason = year.group().reduce(
+        avgEventsBySeason = year.group().reduce(            
                 // add
             function(p, v) {
+                //console.log("p: ", p)
+                //console.log("v: ", v)
                     var omit;
                     if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
                         if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
@@ -166,7 +173,7 @@ $(document).ready(function() {
                         ++p.season3Count;
                         p.season3Avg = p.season3Count / p.numDataSets;
                     }
-
+                    
                     return p;
             },
             // remove
@@ -216,9 +223,54 @@ $(document).ready(function() {
             }
         );
         //end avg stacked bar chart
-        // ===============================================================================================
-        avgIndexGroup = indexDimension.group().reduce(reduceAdd_acrossModelRegion, reduceRemove_acrossModelRegion, reduceInit_acrossModelRegion);                
+        // ===============================================================================================        
+        avgIndexGroup = indexDimension.group().reduce(reduceAdd_acrossModelRegion, reduceRemove_acrossModelRegion, reduceInit_acrossModelRegion);
         avgRegionGroup = regionDimension.group().reduce(reduceAdd_acrossModelIndex, reduceRemove_acrossModelIndex, reduceInit_acrossModelIndex);
+
+        //divide by the number of seasons in each year
+        avgDatasetGroup = datasetDimension.group();
+        for (i = 0; i < avgDatasetGroup.all().length; i++) {
+            if (avgDatasetGroup.all()[i].key == "100") yearRange = 2012 - 1972;
+            console.log("avgDatasetGroup.all()[i].value: ", avgDatasetGroup.all()[i].value)
+            console.log("yearRange: ", yearRange)
+            avgDatasetGroup.all()[i].value = avgDatasetGroup.all()[i].value / yearRange;
+            console.log("avgDatasetGroup.all()[i] after: ", avgDatasetGroup.all()[i])
+        }
+        console.log("avgDatasetGroup.all() after: ", avgDatasetGroup.all())
+
+        avgDatasetGroupxxxxx = datasetDimension.group().reduce(
+                // add
+            function(p, v) {
+                if (v.Year == 1972 ) {
+                    console.log("p: ", p)
+                    console.log("v: ", v)
+                }                
+                
+                //++p.modelCount;
+                p.total += v.Model;
+                
+
+                //avg each year by number of extreme seasons                
+
+                return p;
+            },
+            // remove
+            function(p, v) {
+                //--p.modelCount;
+                p.total -= v.Model;
+                    
+                return p;
+                    
+            },
+            // init
+            function() {
+                return {                        
+                        //modelCount: 0,                        
+                        total: 0                       
+                };
+            }
+        );
+
 
         // avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);        
         // avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -271,7 +323,8 @@ $(document).ready(function() {
         //Regions should always be weighted by number of indices and number of seasons selected
         function reduceAdd_acrossModelRegion(p, v) {                
             numRegionsSelected = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            numSeasonsSelected = 1;  //seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;                    
+            numSeasonsSelected = seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;   
+            //console.log("numRegionsSelected in indexAvg fn: ", numRegionsSelected)                 
            
             //count models
             var omit;
@@ -286,7 +339,7 @@ $(document).ready(function() {
                 p.numDataSets = datasetChart.filters().length - omit;
             }            
                       
-            p.average = p.count / ( p.numDataSets * numRegionsSelected * numSeasonsSelected );
+            p.average = p.count / ( p.numDataSets + numRegionsSelected + numSeasonsSelected );
             //p.average = Math.round( p.count / p.numDataSets );
                         
             return p;
@@ -307,7 +360,7 @@ $(document).ready(function() {
             }        
 
          
-            p.average = p.count / ( p.numDataSets * numRegionsSelected * numSeasonsSelected );
+            p.average = p.count / ( p.numDataSets + numRegionsSelected + numSeasonsSelected );
             //p.average = Math.round( p.count / p.numDataSets );
             
             return p;
@@ -324,7 +377,8 @@ $(document).ready(function() {
         //Indices should always be weighted by number of regions and number of seasons selected
         function reduceAdd_acrossModelIndex(p, v) {        
             numIndicesSelected = indexChart.filters().length ? indexChart.filters().length : numIndices;      
-            numSeasonsSelected = 1; //seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;            
+            numSeasonsSelected = seasonsChart.filters().length ? seasonsChart.filters().length : numSeasons;   
+            //console.log("numRegionsSelected in regionAvg fn: ", choroChart.filters().length)                          
             
             //count models
             var omit;
@@ -341,7 +395,7 @@ $(document).ready(function() {
 
             //p.average = Math.round( p.count / p.numDataSets );
             //p.average = Math.round( p.count / p.numDataSets *  1/( indexChart.filters().length ? indexChart.filters().length : numIndices ) );
-            p.average = p.count / ( p.numDataSets * numIndicesSelected * numSeasonsSelected );
+            p.average = p.count / ( p.numDataSets + numIndicesSelected + numSeasonsSelected );
                         
             return p;
         }
@@ -362,7 +416,7 @@ $(document).ready(function() {
             //p.average = Math.round( p.count / p.numDataSets );
             //p.average = Math.round( p.count / p.numDataSets * 1/( indexChart.filters().length ? indexChart.filters().length : numIndices ) );
             //p.average =  p.count / p.numDataSets  *  1/( indexChart.filters().length ? indexChart.filters().length : numIndices );
-            p.average = p.count / ( p.numDataSets * numIndicesSelected * numSeasonsSelected );
+            p.average = p.count / ( p.numDataSets + numIndicesSelected + numSeasonsSelected );
                          
             return p;
         }
@@ -595,7 +649,8 @@ $(document).ready(function() {
                         left: 10
                     })
                     .dimension(datasetDimension)
-                    .group(datasetGroup)
+                    //.group(datasetGroup)
+                    .group(avgDatasetGroup)
                     //.colors(["#1f77b4"])
                     .colors(["#888888"])
                     .elasticX(true)
