@@ -133,9 +133,9 @@ $(document).ready(function() {
             function(p, v) {
                 ++p.count;
                 if (v.Model < 100) { //not an OBS dataset                   
-                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) ) : (2100-1972);
                 } else { //OBS dataset, not a model
-                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) ) : (2012-1972);
                 }
 
                 p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
@@ -150,9 +150,9 @@ $(document).ready(function() {
             function(p, v) {
                 --p.count;
                 if (v.Model < 100) { //not an OBS dataset
-                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) ) : (2100-1972);
                 } else { //OBS dataset, not a model
-                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
+                    p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) ) : (2012-1972);
                 }
 
                 p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
@@ -210,10 +210,18 @@ $(document).ready(function() {
                 p.numDataSets = datasetChart.filters().length - omit;
             }
 
-            p.average = Math.ceil( p.count / (p.numDataSets * 4) );
+            //number of years selected
+            if (v.Model < 100) { //not an OBS dataset                   
+                p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);
+            } else { //OBS dataset, not a model
+                p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
+            }
+
+            p.average = Math.ceil( p.count / p.numDataSets );
 
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
 
             return p;
         }
@@ -237,10 +245,18 @@ $(document).ready(function() {
                 p.numDataSets = datasetChart.filters().length - omit;
             }
 
-            p.average = Math.ceil( p.count / (p.numDataSets * 4) );
+            //number of years selected
+            if (v.Model < 100) { //not an OBS dataset                
+                p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2100-1972 + 1);                
+            } else { //OBS dataset, not a model
+                p.yearCount = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0]) +1 ) : (2012-1972 + 1);
+            }
+
+            p.average = Math.ceil( p.count / p.numDataSets );
 
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            p.aggregateCount = p.yearCount * 4; //Account for 4 seasons
 
             return p;
         }
@@ -251,7 +267,9 @@ $(document).ready(function() {
                     numDataSets: 0,
                     average: 0,
                     regionCount: 0,
-                    indexCount: 0
+                    indexCount: 0,
+                    yearCount: 0,
+                    aggregateCount: 0
                 };
         }
         
@@ -431,8 +449,10 @@ $(document).ready(function() {
                     .group(avgYearGroup) //avg count across all datasets
                     .valueAccessor(function(p) {
                         //return p.value.average;
-                        //console.log("d.value.regionCount in yearChart: ", d.value.regionCount)
-                        return p.value.average / (p.value.regionCount * p.value.indexCount);
+                        //console.log("d.value.regionCount in yearChart: ", d.value.regionCount)                        
+                        numYears = yearChart.filters().length > 0 ? ( Math.round(yearChart.filters()[0][1]) - Math.round(yearChart.filters()[0][0])) : (2100-1972);
+                        console.log('numYears: ', numYears)
+                        return p.value.average / (p.value.regionCount * p.value.indexCount * numYears);
                     })
                     .elasticY(true)
                     .gap(0)
