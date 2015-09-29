@@ -14,6 +14,7 @@ var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
 var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgYearGroup;
 var numObsDatasets = 1;
+var numSeasons = 4;
 
 //for map click
 var clickedRegion;
@@ -268,7 +269,7 @@ $(document).ready(function() {
                   .dimension(regionDimension)                  
                   .valueAccessor(function(d) {
                         console.log('choroChart d.value.count, d.aggregateCount: ', d.value.count +', '+ d.value.aggregateCount)
-                        return d.value.count;  ///d.value.indexCount;
+                        return d.value.count; // / ( d.value.aggregateCount );  ///d.value.indexCount;
                    })
                   .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
@@ -355,7 +356,7 @@ $(document).ready(function() {
                     .valueAccessor(function(d) {
                         console.log('indexChart d.value.count, d.aggregateCount: ', d.value.count +', '+ d.value.aggregateCount)
                         //console.log('indexChart p.value.regionCount: ', p.value.regionCount)
-                        return d.value.count; // / p.value.regionCount;
+                        return d.value.count;  /// ( d.value.aggregateCount ); // / p.value.regionCount;
                     })
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
@@ -411,17 +412,18 @@ $(document).ready(function() {
                         numYears = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
                         console.log('yearChart numYears: ', numYears)
                         console.log('yearChart d.value.count, d.aggregateCount: ', d.value.count +', '+ d.value.aggregateCount)
-                        return d.value.count; // / (p.value.regionCount * p.value.indexCount * numYears);
+                        return d.value.count/numSeasons; // / (p.value.regionCount * p.value.indexCount * numYears);
                     })
                     .elasticY(true)
                     .gap(0)
                     .renderHorizontalGridLines(true)
-                    .x(d3.scale.linear().domain([1970, 2100]));
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    .y(d3.scale.linear().domain([0, 1]));
 
                 yearChart
-                    .xAxis().ticks(5).tickFormat(d3.format("d"));
+                    .xAxis().ticks(2).tickFormat(d3.format("d"));
                 yearChart
-                    .yAxis().ticks(5).tickFormat(d3.format("d"));        
+                    .yAxis().ticks(4).tickFormat(d3.format("d"));        
 
             // =================
             datasetChart
@@ -437,7 +439,7 @@ $(document).ready(function() {
                     .group(avgDatasetGroup)
                     .valueAccessor(function(d) {
                         console.log('datasetChart d.value.count, d.aggregateCount: ', d.value.count +', '+ d.value.aggregateCount)
-                        return d.value.count;  ///(d.value.regionCount * d.value.indexCount);
+                        return d.value.count; /// ( d.value.aggregateCount );  ///(d.value.regionCount * d.value.indexCount);
                     })
                     //.group(avgDatasetGroup)                    
                     .colors(["#888888"])
