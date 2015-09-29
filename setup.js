@@ -269,7 +269,7 @@ $(document).ready(function() {
                   .dimension(regionDimension)                  
                   .valueAccessor(function(d) {
                         console.log('choroChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count / ( d.value.seasonCount );  ///d.value.indexCount;
+                        return d.value.count / ( d.value.seasonCount * d.value.indexCount );
                    })
                   .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
@@ -412,7 +412,7 @@ $(document).ready(function() {
                         numYears = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
                         console.log('yearChart numYears: ', numYears)
                         console.log('yearChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count/numSeasons; // / (p.value.regionCount * p.value.indexCount * numYears);
+                        return d.value.count/( numSeasons * d.value.indexCount ); // / (p.value.regionCount * p.value.indexCount * numYears);
                     })
                     .elasticY(true)
                     .gap(0)
