@@ -439,7 +439,7 @@ $(document).ready(function() {
                     .group(avgDatasetGroup)
                     .valueAccessor(function(d) {
                         console.log('datasetChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count / ( d.value.seasonCount );  ///(d.value.regionCount * d.value.indexCount);
+                        return d.value.count / ( d.value.seasonCount * d.value.indexCount );  ///(d.value.regionCount * d.value.indexCount);
                     })
                     //.group(avgDatasetGroup)                    
                     .colors(["#888888"])
@@ -452,7 +452,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + d.value.count / ( d.value.seasonCount ) + " events";
+                        return models[d.key] + ": " + d.value.count / ( d.value.seasonCount * d.value.indexCount ) + " events";
                     })
                     .gap(0.5);
             datasetChart
