@@ -26,6 +26,7 @@ var choroChart;
 $(document).ready(function() {
 
     document.getElementById("ts-button").disabled = true;
+//})
 
     var chart;
     var groupname = "Choropleth";
@@ -164,14 +165,7 @@ $(document).ready(function() {
                     omit = 0;
                 }
                 p.numDataSets = datasetChart.filters().length - omit;
-            }
-
-            //number of years selected
-            if (v.Model < 100) { //not an OBS dataset                   
-                p.yearCount = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-            } else { //OBS dataset, not a model
-                p.yearCount = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : obsRange;
-            }                    
+            }        
 
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -201,13 +195,6 @@ $(document).ready(function() {
                 }
                 p.numDataSets = datasetChart.filters().length - omit;
             }
-
-            //number of years selected
-            if (v.Model < 100) { //not an OBS dataset                   
-                p.yearCount = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-            } else { //OBS dataset, not a model
-                p.yearCount = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : obsRange;
-            }                    
 
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -260,16 +247,14 @@ $(document).ready(function() {
             });
 
 
-            drawChoropleth(csv,statesJson);
-           
-            function drawChoropleth(data,geojson) {
-                var minEvents;
+                    
 
                 choroChart //= dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)                  
                   .valueAccessor(function(d) {
-                        console.log('choroChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count / ( d.value.seasonCount * d.value.indexCount * d.value.numDataSets );
+                        //console.log('choroChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
+                        console.log('choroChart d.regionCount: ', d.value.regionCount)
+                        return d.value.count; // / ( d.value.seasonCount * d.value.indexCount * d.value.numDataSets );
                    })
                   .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
@@ -277,7 +262,8 @@ $(document).ready(function() {
                     .height(400)
                   .center([47.00, 2.00])
                   .zoom(5)
-                  .geojson(geojson)                  
+                  //.geojson(geojson)                  
+                  .geojson(statesJson)
                   .colors(colorbrewer.YlGnBu[9])
                   .colorAccessor(function(d,i) {
                     return d.value.count;
@@ -320,7 +306,7 @@ $(document).ready(function() {
                         chart.colorDomain(eventRange);  
                     }
                 });            
-            }
+            
 
 
             // =================
@@ -354,16 +340,18 @@ $(document).ready(function() {
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
                     .valueAccessor(function(d) {
-                        console.log('indexChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
+                        //console.log('indexChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
                         //console.log('indexChart p.value.regionCount: ', p.value.regionCount)
-                        return d.value.count / ( d.value.seasonCount  * d.value.numDataSets); // / p.value.regionCount;
+                        
+                        return d.value.count; // / ( d.value.seasonCount  * d.value.numDataSets * d.value.regionCount); // / p.value.regionCount;
                     })
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
                     .title(function(d) {                        
-                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count  / ( d.data.value.seasonCount  * d.data.value.numDataSets ) + " events";
-                        //return indexID[d.key] + " (" + indices[indexID[d.key]] + ")" + ":\n" + d.value.average + " events";
+                        // return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
+                        //        d.data.value.count  / ( d.data.value.seasonCount  * d.data.value.numDataSets * d.data.value.regionCount ) + " events";                        
+                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count;
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
@@ -409,11 +397,12 @@ $(document).ready(function() {
                     .valueAccessor(function(d) {
                         //return p.value.average;
                         //console.log("d.value.regionCount in yearChart: ", d.value.regionCount)                        
-                        numYears = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        console.log('yearChart numYears: ', numYears)
-                        console.log('yearChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count/( numSeasons * d.value.indexCount  * d.value.numDataSets ); // / (p.value.regionCount);
+                        //numYears = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                        //console.log('numYears: ', numYears)
+//                        console.log('yearChart d.regionCount: ', d.value.regionCount)
+                        return d.value.count; ///( numSeasons * d.value.indexCount  * d.value.numDataSets * d.value.regionCount );
                     })
+                    .filter([2016,2022])
                     .elasticY(true)
                     .gap(0)
                     .renderHorizontalGridLines(true)
@@ -423,7 +412,10 @@ $(document).ready(function() {
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d"));
                 yearChart
-                    .yAxis().ticks(4).tickFormat(d3.format("d"));        
+                    .yAxis().ticks(4).tickFormat(d3.format("d"));
+
+                //yearChart.brush().extent(dc.filters.RangedFilter(1972,1999));    
+                //dc.filters.RangedFilter(7, 10)
 
             // =================
             datasetChart
@@ -438,25 +430,31 @@ $(document).ready(function() {
                     // .group(datasetGroup)
                     .group(avgDatasetGroup)
                     .valueAccessor(function(d) {
-                        console.log('datasetChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count / ( d.value.seasonCount * d.value.indexCount );  ///(d.value.regionCount * d.value.indexCount);
+                        //console.log('datasetChart d.value.count, d.seasonCount, d.value.regionCount, d.value.indexCount: ', d.value.count +', '+ 
+                                   //  d.value.seasonCount +', '+ d.value.regionCount +', '+ d.value.indexCount)
+                        //console.log('datasetChart d.regionCount: ', d.value.regionCount)
+                        //console.log('active filters: ', d.value.count +', '+ d.value.regionCount +', '+ d.value.indexCount +', '+ d.value.seasonCount)
+                        //return 1000 * (d.value.count / ( d.value.seasonCount * d.value.indexCount * d.value.regionCount ));
+                        console.log('datasetChart d.value.count, d.regionCount: ', d.value.count +', '+ d.value.regionCount)
+                        return d.value.count/d.value.regionCount;
                     })
                     //.group(avgDatasetGroup)                    
                     .colors(["#888888"])
                     .elasticX(true)
-                    .ordering(function(d) {
-                        return -d.value;
-                    })
+                    // .ordering(function(d) {
+                    //     return -d.value;
+                    // })
                     .label(function(d) {
                         return models[d.key];
                     })
                     .title(function(d) {
                         //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + d.value.count / ( d.value.seasonCount * d.value.indexCount ) + " events";
+                        return models[d.key] + ": " + d.value.count/d.value.regionCount + " events";
+                        //return models[d.key] + ": " + d.value.count / ( d.value.seasonCount * d.value.indexCount * d.value.regionCount ) + " events";
                     })
                     .gap(0.5);
             datasetChart
-                    .xAxis().ticks(4).tickFormat(d3.format("d"));
+                    .xAxis().ticks(10).tickFormat(d3.format("d"));
 
 
             // =================
