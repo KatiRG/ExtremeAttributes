@@ -269,7 +269,7 @@ $(document).ready(function() {
                   .dimension(regionDimension)                  
                   .valueAccessor(function(d) {
                         console.log('choroChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count / ( d.value.seasonCount * d.value.indexCount );
+                        return d.value.count / ( d.value.seasonCount * d.value.indexCount * d.value.numDataSets );
                    })
                   .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
@@ -356,13 +356,13 @@ $(document).ready(function() {
                     .valueAccessor(function(d) {
                         console.log('indexChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
                         //console.log('indexChart p.value.regionCount: ', p.value.regionCount)
-                        return d.value.count / ( d.value.seasonCount ); // / p.value.regionCount;
+                        return d.value.count / ( d.value.seasonCount  * d.value.numDataSets); // / p.value.regionCount;
                     })
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
                     .title(function(d) {                        
-                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count  / ( d.data.value.seasonCount ) + " events";
+                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count  / ( d.data.value.seasonCount  * d.data.value.numDataSets ) + " events";
                         //return indexID[d.key] + " (" + indices[indexID[d.key]] + ")" + ":\n" + d.value.average + " events";
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
@@ -412,7 +412,7 @@ $(document).ready(function() {
                         numYears = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
                         console.log('yearChart numYears: ', numYears)
                         console.log('yearChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        return d.value.count/( numSeasons * d.value.indexCount ); // / (p.value.regionCount * p.value.indexCount * numYears);
+                        return d.value.count/( numSeasons * d.value.indexCount  * d.value.numDataSets ); // / (p.value.regionCount);
                     })
                     .elasticY(true)
                     .gap(0)
