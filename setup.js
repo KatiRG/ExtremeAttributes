@@ -133,7 +133,8 @@ $(document).ready(function() {
         // ===============================================================================================       
         var numModels = datasetGroup.size();
         var numRegions = Object.keys(regions).length;
-        var numIndices = 2; //Object.keys(indexID).length;        
+        var numIndices = 2; //Object.keys(indexID).length;
+        var numDataSets = 2; //Object.keys(models).length;
         console.log("numModels:", numModels)
         console.log("numRegions:", numRegions)
         console.log("numIndices: ", numIndices)
@@ -151,25 +152,27 @@ $(document).ready(function() {
             ++p.count;
 
             //Calculate number of datasets to include in avg
-            if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-                if (v.Year > cutoffYear_Safran) {
-                    p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                }
-                else {
-                    p.numDataSets = datasetGroup.all().length;
-                }
-            } else {
-                if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                    omit = numObsDatasets;
-                } else {
-                    omit = 0;
-                }
-                p.numDataSets = datasetChart.filters().length - omit;
-            }        
+            // if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
+            //     if (v.Year > cutoffYear_Safran) {
+            //         p.numDataSets = datasetGroup.all().length - numObsDatasets;
+            //     }
+            //     else {
+            //         p.numDataSets = datasetGroup.all().length;
+            //     }
+            // } else {
+            //     if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+            //         omit = numObsDatasets;
+            //     } else {
+            //         omit = 0;
+            //     }
+            //     p.numDataSets = datasetChart.filters().length - omit;
+            // }       
 
+            p.numDataSets = datasetChart.filters().length ? datasetChart.filters().length : numDataSets;
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
+            //p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
+            p.yearCount = yearChart.filters().length ? yearChart.filters().length : 128;
             p.seasonCount = p.yearCount * 4; //Account for 4 seasons
 
             return p;
@@ -179,26 +182,28 @@ $(document).ready(function() {
             var omit;
             --p.count;
 
-            //Calculate number of datasets to include in avg
-            if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-                if (v.Year > cutoffYear_Safran) {
-                    p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                }
-                else {
-                    p.numDataSets = datasetGroup.all().length;
-                }
-            } else {
-                if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                    omit = numObsDatasets;
-                } else {
-                    omit = 0;
-                }
-                p.numDataSets = datasetChart.filters().length - omit;
-            }
+            // //Calculate number of datasets to include in avg
+            // if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
+            //     if (v.Year > cutoffYear_Safran) {
+            //         p.numDataSets = datasetGroup.all().length - numObsDatasets;
+            //     }
+            //     else {
+            //         p.numDataSets = datasetGroup.all().length;
+            //     }
+            // } else {
+            //     if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
+            //         omit = numObsDatasets;
+            //     } else {
+            //         omit = 0;
+            //     }
+            //     p.numDataSets = datasetChart.filters().length - omit;
+            // }
 
+            p.numDataSets = datasetChart.filters().length ? datasetChart.filters().length : numDataSets;
             p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
             p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
+            //p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
+            p.yearCount = yearChart.filters().length ? yearChart.filters().length : 128;
             p.seasonCount = p.yearCount * 4; //Account for 4 seasons
 
             return p;
