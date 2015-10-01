@@ -39,8 +39,9 @@ $(document).ready(function() {
 
     var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-    d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
-    //d3.csv("data/test_extremoscope_int.csv", function(csv) {              
+    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
+    //d3.csv("data/test_extremoscope_int.csv", function(csv) {
+    d3.csv("data/test_percentile_extremoscope.csv", function(csv) {        
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -69,34 +70,35 @@ $(document).ready(function() {
         };
 
         indices = {
-                "GD4": "growing degree days [days]",
-                "HD17": "heat index (17 - tas mean)",
-                "TG": "temperature mean",
-                "R10mm": "nr of days where precipitation > 10mm",
-                "R20mm": "nr of days where precipitation > 20mm",
-                "RR1": "nr of days with rain >=1",
-                "RR": "prescipitation amount",
-                "RX1day": "max rain day",
-                "SDII": "simple drought index"
+                "GD4": "Growing degree days (sum of TG>4 degC) (degC)",
+                "HD17": "Heating degree days (sum of 17degC - TG) (degC)",
+                "TG": "Mean daily temp (degC)",                
+                "R20mm": "Days where precipitation > 20mm (days)",
+                "RR1": "Wet days (RR≥1 mm) (days)",
+                "RR": "Precipitation sum (mm)",
+                "RX1day": "Highest 1-day precipitation amount (mm)",
+                "RX5day": "Highest 5-day precipitation amount (mm)",
+                "CWD": "Maximum number of consecutive wet days (RR≥1 mm) (days)",
+                "CDD": "Maximum number of consecutive dry days (RR<1 mm) (days)"
         };
 
-        indexID = {
-                1: "GD4",
-                2: "HD17",
-                3: "TG",
-                4: "R10mm",
-                5: "R20mm",
-                6: "RR1",
-                7: "RR",
-                8: "RX1day",
-                9: "SDII"
-        };
+        indexID={       
+            1: "GD4",
+            2: "HD17",
+            3: "TG",
+            4: "R20mm",
+            5: "RR1",
+            6: "RR",
+            7: "RX1day",
+            8: "RX5day",
+            9: "CWD",
+            10: "CDD"
+        }
 
-        indexNames = ["GD4", "HD17", "TG", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII"];
-        //indexColours = ["#C01525", "#C01525", "#C01525", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6", "#2c7bb6"];
+        indexNames = ["GD4", "HD17", "TG", "R20mm", "RR1", "RR", "RX1day", "RX5day", "CDW", "CDD",];        
 
         //http://www.colourlovers.com/palette/3511190/Rain_Waves
-        indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
+        indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
 
         seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall" };
         //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1
@@ -119,7 +121,7 @@ $(document).ready(function() {
             //     //console.log('d.Model: ', d.Model)
             //     if (d.Model == 100) return +d.Model; 
             // }),
-            sigma = filter.dimension(function(d) { return d.Sigma; }),
+            
             seasonDimension = filter.dimension(function(d) { return d.Season; }),
             scenario = filter.dimension(function(d) { return d.Scenario; });
             //timeDimension = filter.dimension(function(d) { return d.Year; });
@@ -441,31 +443,14 @@ $(document).ready(function() {
             dc.renderAll();            
 
             // =================
-            //Filter dc charts according to which radio button is checked by user:
-            $("input:radio[name=sigma]").click(function() {
-                    var radioValue = $("input:radio[name=sigma]:checked").val();                    
-                    sigma.filterAll();
-                    sigma.filter(radioValue);
-                    dc.redrawAll();
-            });
+            //Filter dc charts according to which radio button is checked by user:           
             $("input:radio[name=rcp]").click(function() {
                     var radioValue = $("input:radio[name=rcp]:checked").val();                    
                     scenario.filterAll();
                     scenario.filter(radioValue);
                     dc.redrawAll();
             });
-
-            //$("input:radio[name=sigma]").trigger("click"); //doesn't work. Do as below instead:
-            //Click sigma1 and rcp4.5 radio buttons on page load
-            //http://stackoverflow.com/questions/871063/how-to-set-radio-option-checked-onload-with-jquery
-            $("input[name='sigma']").click(function() {
-                    var radioValue = $("input[name='sigma']:checked").val();
-                    threshold_clicked = $("input:radio[name=sigma]:checked").val();
-                    sigma.filterAll();
-                    sigma.filter(radioValue);
-                    dc.redrawAll();
-            });
-
+          
             $("input[name='rcp']").click(function() {
                 var radioValue = $("input[name='rcp']:checked").val();
                     scenario_clicked = $("input:radio[name=rcp]:checked").val();
@@ -474,10 +459,8 @@ $(document).ready(function() {
                     scenario.filter(radioValue);
                     dc.redrawAll();
             });
-
-            $("input[name='sigma'][value='1']").prop('checked', true);
-            $("input[name='rcp'][value='rcp85']").prop('checked', true);
-            $("input[name='sigma'][value='1']").trigger("click");
+            
+            $("input[name='rcp'][value='rcp85']").prop('checked', true);            
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
             // =================
