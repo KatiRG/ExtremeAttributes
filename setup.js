@@ -11,7 +11,7 @@ var saveRange;
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
-var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgYearGroup;
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgYearGroup, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
 var numObsDatasets = 1;
 var numSeasons = 4;
 
@@ -27,20 +27,15 @@ var regionCount, datasetCount, regionCount, indexCount, yearCount, seasonCount;
 $(document).ready(function() {
 
     document.getElementById("ts-button").disabled = true;
-//})
 
-    var chart;
-    var groupname = "Choropleth";
-    //var choroChart = dc.leafletChoroplethChart("#choro-map .map");
+    var chart;    
+    
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
-
-    //franceChart = dc.geoChoroplethChart("#france-chart");
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
     //stackedYearChart = dc.barChart("#chart-stackedYear");
     categoryChart = dc.pieChart("#chart-category");
-    yearChart = dc.barChart("#chart-year");
-    //franceChart = dc.leafletChoroplethChart("#demo3 .map",groupname); 
+    yearChart = dc.barChart("#chart-year");    
 
     var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
@@ -117,6 +112,13 @@ $(document).ready(function() {
             indexDimension = filter.dimension(function(d) { return d.Index; }),
             regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
             datasetDimension = filter.dimension(function(d) { return +d.Model; }),
+            modelDimension = filter.dimension(function(d) {
+                if (d.Model < 100) return +d.Model; 
+            }),
+            // obsDimension = filter.dimension(function(d) {
+            //     //console.log('d.Model: ', d.Model)
+            //     if (d.Model == 100) return +d.Model; 
+            // }),
             sigma = filter.dimension(function(d) { return d.Sigma; }),
             seasonDimension = filter.dimension(function(d) { return d.Season; }),
             scenario = filter.dimension(function(d) { return d.Scenario; });
@@ -126,13 +128,15 @@ $(document).ready(function() {
             categoryGroup = categoryDimension.group(),
             seasonGroup = seasonDimension.group(),
             yearGroup = yearDimension.group(),
-            regionGroup = regionDimension.group(),
-            datasetGroup = datasetDimension.group();
+            regionGroup = regionDimension.group();
+            //datasetGroup = datasetDimension.group();
 
-            
+            datasetGroup = datasetDimension.group();
+            modelGroup = modelDimension.group();
+            //obsGroup = obsDimension.group();
 
         // ===============================================================================================       
-        var numModels = datasetGroup.size();
+        var numModels = modelGroup.size();  //datasetGroup.size();
         var numRegions = Object.keys(regions).length;
         var numIndices = 2; //Object.keys(indexID).length;
         var modelRange = 2100-1972, obsRange = 2012 - 1972;                
@@ -141,19 +145,14 @@ $(document).ready(function() {
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        //avgObsGroup = obsDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
         //Fns to compute avg.
-        function reduceAdd(p, v) {
-            //if (p.count ==0) console.log("v.Year: ", v.Year)
+        function reduceAdd(p, v) {            
 
             var omit;
-            ++p.count;
-      
-
-            // p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
-            // p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            // p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
-            // p.seasonCount = p.yearCount * 4; //Account for 4 seasons            
+            ++p.count;       
 
             return p;
         }
@@ -162,23 +161,12 @@ $(document).ready(function() {
             var omit;
             --p.count;
 
-            // p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
-            // p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            // p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
-            // p.seasonCount = p.yearCount * 4; //Account for 4 seasons
-
             return p;
         }
 
         function reduceInitial() {
                 return {
                     count: 0
-                    //yearAverage: 0,
-                    //numDataSets: 0,
-                    // regionCount: 0,
-                    // indexCount: 0,
-                    // yearCount: 0,
-                    // seasonCount: 0
                 };
         }
         
@@ -230,7 +218,7 @@ $(document).ready(function() {
                 .center([47.00, 2.00])
                 .zoom(5)             
                 .geojson(statesJson)
-                .colors(colorbrewer.YlGnBu[9])
+                .colors(colorbrewer.YlGnBu[3])
                 .colorAccessor(function(d,i) {
                     return d.value.count;
                 })
@@ -259,12 +247,13 @@ $(document).ready(function() {
             });
 
             //var numRegions;
-            choroChart.on("preRedraw", function(chart) {
+            choroChart.on("preRedraw", function(chart) {                
                 //save initial eventRange upon page load                    
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
-                    && datasetChart.filters().length == 0 && yearChart.filters().length == 0)
+                    && datasetChart.filters().length == 0 ) //&& yearChart.filters().length == 0)
                 {                        
-                    eventRange = d3.extent(chart.group().all(), chart.valueAccessor());   
+                    eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
+                    //console.log('eventRange: ', eventRange)
                     eventRange[0] = 0; //make min always 0                                         
                         
                     chart.colorDomain(eventRange);  
@@ -390,9 +379,10 @@ $(document).ready(function() {
                         bottom: 30,
                         left: 10
                     })
-                    .dimension(datasetDimension)
-                    // .group(datasetGroup)
-                    .group(avgDatasetGroup)
+                    //.dimension(datasetDimension)
+                    //.group(avgDatasetGroup)
+                    .dimension(modelDimension)
+                    .group(avgModelGroup)
                     .valueAccessor(function(d) {                        
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
