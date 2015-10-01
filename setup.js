@@ -335,7 +335,8 @@ $(document).ready(function() {
 
                     if (chart.filters().length == 1 && choroChart.filters().length == 1) {              
                         document.getElementById("ts-button").disabled = false;
-                        tsRegion = choroChart.filter();                        
+                        tsRegion = choroChart.filter();
+                        console.log("d: ", d)
                     }
                     else document.getElementById("ts-button").disabled = true;
                 });                 
@@ -358,7 +359,8 @@ $(document).ready(function() {
                         return d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
 
                     })
-                    .filter([2001, 2030])
+                    //.filter([2001, 2030])
+                    .filter([1976, 2005])
                     .elasticY(true)
                     .gap(0)
                     .renderHorizontalGridLines(true)
@@ -491,7 +493,7 @@ function showTimeSeries(regionName) {
 
         clearSeries();
 
-        callHighChart(index_clicked + " for " + regionName + ", " + threshold_clicked + " Sigma" + ", " + scenario_clicked);
+        callHighChart(index_clicked + " for " + regionName + ", " + scenario_clicked);
 
         makeRequest(regionName);
 
@@ -566,7 +568,7 @@ function makeRequest(regionName) {
 
 }
 
-function addData(request, color, dash, label, visible, addSigma) {
+function addData(request, color, dash, label, visible, addPercentile) {
 
     $.ajax({
         async: false,
@@ -596,7 +598,7 @@ function addData(request, color, dash, label, visible, addSigma) {
 
             highchart.addSeries(serie);
 
-            if (addSigma) {
+            if (addPercentile) {
                 //console.log("serie: ", serie)
                 var dataValues = []
                 $.each(serie.data, function(index, value) {
@@ -606,20 +608,32 @@ function addData(request, color, dash, label, visible, addSigma) {
                 // OBS Safran is described from 1971 to 2012
                 // to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
                 // consider 5:34 (in javascript notation start 0) so arr.slice(5,35)
-                dataValues = dataValues.slice(5, 35);
-                //console.log(dataValues);
-                //console.log("mean: " + math.mean(dataValues));
-                //console.log("std: " + math.std(dataValues));
-                threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
-                //console.log("threshold: ", threshold1); 
+                dataValues = dataValues.slice(4, 34);
+                //percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
+                percentile90 = percentile(dataValues.sort(), .90);
+                percentile10 = percentile(dataValues.sort(), .10);
+                //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
+                //console.log("threshold: ", threshold1);
+                //Add 90th percentile 
                 highchart.yAxis[0].addPlotLine({
                     color: '#000000',
                     dashStyle: 'ShortDash',
                     width: 2,
-                    value: threshold1,
+                    value: percentile90,
                     zIndex: 10,
                     label: {
-                        text: threshold_clicked + ' Sigma'
+                        text: ' 90th Percentile'
+                    }
+                });
+                //Add 10th percentile
+                highchart.yAxis[0].addPlotLine({
+                    color: '#000000',
+                    dashStyle: 'ShortDash',
+                    width: 2,
+                    value: percentile10,
+                    zIndex: 10,
+                    label: {
+                        text: ' 10th Percentile'
                     }
                 });
             }
@@ -659,11 +673,11 @@ function callHighChart(title) {
                 }
             },
             plotBands: [{
-                from: Date.UTC(1971, 06, 01), // month from 0 to 11 !
+                from: Date.UTC(1976, 06, 01), // month from 0 to 11 !
                 to: Date.UTC(2012, 06, 01),
                 color: '#EEEEEE'
             }, {
-                from: Date.UTC(2012, 06, 01), // month from 0 to 11 !
+                from: Date.UTC(2005, 06, 01), // month from 0 to 11 !
                 to: Date.UTC(2200, 01, 01),
                 color: '#EFFFFF'
             }]
