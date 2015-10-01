@@ -128,15 +128,17 @@ $(document).ready(function() {
             regionGroup = regionDimension.group(),
             datasetGroup = datasetDimension.group();
 
-        var modelRange = 2100-1972, obsRange = 2012 - 1972;    
+            
 
         // ===============================================================================================       
         var numModels = datasetGroup.size();
         var numRegions = Object.keys(regions).length;
-        var numIndices = 2; //Object.keys(indexID).length;        
-        console.log("numModels:", numModels)
-        console.log("numRegions:", numRegions)
-        console.log("numIndices: ", numIndices)
+        var numIndices = 2; //Object.keys(indexID).length;
+        var modelRange = 2100-1972, obsRange = 2012 - 1972;
+        
+        //to be defined in each chart:
+        var regionCount, datasetCount, regionCount, indexCount, yearCount, seasonCount;
+        
 
         avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -402,7 +404,7 @@ $(document).ready(function() {
 //                        console.log('yearChart d.regionCount: ', d.value.regionCount)
                         return d.value.count; ///( numSeasons * d.value.indexCount  * d.value.numDataSets * d.value.regionCount );
                     })
-                    .filter([2016,2022])
+                    .filter([2010, 2013])
                     .elasticY(true)
                     .gap(0)
                     .renderHorizontalGridLines(true)
@@ -429,32 +431,58 @@ $(document).ready(function() {
                     .dimension(datasetDimension)
                     // .group(datasetGroup)
                     .group(avgDatasetGroup)
-                    .valueAccessor(function(d) {
-                        //console.log('datasetChart d.value.count, d.seasonCount, d.value.regionCount, d.value.indexCount: ', d.value.count +', '+ 
-                                   //  d.value.seasonCount +', '+ d.value.regionCount +', '+ d.value.indexCount)
-                        //console.log('datasetChart d.regionCount: ', d.value.regionCount)
-                        //console.log('active filters: ', d.value.count +', '+ d.value.regionCount +', '+ d.value.indexCount +', '+ d.value.seasonCount)
-                        //return 1000 * (d.value.count / ( d.value.seasonCount * d.value.indexCount * d.value.regionCount ));
-                        console.log('datasetChart d.value.count, d.regionCount: ', d.value.count +', '+ d.value.regionCount)
-                        return d.value.count/d.value.regionCount;
-                    })
-                    //.group(avgDatasetGroup)                    
+                    .valueAccessor(function(d) {                        
+                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        
+                        return d.value.count/( regionCount * seasonCount * indexCount );
+                    })                                    
                     .colors(["#888888"])
                     .elasticX(true)
-                    // .ordering(function(d) {
-                    //     return -d.value;
-                    // })
+                    .ordering(function(d) {
+                        return -d.value;
+                    })
                     .label(function(d) {
                         return models[d.key];
                     })
                     .title(function(d) {
                         //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + d.value.count/d.value.regionCount + " events";
-                        //return models[d.key] + ": " + d.value.count / ( d.value.seasonCount * d.value.indexCount * d.value.regionCount ) + " events";
+                        return models[d.key] + ": " + d.value.count/( regionCount * seasonCount * indexCount ) + " events";                        
                     })
                     .gap(0.5);
             datasetChart
                     .xAxis().ticks(10).tickFormat(d3.format("d"));
+
+            // =================
+            dataTable = dc.dataTable("#dc-data-table");
+            dataTable
+                    .dimension(yearDimension)
+                    .group(function(d) {
+                        return ""
+                    })
+                    .size(20)
+                    .columns([
+                        function(d) {
+                            return d.Year;
+                        },
+                        function(d) {
+                            return regions[d.Region];
+                        },
+                        function(d) {
+                            return indexID[d.Index];
+                        },
+                        function(d) {
+                            return models[d.Model];
+                        }
+                    ])
+                    .sortBy(function(d) {
+                        return d.Year;
+                    })
+                    .order(d3.ascending);
+
+            // =================        
 
 
             // =================
