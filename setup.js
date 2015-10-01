@@ -148,28 +148,12 @@ $(document).ready(function() {
 
             var omit;
             ++p.count;
+      
 
-            //Calculate number of datasets to include in avg
-            if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-                if (v.Year > cutoffYear_Safran) {
-                    p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                }
-                else {
-                    p.numDataSets = datasetGroup.all().length;
-                }
-            } else {
-                if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                    omit = numObsDatasets;
-                } else {
-                    omit = 0;
-                }
-                p.numDataSets = datasetChart.filters().length - omit;
-            }        
-
-            p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
-            p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
-            p.seasonCount = p.yearCount * 4; //Account for 4 seasons
+            // p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+            // p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            // p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
+            // p.seasonCount = p.yearCount * 4; //Account for 4 seasons            
 
             return p;
         }
@@ -178,40 +162,23 @@ $(document).ready(function() {
             var omit;
             --p.count;
 
-            //Calculate number of datasets to include in avg
-            if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected         
-                if (v.Year > cutoffYear_Safran) {
-                    p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                }
-                else {
-                    p.numDataSets = datasetGroup.all().length;
-                }
-            } else {
-                if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                    omit = numObsDatasets;
-                } else {
-                    omit = 0;
-                }
-                p.numDataSets = datasetChart.filters().length - omit;
-            }
-
-            p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
-            p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
-            p.seasonCount = p.yearCount * 4; //Account for 4 seasons
+            // p.indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+            // p.regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            // p.yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : (v.Model < 100 ? modelRange : obsRange);
+            // p.seasonCount = p.yearCount * 4; //Account for 4 seasons
 
             return p;
         }
 
         function reduceInitial() {
                 return {
-                    count: 0,                    
-                    //average: 0,
-                    numDataSets: 0,
-                    regionCount: 0,
-                    indexCount: 0,
-                    yearCount: 0,
-                    seasonCount: 0
+                    count: 0
+                    //yearAverage: 0,
+                    //numDataSets: 0,
+                    // regionCount: 0,
+                    // indexCount: 0,
+                    // yearCount: 0,
+                    // seasonCount: 0
                 };
         }
         
@@ -246,12 +213,9 @@ $(document).ready(function() {
             });
 
 
-                    
-
-                choroChart //= dc.leafletChoroplethChart("#choro-map .map")                
-                  .dimension(regionDimension)                  
-                  .valueAccessor(function(d) {                        
-                        return d.value.count; // / ( d.value.seasonCount * d.value.indexCount * d.value.numDataSets );
+            choroChart             
+                .dimension(regionDimension)                  
+                .valueAccessor(function(d) {                        
 
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
@@ -259,59 +223,53 @@ $(document).ready(function() {
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
                         return d.value.count/( indexCount * seasonCount * datasetCount );
-                   })
-                  .group(avgRegionGroup)                  
-                  //.group(region_ModelRegionSeasonAvg)
-                  .width(800)
-                    .height(400)
-                  .center([47.00, 2.00])
-                  .zoom(5)
-                  //.geojson(geojson)                  
-                  .geojson(statesJson)
-                  .colors(colorbrewer.YlGnBu[9])
-                  .colorAccessor(function(d,i) {
+                })
+                .group(avgRegionGroup)                                    
+                .width(800)
+                .height(400)
+                .center([47.00, 2.00])
+                .zoom(5)             
+                .geojson(statesJson)
+                .colors(colorbrewer.YlGnBu[9])
+                .colorAccessor(function(d,i) {
                     return d.value.count;
-                  })
-                  .featureKeyAccessor(function(feature) {
+                })
+                .featureKeyAccessor(function(feature) {
                     return feature.properties.name;
-                  })
-                  .renderPopup(false);
-                  // .popup(function(d,feature) {
-                  //   return feature.properties.name+" : "+d.value.count;
-                  // });
+                })
+                .renderPopup(false);
+                // .popup(function(d,feature) {
+                //   return feature.properties.name+" : "+d.value.count;
+                // });
 
-                choroChart.renderlet(function(chart) {
-                    chart.selectAll("g").on("click", function(d, j) {                                        
-                        
+            choroChart.renderlet(function(chart) {
+                chart.selectAll("g").on("click", function(d, j) {                
 
-                        if (chart.filters().length == 1 && indexChart.filters().length == 1) {
-                            document.getElementById("ts-button").disabled = false;
-                            tsRegion = chart.filter();                                                     
-                        }
-                        else document.getElementById("ts-button").disabled = true;
-                    });                 
-                })            
-
-                choroChart.on("preRender", function(chart) {                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
-                });
-
-                //var numRegions;
-                choroChart.on("preRedraw", function(chart) {
-
-                    //save initial eventRange upon page load                    
-                    if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
-                        && datasetChart.filters().length == 0 && yearChart.filters().length == 0)
-                    {                        
-                        eventRange = d3.extent(chart.group().all(), chart.valueAccessor());   
-                        eventRange[0] = 0; //make min always 0                                         
-                        
-                        chart.colorDomain(eventRange);  
+                    if (chart.filters().length == 1 && indexChart.filters().length == 1) {
+                        document.getElementById("ts-button").disabled = false;
+                        tsRegion = chart.filter();                                                     
                     }
-                });            
-            
+                    else document.getElementById("ts-button").disabled = true;
+                });                 
+            })            
 
+            choroChart.on("preRender", function(chart) {                    
+                chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                    //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
+            });
+
+            //var numRegions;
+            choroChart.on("preRedraw", function(chart) {
+                //save initial eventRange upon page load                    
+                if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
+                    && datasetChart.filters().length == 0 && yearChart.filters().length == 0)
+                {                        
+                    eventRange = d3.extent(chart.group().all(), chart.valueAccessor());   
+                    eventRange[0] = 0; //make min always 0                                         
+                        
+                    chart.colorDomain(eventRange);  
+                }
+            });
 
             // =================
             categoryChart
@@ -344,7 +302,6 @@ $(document).ready(function() {
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
                     .valueAccessor(function(d) {                        
-                        //return d.value.count; // / ( d.value.seasonCount  * d.value.numDataSets * d.value.regionCount); // / p.value.regionCount;
 
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
@@ -400,13 +357,14 @@ $(document).ready(function() {
                     .dimension(yearDimension)
                     //.group(yearGroup)
                     .group(avgYearGroup) //avg count across all datasets
-                    .valueAccessor(function(d) {
-                        //return p.value.average;
-                        //console.log("d.value.regionCount in yearChart: ", d.value.regionCount)                        
-                        //numYears = yearChart.filters().length > 0 ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        //console.log('numYears: ', numYears)
-//                        console.log('yearChart d.regionCount: ', d.value.regionCount)
-                        return d.value.count; ///( numSeasons * d.value.indexCount  * d.value.numDataSets * d.value.regionCount );
+                    .valueAccessor(function(d) {                        
+                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        
+                        return d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
+
                     })
                     .filter([2010, 2013])
                     .elasticY(true)
