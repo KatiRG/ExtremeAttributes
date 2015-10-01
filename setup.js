@@ -6,7 +6,6 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 var colourDomain = [];
 var saveRange;
-var colourBarExists = 0;
 
 //for avgs
 var currentTime = new Date();
@@ -21,7 +20,9 @@ var clickedRegion;
 var palette;
 window.eventRange;
 var choroChart;
-//var numRegions;
+
+//to be defined in each chart:
+var regionCount, datasetCount, regionCount, indexCount, yearCount, seasonCount;
 
 $(document).ready(function() {
 
@@ -134,11 +135,7 @@ $(document).ready(function() {
         var numModels = datasetGroup.size();
         var numRegions = Object.keys(regions).length;
         var numIndices = 2; //Object.keys(indexID).length;
-        var modelRange = 2100-1972, obsRange = 2012 - 1972;
-        
-        //to be defined in each chart:
-        var regionCount, datasetCount, regionCount, indexCount, yearCount, seasonCount;
-        
+        var modelRange = 2100-1972, obsRange = 2012 - 1972;                
 
         avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -253,10 +250,15 @@ $(document).ready(function() {
 
                 choroChart //= dc.leafletChoroplethChart("#choro-map .map")                
                   .dimension(regionDimension)                  
-                  .valueAccessor(function(d) {
-                        //console.log('choroChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        console.log('choroChart d.regionCount: ', d.value.regionCount)
+                  .valueAccessor(function(d) {                        
                         return d.value.count; // / ( d.value.seasonCount * d.value.indexCount * d.value.numDataSets );
+
+                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        
+                        return d.value.count/( indexCount * seasonCount * datasetCount );
                    })
                   .group(avgRegionGroup)                  
                   //.group(region_ModelRegionSeasonAvg)
