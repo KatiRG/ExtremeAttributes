@@ -39,8 +39,8 @@ $(document).ready(function() {
 
     var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
-    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
-    d3.csv("data/test_extremoscope_int.csv", function(csv) {              
+    d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
+    //d3.csv("data/test_extremoscope_int.csv", function(csv) {              
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -138,7 +138,7 @@ $(document).ready(function() {
         // ===============================================================================================       
         var numModels = modelGroup.size();  //datasetGroup.size();
         var numRegions = Object.keys(regions).length;
-        var numIndices = 2; //Object.keys(indexID).length;
+        var numIndices = Object.keys(indexID).length;
         var modelRange = 2100-1972, obsRange = 2012 - 1972;                
 
         avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -355,7 +355,7 @@ $(document).ready(function() {
                         return d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
 
                     })
-                    .filter([2010, 2013])
+                    .filter([2001, 2030])
                     .elasticY(true)
                     .gap(0)
                     .renderHorizontalGridLines(true)
