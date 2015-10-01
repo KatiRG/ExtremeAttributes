@@ -341,19 +341,21 @@ $(document).ready(function() {
                     })
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
-                    .valueAccessor(function(d) {
-                        //console.log('indexChart d.value.count, d.seasonCount: ', d.value.count +', '+ d.value.seasonCount)
-                        //console.log('indexChart p.value.regionCount: ', p.value.regionCount)
+                    .valueAccessor(function(d) {                        
+                        //return d.value.count; // / ( d.value.seasonCount  * d.value.numDataSets * d.value.regionCount); // / p.value.regionCount;
+
+                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
-                        return d.value.count; // / ( d.value.seasonCount  * d.value.numDataSets * d.value.regionCount); // / p.value.regionCount;
+                        return d.value.count/( regionCount * seasonCount * datasetCount );
                     })
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d) {                        
-                        // return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
-                        //        d.data.value.count  / ( d.data.value.seasonCount  * d.data.value.numDataSets * d.data.value.regionCount ) + " events";                        
-                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count;
+                    .title(function(d) {                                        
+                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count / ( regionCount * seasonCount * datasetCount );
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
