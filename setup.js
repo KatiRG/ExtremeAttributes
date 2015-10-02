@@ -215,7 +215,7 @@ $(document).ready(function() {
                         seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
-                        return d.value.count/( indexCount * seasonCount * datasetCount );
+                        return 100 * d.value.count/( indexCount * seasonCount * datasetCount );
                 })
                 .group(avgRegionGroup)                                    
                 .width(800)
@@ -223,10 +223,10 @@ $(document).ready(function() {
                 .center([47.00, 2.00])
                 .zoom(5)             
                 .geojson(statesJson)
-                .colors(colorbrewer.YlGnBu[3])
-                .colorAccessor(function(d,i) {
-                    return d.value.count;
-                })
+                .colors(colorbrewer.YlGnBu[7])
+                // .colorAccessor(function(d,i) {
+                //     return 100 * d.value.count/( indexCount * seasonCount * datasetCount );
+                // })
                 .featureKeyAccessor(function(feature) {
                     return feature.properties.name;
                 })
@@ -236,17 +236,16 @@ $(document).ready(function() {
                 // });
 
             choroChart.renderlet(function(chart) {
-                chart.selectAll("g").on("click", function(d, j) {                
-
+                chart.selectAll("g").on("click", function(d, j) {
                     if (chart.filters().length == 1 && indexChart.filters().length == 1) {
                         document.getElementById("ts-button").disabled = false;
-                        tsRegion = chart.filter();                                                     
+                        tsRegion = chart.filter();
                     }
                     else document.getElementById("ts-button").disabled = true;
-                });                 
-            })            
+                });
+            })
 
-            choroChart.on("preRender", function(chart) {                    
+            choroChart.on("preRender", function(chart) {
                 chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
                     //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
             });
@@ -255,11 +254,13 @@ $(document).ready(function() {
             choroChart.on("preRedraw", function(chart) {                
                 //save initial eventRange upon page load                    
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
-                    && datasetChart.filters().length == 0 ) //&& yearChart.filters().length == 0)
+                    && datasetChart.filters().length == 0 && yearChart.filters().length == 0)
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
-                    //console.log('eventRange: ', eventRange)
-                    eventRange[0] = 0; //make min always 0                                         
+                    console.log('eventRange: ', eventRange)
+                    eventRange[0] = 0; //make min always 0 
+                    console.log('eventRange after: ', eventRange)
+                    console.log('chart.valueAccessor(): ', chart.valueAccessor())
                         
                     chart.colorDomain(eventRange);  
                 }
@@ -302,13 +303,14 @@ $(document).ready(function() {
                         seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
-                        return d.value.count/( regionCount * seasonCount * datasetCount );
+                        return 100 * d.value.count/( regionCount * seasonCount * datasetCount );
                     })
                     .elasticY(true)
                     .renderHorizontalGridLines(true)
                     .gap(1)
                     .title(function(d) {                                        
-                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count / ( regionCount * seasonCount * datasetCount );
+                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
+                               100 * d.data.value.count / ( regionCount * seasonCount * datasetCount );
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
@@ -358,11 +360,11 @@ $(document).ready(function() {
                         indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
-                        return d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
+                        return 100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
 
                     })
                     //.filter([2001, 2030])
-                    .filter([1976, 2005])
+                    //.filter([1976, 2005])
                     .elasticY(true)
                     .gap(0)
                     .renderHorizontalGridLines(true)
@@ -396,7 +398,7 @@ $(document).ready(function() {
                         seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
                         indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
                         
-                        return d.value.count/( regionCount * seasonCount * indexCount );
+                        return 100 * d.value.count/( regionCount * seasonCount * indexCount );
                     })                                    
                     .colors(["#888888"])
                     .elasticX(true)
@@ -408,7 +410,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + d.value.count/( regionCount * seasonCount * indexCount ) + " events";                        
+                        return models[d.key] + ": " + 100 * d.value.count/( regionCount * seasonCount * indexCount ) + " events";                        
                     })
                     .gap(0.5);
             datasetChart
