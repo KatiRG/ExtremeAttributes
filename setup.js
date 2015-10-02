@@ -42,7 +42,8 @@ $(document).ready(function() {
     //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
     //d3.csv("data/test_extremoscope_int.csv", function(csv) {
     //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
-    d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
+    //d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
+    d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {        
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -483,7 +484,7 @@ function resetTSbutton() {
 
 
 //--------------------------------------------------------------------
-//  TIME SERIES fLOTTIING
+//  TIME SERIES PLOTTIING
 //--------------------------------------------------------------------
 
 function showTimeSeries(regionName) {
@@ -608,8 +609,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
                 });
                 // OBS Safran is described from 1971 to 2012
                 // to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
-                // consider 5:34 (in javascript notation start 0) so arr.slice(5,35)
-                dataValues = dataValues.slice(4, 34);
+                // consider 4:33 (in javascript notation start 0) so arr.slice(4,33)
+                dataValues = dataValues.slice(4, 33);
                 //percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
                 percentile90 = percentile(dataValues.sort(), .90);
                 percentile10 = percentile(dataValues.sort(), .10);
