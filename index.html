@@ -17,13 +17,8 @@
     <script src="lib/crossfilter.js"></script>
     <script src="lib/dc.js"></script>    
     <link rel="stylesheet" href="lib/dc.css" />
-<<<<<<< HEAD
-    <script src="lib/jquery-1.10.2.min.js"></script>    
-=======
     <script src="lib/jquery-1.10.2.min.js"></script>
     <script src="lib/colorbrewer.js"></script>
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
-
 
     <!--ONLINE LINKS
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -40,38 +35,16 @@
     <script src="lib/bootstrap-3.0.2-dist/js/bootstrap.min.js"></script>
     <!-- Custom styles for this template -->
     <link href="sticky-footer-navbar.css" rel="stylesheet">
-<<<<<<< HEAD
-
-    <!--Custom files -->
-    <script type="text/javascript" src="lib/d3tip.js"></script>
-    <!-- colorbar http://bl.ocks.org/chrisbrich/4209888 -->
-    <link href="lib/colorbar.css" rel="stylesheet">
-    <script type="text/javascript" src="lib/colorbar.js"></script>
-
-    <!--
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/highstock/2.0.4/highstock.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script> 
-    -->
-    <script src="lib/highstock.js"></script>
-    <script src="lib/exporting.js"></script>
-
-    <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/1.7.0/math.min.js"></script>
-    -->
-=======
     <link rel="stylesheet" href="lib/colorbrewer.css" />
 
     <script src="lib/highstock.js"></script>
     <script src="lib/exporting.js"></script>
 
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
     <script src="lib/math.min.js"></script>
 
     <script type="text/javascript" src="setup.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" media="all">
 
-<<<<<<< HEAD
-=======
     <!-->Leaflet from Yurukov<-->
     <!--<script type="text/javascript" src="lib/dc.leaflet.js"></script>-->
     <script type="text/javascript" src="lib/my-dc.leaflet.js"></script>
@@ -104,7 +77,6 @@
         }
     </style>
 
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 </head>
 
 <body>
@@ -138,35 +110,6 @@
 
             <!--ROW 1-->
             <div class="row">
-<<<<<<< HEAD
-                <div id="tags" class="col-md-2">
-                    <div class="filterName">Threshold</div>
-                    <input type="radio" name="sigma" value="1">1 Sigma
-                    <br>
-                    <input type="radio" name="sigma" value="2">2 Sigma
-                    <br>
-                    <br>
-                    <br>
-                    <div class="filterName">Scenario</div>
-                    <input type="radio" name="rcp" value="rcp45">RCP 4.5
-                    <br>
-                    <input type="radio" name="rcp" value="rcp85">RCP 8.5
-                </div>
-                <div id="chart-category" class="dc-chart col-md-2">
-                    <div class="filterName">Index Type                        
-                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
-                <div id="chart-index" class="dc-chart col-md-4">
-                    <div class="filterName">Index Name
-                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>            
-                <div id="chart-dataset" class="dc-chart col-md-4">
-                    <div class="filterName">Model + Obs
-=======
                 <div class="col-md-4">
                     <div class="filterName">Threshold</div>
                     Events > 90th and < 10th percentile displayed.
@@ -211,39 +154,11 @@
                          
                 <div id="chart-dataset" class="dc-chart col-md-4">
                     <div class="filterName">Models
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-            <!--end ROW 1-->
-
-            <!--ROW 2-->
-            <div class="row">
-
-                <div id="colourbar" class="dc-chart col-md-1"></div>
-                <div id="france-chart" class="dc-chart col-md-3">
-                    <div class="filterName">Map
-                        <a class="reset" href="javascript:franceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
-
-                <div id="chart-stackedYear" class="dc-chart col-md-8">                    
-                    <div class="filterName">Year by Season
-                        <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>                    
-                </div> 
-                <div id="chart-seasons">   
-                    <div class="filterName" style="font-weight: normal;">Seasons
-                        <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span><p>
-                    </div>
-                </div>
-=======
             <!--end ROW 2-->
 
   
@@ -265,17 +180,8 @@
                         <span id="active">-</span> of <span id="total">-</span> rows selected.
                     </table>
             </div>      
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
-             
-
-            </div>
-<<<<<<< HEAD
-            <!--end ROW 2-->
-=======
-            <!--end ROW 4-->
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
-        
+            <!--end ROW 2-->    
 
             <!--ROW TIME SERIES -->
             <div class="row">
@@ -300,10 +206,6 @@
         <!-- /.container -->
     </div>
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 </body>
 
 

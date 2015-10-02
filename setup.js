@@ -6,35 +6,11 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 var colourDomain = [];
 var saveRange;
-<<<<<<< HEAD
-var colourBarExists = 0;
-=======
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
 //for avgs
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
-<<<<<<< HEAD
-var avgIndexGroup, avgRegionGroup, avgEventsBySeason;
-var numObsDatasets = 1;
-
-$(document).ready(function() {
-
-        var chart;
-        franceChart = dc.geoChoroplethChart("#france-chart");
-        indexChart = dc.barChart("#chart-index");        
-        datasetChart = dc.rowChart("#chart-dataset");
-        stackedYearChart = dc.barChart("#chart-stackedYear");        
-        categoryChart = dc.pieChart("#chart-category");
-        seasonsChart = dc.pieChart("#chart-seasons");
-
-        var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];        
-        
-        //d3.csv("data/data_obs_CategoryIndexandSeasons_numericalIDs.csv", function(csv) {
-        d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {
-            regions={
-=======
 var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgYearGroup, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
 var numObsDatasets = 1;
 var numSeasons = 4;
@@ -68,7 +44,6 @@ $(document).ready(function() {
     //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
     d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
         regions = {
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
                 3: "Auvergne et Rhône-Alpes",
@@ -82,15 +57,9 @@ $(document).ready(function() {
                 15: "Pays de la Loire",
                 16: "Provence-Alpes-Côte d'Azur",
                 17: "Île-de-France"
-<<<<<<< HEAD
-            };
-
-            models={                
-=======
         };
 
-        models = {
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
+        models={
                 1: "CNRM-CERFACS-CNRM-CM5_RCA4",
                 2: "ICHEC-EC-EARTH_HIRHAM5",
                 3: "ICHEC-EC-EARTH_RCA4",
@@ -99,278 +68,6 @@ $(document).ready(function() {
                 6: "MPI-ESM-LR_CCLM4-8-17",
                 7: "MPI-ESM-LR_REMO019",
                 100: "OBS Safran"
-<<<<<<< HEAD
-            };
-
-            indices={
-                "GD4": "growing degree days [days]",
-                "HD17": "heat index (17 - tas mean)",
-                "TG": "temperature mean",
-                "R10mm": "nr of days where precipitation > 10mm",
-                "R20mm": "nr of days where precipitation > 20mm",
-                "RR1": "nr of days with rain >=1",
-                "RR": "prescipitation amount",
-                "RX1day": "max rain day",
-                "SDII": "simple drought index"
-            };
-
-            indexID={
-                1: "GD4",
-                2: "HD17",
-                3: "TG",
-                4: "R10mm",
-                5: "R20mm",
-                6: "RR1",
-                7: "RR",
-                8: "RX1day",
-                9: "SDII"
-            };
-
-            indexNames = ["GD4", "HD17", "TG", "R10mm", "R20mm", "RR1", "RR", "RX1day", "SDII"];
-            indexColours = ["#C01525","#C01525","#C01525","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6","#2c7bb6"];
-
-            seasons={
-                "DJF": "Winter",
-                "MAM": "Spring",
-                "JJA": "Summer",
-                "SON": "Fall"
-            };
-
-            var filter = crossfilter(csv);
-
-            var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),                
-                categoryDimension = filter.dimension(function(d) { 
-                    //return d.Category; 
-                    if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
-                    else return "Rain";
-                }),
-                indexDimension = filter.dimension(function(d) { return d.Index; }),
-                regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
-                datasetDimension = filter.dimension(function(d) { return d.Model; }),
-                sigma = filter.dimension(function(d) { return d.Sigma; }),
-                seasonDimension = filter.dimension(function(d) { return d.Season; }),
-                scenario = filter.dimension(function(d) { return d.Scenario; }),
-                timeDimension = filter.dimension(function(d) { return d.Year; });
-
-            var indexGroup = indexDimension.group(),
-                categoryGroup = categoryDimension.group(),
-                seasonGroup = seasonDimension.group(),
-                regionGroup = regionDimension.group(),
-                datasetGroup = datasetDimension.group();
-
-            // ===============================================================================================
-            //for avg stacked bar chart
-            //https://github.com/dc-js/dc.js/issues/21
-            var year = filter.dimension(function(d){return +d.Year;});
-            avgEventsBySeason = year.group().reduce(
-                // add
-                function(p,v){
-                    var omit;                    
-                    if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
-                        if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                        else p.numDataSets = datasetGroup.all().length;
-                    } else {
-                        if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                            omit = numObsDatasets;
-                        } else omit = 0;
-                        p.numDataSets = datasetChart.filters().length - omit;
-                    }                    
-                    if(v.Season == "DJF"){ ++p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
-                    if(v.Season == "MAM"){ ++p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
-                    if(v.Season == "JJA"){ ++p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
-                    if(v.Season == "SON"){ ++p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
-                                    
-                    return p;
-                },
-                // remove
-                function(p,v){
-                    var omit;
-                    if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
-                        if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                        else p.numDataSets = datasetGroup.all().length;
-                    } else {
-                        if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                            omit = numObsDatasets;
-                        } else omit = 0;
-                        p.numDataSets = datasetChart.filters().length - omit;
-                    }
-                    if(v.Season == "DJF"){ --p.season0Count; p.season0Avg = p.season0Count/p.numDataSets;}
-                    if(v.Season == "MAM"){ --p.season1Count; p.season1Avg = p.season1Count/p.numDataSets;}
-                    if(v.Season == "JJA"){ --p.season2Count; p.season2Avg = p.season2Count/p.numDataSets;}
-                    if(v.Season == "SON"){ --p.season3Count; p.season3Avg = p.season3Count/p.numDataSets;}
-
-                    return p;
-                },
-                // init
-                function(){
-                    return {
-                        numDataSets: 0, 
-                        season0Count:0, season0Avg:0,
-                        season1Count:0, season1Avg:0,
-                        season2Count:0, season2Avg:0,
-                        season3Count:0, season3Avg:0                        
-                    };
-                }
-            );
-            //end avg stacked bar chart
-            // ===============================================================================================
-
-            var numModels = datasetGroup.size();
-            
-            avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-            avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-
-            //Fns to compute avg for the other charts
-            function reduceAdd(p, v) {
-                var omit;                
-                ++p.count;
-                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no models selected                    
-                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    else p.numDataSets = datasetGroup.all().length;
-                } else {
-                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                        omit = numObsDatasets;
-                    } else omit = 0;
-                    p.numDataSets = datasetChart.filters().length - omit;
-                }
-
-                p.average = Math.ceil(p.count / p.numDataSets);
-                return p;
-            }
-
-            function reduceRemove(p, v) {
-                var omit;
-                --p.count;
-                if (datasetChart.filters().length == 0 || datasetChart.filters().length == numModels) { //no or all models selected                    
-                    if (v.Year > cutoffYear_Safran) p.numDataSets = datasetGroup.all().length - numObsDatasets;
-                    else p.numDataSets = datasetGroup.all().length;
-                } else {
-                    if (v.Year > cutoffYear_Safran && datasetChart.filters().length > 1 && datasetChart.filters().indexOf("OBS Safran") != -1) {
-                        omit = numObsDatasets;
-                    } else omit = 0;
-                    p.numDataSets = datasetChart.filters().length - omit;
-                }
-
-                p.average = Math.ceil(p.count / p.numDataSets);
-                return p;
-            }
-
-            function reduceInitial() {
-                return {
-                    count: 0,
-                    numDataSets: 0,
-                    average: 0
-                };
-            }
-            // ===============================================================================================
-
-            minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
-            maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
-
-            d3.selectAll("#total").text(filter.size()); // total number of events
-
-            //MAP
-            var width = 300,
-                height = 300;
-
-            //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
-            var projection = d3.geo.conicConformal() // Lambert-93
-                .center([6, 49]) // On centre la carte sur la France
-                .scale(1400)
-                .translate([180, 100]);
-
-            //d3.json("geojson/FRA_admin12.json", function (statesJson) { //WAY TOO HUGE!!!!
-            d3.json("geojson/myFRA_admin12.json", function(statesJson) {
-
-                //region name dictionary
-                statesJson.features.forEach(function(d, idx) {
-                    region_dict.push({
-                        key: d.properties.name,
-                        value: region_id[idx]
-                    });
-                    legend[idx] = d.properties.name;
-                });
-
-                franceChart.width(width)
-                    .height(height)
-                    .dimension(regionDimension)
-                    //.group(regionGroup)
-                    .group(avgRegionGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {
-                        return p.value.average;
-                    })
-                    .colors(d3.scale.linear().range(colourRange))
-                    .projection(projection)
-                    .overlayGeoJson(statesJson.features, "state", function(d) {                        
-                        return d.properties.name;
-                    })
-                    .title(function(d) {
-                        d3.select("#active").text(filter.groupAll().value()); //total number selected                        
-                        return d.key + ": \n" + d.value + " events";
-                    });
-                franceChart.on("preRender", function(chart) { //dynamically calculate domain                                        
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                });
-                franceChart.on("preRedraw", function(chart) { //loops through 4 times. WHY?? Need preRedraw to get map colours correct                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                });
-                franceChart.on("postRedraw", function(chart) { //use to get range for number of events                    
-                    chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-                    //calculate colourbar params and plot colourbar
-                    saveRange = chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor())).colorDomain();
-                    calculateDomain(saveRange, colourRange); //returns colourDomain                    
-                    plotColourbar(colourDomain, colourRange);
-                });
-                //see: https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/r0_lPT-pBsAJ
-                //use chart.group().all(): https://groups.google.com/forum/#!msg/dc-js-user-group/6_EzrHSRQ30/PMblOq_f0oAJ                                                
-                // =================
-                //define click action
-                franceChart.renderlet(function(chart) {
-                    chart.selectAll("g.layer0 g.state").on("click", function(d) {
-                        showTimeSeries(d.properties.name);
-                    });
-                })
-
-                // =================
-                categoryChart
-                    .width(100)
-                    .height(200)
-                    .slicesCap(4)
-                    .innerRadius(20)                    
-                    .colors(["#C01525", "#2c7bb6"])
-                    .dimension(categoryDimension)
-                    .group(categoryGroup)                    
-                    //.legend(dc.legend())
-                    .title(function(d){                        
-                        return d.data.key + ": " + d.data.value + " events";                        
-                    });
-
-                // =================                    
-                indexChart
-                    .width(400).height(200)
-                    .margins({ top: 10, right: 30, bottom: 30, left: 50 })
-                    .dimension(indexDimension)                    
-                    .group(avgIndexGroup) //avg count across all datasets
-                    .valueAccessor(function(p) {                        
-                        return p.value.average;                        
-                    })                                        
-                    .elasticY(true)
-                    .renderHorizontalGridLines(true)
-                    .gap(1)                                    
-                    .title(function(d){                        
-                        return indexID[d.data.key]
-                                + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.average + " events";                       
-                    })                    
-                    .x(d3.scale.ordinal().domain(indexNames))
-                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
-                indexChart
-                   .yAxis().tickFormat(d3.format("d"));
-
-                indexChart.renderlet(function (chart) {
-                    chart.selectAll('g rect.bar').each(function(d) {
-                        if (d3.select(this).attr("class") == "bar deselected") {
-                            d3.select(this).style("fill", "#ccc");                    
-=======
         };
 
         indices = {
@@ -621,72 +318,11 @@ $(document).ready(function() {
                     chart.selectAll('g rect.bar').each(function(d) {
                         if (d3.select(this).attr("class") == "bar deselected") {
                             d3.select(this).style("fill", "#ccc");
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                         } else {
                             idx = parseInt(d.data.key) - 1;
                             d3.select(this).style("fill", indexColours[idx]);
                         }
                     });
-<<<<<<< HEAD
-                });
-
-                indexChart.renderlet(function (chart) {
-                    // rotate x-axis labels
-                    chart.selectAll('g.x text')
-                    .attr('transform','translate(-10,10) rotate(315)');
-                });
-    
-                
-    
-                // =================                
-                stackedYearChart
-                    .width(790)
-                    .height(350)
-                    .dimension(year)
-                    .x(d3.scale.linear().domain([1970, 2100]))
-                    .elasticY(true)
-                    .renderHorizontalGridLines(true)
-                    .centerBar(true)
-                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
-                    .group(avgEventsBySeason, "Winter")
-                    .valueAccessor(function(p){return p.value.season0Avg;})
-                    .stack(avgEventsBySeason, "Spring", function(p){return p.value.season2Avg})
-                    .stack(avgEventsBySeason, "Summer", function(p){return p.value.season1Avg})
-                    .stack(avgEventsBySeason, "Fall", function(p){return p.value.season3Avg});
-                    //.legend(dc.legend().x(70).y(30));
-                    // .renderlet(function (chart) {
-                    //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
-                    // });
-
-                stackedYearChart
-                    .xAxis().tickFormat(d3.format("d"));
-
-                // =================
-                seasonsChart
-                    .width(65)
-                    .height(65)
-                    .slicesCap(4)
-                    .innerRadius(10)                    
-                    .colors(["#2c7bb6", "#C01525", "#B3CC57", "#CC982A"]) //DJF, JJA, MAM, SON
-                    .dimension(seasonDimension)
-                    .group(seasonGroup)
-                    .valueAccessor(function (d) { if (d.value != 0) return 0.25; })
-                    .title(function(d){ return seasons[d.data.key]; });
-                    // .renderlet(function (chart) {
-                    //     chart.selectAll("g").attr("transform", "translate(50, 70)");                       
-                    // })
-                    // .renderlet(function (chart) {
-                    //     chart.selectAll("g.text").attr("transform", function (d, i) {
-                    //         console.log("d, i: ", d)
-                    //     });
-                    // });
-
-                    //d3.select("#chart-seasons > dc-chart > svg > g").attr("transform", "translate(50,-10)");
-    
-
-                // =================
-                datasetChart
-=======
             });
 
             indexChart.renderlet(function(chart) {
@@ -742,7 +378,6 @@ $(document).ready(function() {
 
             // =================
             datasetChart
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                     .width(300).height(200)
                     .margins({
                         top: 10,
@@ -750,79 +385,6 @@ $(document).ready(function() {
                         bottom: 30,
                         left: 10
                     })
-<<<<<<< HEAD
-                    .dimension(datasetDimension)
-                    .group(datasetGroup)
-                    .colors(["#1f77b4"])
-                    .elasticX(true)
-                    .ordering(function(d) {
-                        return -d.value; 
-                    })
-                    .label(function(d) {                        
-                        return models[d.key];                        
-                    })
-                    .title(function(d) {                                                
-                        return models[d.key] + ": " + d.value + " events";
-                    })
-                    .gap(0.5);
-                    
-
-                datasetChart
-                    .xAxis().ticks(4).tickFormat(d3.format("d"));
-
-                // =================
-                dataTable = dc.dataTable("#dc-data-table");
-                dataTable
-                    .dimension(timeDimension)
-                    .group(function(d) {
-                        return ""
-                    })
-                    .size(10)
-                    .columns([
-                        function(d) { return d.Year; },
-                        function(d) { return d.Season; },
-                        function(d) { return d.Region; },
-                        function(d) { return d.Index; },
-                        function(d) { return d.Sigma; },
-                        function(d) { return d.Model; }
-                    ])
-                    .sortBy(function(d) { return d.Year; })
-                    .order(d3.ascending);
-
-                // =================
-                dc.renderAll();
-
-                // =================
-                //Filter dc charts according to which radio button is checked by user:
-                $("input:radio[name=sigma]").click(function() {
-                    var radioValue = $("input:radio[name=sigma]:checked").val();
-                    //console.log(radioValue);
-                    sigma.filterAll();
-                    sigma.filter(radioValue);
-                    dc.redrawAll();
-                });
-                $("input:radio[name=rcp]").click(function() {
-                    var radioValue = $("input:radio[name=rcp]:checked").val();
-                    //console.log(radioValue);
-                    scenario.filterAll();
-                    scenario.filter(radioValue);
-                    dc.redrawAll();
-                });
-
-                //$("input:radio[name=sigma]").trigger("click"); //doesn't work. Do as below instead:
-                //Click sigma1 and rcp4.5 radio buttons on page load
-                //http://stackoverflow.com/questions/871063/how-to-set-radio-option-checked-onload-with-jquery
-                $("input[name='sigma']").click(function() {
-                    var radioValue = $("input[name='sigma']:checked").val();
-                    threshold_clicked = $("input:radio[name=sigma]:checked").val();
-                    sigma.filterAll();
-                    sigma.filter(radioValue);
-                    dc.redrawAll();
-                });
-
-                $("input[name='rcp']").click(function() {
-                    var radioValue = $("input[name='rcp']:checked").val();
-=======
                     //.dimension(datasetDimension)
                     //.group(avgDatasetGroup)
                     .dimension(modelDimension)
@@ -895,58 +457,11 @@ $(document).ready(function() {
           
             $("input[name='rcp']").click(function() {
                 var radioValue = $("input[name='rcp']:checked").val();
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                     scenario_clicked = $("input:radio[name=rcp]:checked").val();
                     //console.log("scenario_clicked: ", scenario_clicked)
                     scenario.filterAll();
                     scenario.filter(radioValue);
                     dc.redrawAll();
-<<<<<<< HEAD
-                });
-
-                $("input[name='sigma'][value='1']").prop('checked', true);
-                $("input[name='rcp'][value='rcp85']").prop('checked', true);
-                $("input[name='sigma'][value='1']").trigger("click");
-                $("input[name='rcp'][value='rcp85']").trigger("click");
-
-            }); //end geojson
-        }); //end csv
-    }) //end document.ready
-
-//--------------------------------------------------------------------
-//  COLOUR-RELATED CODE FOR CHARTS
-//--------------------------------------------------------------------
-
-//divide colourbar range into 10 equal steps (since 10 colours have been defined):
-function calculateDomain(saveRange, colourRange_array) {
-    rangeDiff = saveRange[1] - saveRange[0];
-    step = rangeDiff / (colourRange_array.length - 1);
-    for (var j = 0; j < colourRange_array.length; j++) {
-        colourDomain[j] = saveRange[0] + j * step;
-    }
-    return colourDomain;
-}
-
-//colourbar (http://bl.ocks.org/chrisbrich/4209888)
-function plotColourbar(colourDomain_array, colourRange_array) {
-    if (colourBarExists == 0) { //only create svg once
-        var g = d3.select("div#colourbar").append("svg").attr("width", 100).attr("height", 300)
-            .attr("transform", "translate(25,120),scale(0.8)")
-            .classed("colorbar", true);
-    } else var g = d3.select("div#colourbar");
-
-    var cb = colorBar().color(d3.scale.linear()
-            .domain(colourDomain_array)
-            .range(colourRange_array))
-        .size(150).lineWidth(25).precision(1);
-
-    g.call(cb);
-    colourBarExists = 1;
-}
-
-//--------------------------------------------------------------------
-//  TIME SERIES PLOTTIING
-=======
             });
             
             $("input[name='rcp'][value='rcp85']").prop('checked', true);            
@@ -968,27 +483,18 @@ function resetTSbutton() {
 
 
 //--------------------------------------------------------------------
-//  TIME SERIES fLOTTIING
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
+//  TIME SERIES PLOTTIING
 //--------------------------------------------------------------------
 
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
         //console.log("In showTimeSeries for ", regionName);
-<<<<<<< HEAD
-        index_clicked = indexNames[indexChart.filters()[0] -1];
-
-        clearSeries();
-
-        callHighChart(index_clicked + " for " + regionName + ", " + threshold_clicked + " Sigma" + ", " + scenario_clicked);
-=======
         index_clicked = indexNames[indexChart.filters()[0] - 1];
 
         clearSeries();
 
         callHighChart(index_clicked + " for " + regionName + ", " + scenario_clicked);
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
         makeRequest(regionName);
 
@@ -1033,24 +539,16 @@ function makeRequest(regionName) {
 
     regionNum = region_dict[legend.indexOf(regionName)].value;
 
-    //console.log("model[i]: ", models[0])
+    //console.log("model[i]: ", models[0])    
     datasetFiltered = datasetChart.filters();
     for (var i = 0; i < models.length; i++) {
-<<<<<<< HEAD
-        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";        
-=======
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
         visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[i]) != -1 ? true : false);
         addData(request, colors[i], 'Solid', models[i], visible, false);
     }
 
     // obs
-<<<<<<< HEAD
-    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";    
-=======
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
     addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
     // calcul of the mean for 1976-2005 for obs
 
@@ -1071,9 +569,6 @@ function makeRequest(regionName) {
 
 }
 
-<<<<<<< HEAD
-function addData(request, color, dash, label, visible, addSigma) {
-=======
 function addData(request, color, dash, label, visible, addPercentile) {
 >>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
@@ -1105,11 +600,7 @@ function addData(request, color, dash, label, visible, addPercentile) {
 
             highchart.addSeries(serie);
 
-<<<<<<< HEAD
-            if (addSigma) {
-=======
             if (addPercentile) {
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 //console.log("serie: ", serie)
                 var dataValues = []
                 $.each(serie.data, function(index, value) {
@@ -1118,16 +609,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
                 });
                 // OBS Safran is described from 1971 to 2012
                 // to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
-                // consider 5:34 (in javascript notation start 0) so arr.slice(5,35)
-<<<<<<< HEAD
-                dataValues = dataValues.slice(5, 35);
-                //console.log(dataValues);
-                //console.log("mean: " + math.mean(dataValues));
-                //console.log("std: " + math.std(dataValues));
-                threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
-                //console.log("threshold: ", threshold1); 
-=======
-                dataValues = dataValues.slice(4, 34);
+                // consider 4:33 (in javascript notation start 0) so arr.slice(4,33)
+                dataValues = dataValues.slice(4, 33);
                 //percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
                 percentile90 = percentile(dataValues.sort(), .90);
                 percentile10 = percentile(dataValues.sort(), .10);
@@ -1145,22 +628,14 @@ function addData(request, color, dash, label, visible, addPercentile) {
                     }
                 });
                 //Add 10th percentile
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 highchart.yAxis[0].addPlotLine({
                     color: '#000000',
                     dashStyle: 'ShortDash',
                     width: 2,
-<<<<<<< HEAD
-                    value: threshold1,
-                    zIndex: 10,
-                    label: {
-                        text: threshold_clicked + ' Sigma'
-=======
                     value: percentile10,
                     zIndex: 10,
                     label: {
                         text: ' 10th Percentile'
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                     }
                 });
             }
@@ -1200,19 +675,11 @@ function callHighChart(title) {
                 }
             },
             plotBands: [{
-<<<<<<< HEAD
-                from: Date.UTC(1971, 06, 01), // month from 0 to 11 !
-                to: Date.UTC(2012, 06, 01),
-                color: '#EEEEEE'
-            }, {
-                from: Date.UTC(2012, 06, 01), // month from 0 to 11 !
-=======
                 from: Date.UTC(1976, 06, 01), // month from 0 to 11 !
                 to: Date.UTC(2012, 06, 01),
                 color: '#EEEEEE'
             }, {
                 from: Date.UTC(2005, 06, 01), // month from 0 to 11 !
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 to: Date.UTC(2200, 01, 01),
                 color: '#EFFFFF'
             }]
