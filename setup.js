@@ -6,12 +6,16 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 var colourDomain = [];
 var saveRange;
+<<<<<<< HEAD
 var colourBarExists = 0;
+=======
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
 //for avgs
 var currentTime = new Date();
 var currentYear = currentTime.getFullYear();
 var cutoffYear_Safran = 2012;
+<<<<<<< HEAD
 var avgIndexGroup, avgRegionGroup, avgEventsBySeason;
 var numObsDatasets = 1;
 
@@ -30,6 +34,41 @@ $(document).ready(function() {
         //d3.csv("data/data_obs_CategoryIndexandSeasons_numericalIDs.csv", function(csv) {
         d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {
             regions={
+=======
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgYearGroup, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
+var numObsDatasets = 1;
+var numSeasons = 4;
+
+//for map click
+var clickedRegion;
+var palette;
+window.eventRange;
+var choroChart;
+
+//to be defined in each chart:
+var regionCount, datasetCount, regionCount, indexCount, yearCount, seasonCount;
+
+$(document).ready(function() {
+
+    document.getElementById("ts-button").disabled = true;
+
+    var chart;    
+    
+    choroChart = dc.leafletChoroplethChart("#choro-map .map");
+    indexChart = dc.barChart("#chart-index");
+    datasetChart = dc.rowChart("#chart-dataset");
+    //stackedYearChart = dc.barChart("#chart-stackedYear");
+    categoryChart = dc.pieChart("#chart-category");
+    yearChart = dc.barChart("#chart-year");    
+
+    var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
+
+    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
+    //d3.csv("data/test_extremoscope_int.csv", function(csv) {
+    //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
+    d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
+        regions = {
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
                 3: "Auvergne et Rhône-Alpes",
@@ -43,9 +82,15 @@ $(document).ready(function() {
                 15: "Pays de la Loire",
                 16: "Provence-Alpes-Côte d'Azur",
                 17: "Île-de-France"
+<<<<<<< HEAD
             };
 
             models={                
+=======
+        };
+
+        models = {
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 1: "CNRM-CERFACS-CNRM-CM5_RCA4",
                 2: "ICHEC-EC-EARTH_HIRHAM5",
                 3: "ICHEC-EC-EARTH_RCA4",
@@ -54,6 +99,7 @@ $(document).ready(function() {
                 6: "MPI-ESM-LR_CCLM4-8-17",
                 7: "MPI-ESM-LR_REMO019",
                 100: "OBS Safran"
+<<<<<<< HEAD
             };
 
             indices={
@@ -324,11 +370,264 @@ $(document).ready(function() {
                     chart.selectAll('g rect.bar').each(function(d) {
                         if (d3.select(this).attr("class") == "bar deselected") {
                             d3.select(this).style("fill", "#ccc");                    
+=======
+        };
+
+        indices = {
+                "GD4": "Growing degree days (sum of TG>4 degC) (degC)",
+                "HD17": "Heating degree days (sum of 17degC - TG) (degC)",
+                "TG": "Mean daily temp (degC)",                
+                "R20mm": "Days where precipitation > 20mm (days)",
+                "RR1": "Wet days (RR≥1 mm) (days)",
+                "RR": "Precipitation sum (mm)",
+                "RX1day": "Highest 1-day precipitation amount (mm)",
+                "RX5day": "Highest 5-day precipitation amount (mm)",
+                "CWD": "Maximum number of consecutive wet days (RR≥1 mm) (days)",
+                "CDD": "Maximum number of consecutive dry days (RR<1 mm) (days)"
+        };
+
+        indexID={       
+            1: "GD4",
+            2: "HD17",
+            3: "TG",
+            4: "R20mm",
+            5: "RR1",
+            6: "RR",
+            7: "RX1day",
+            8: "RX5day",
+            9: "CWD",
+            10: "CDD"
+        }
+
+        indexNames = ["GD4", "HD17", "TG", "R20mm", "RR1", "RR", "RX1day", "RX5day", "CDW", "CDD",];        
+
+        //http://www.colourlovers.com/palette/3511190/Rain_Waves
+        indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
+
+        seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall" };
+        //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1
+        seasonsColours = ["#9DD8D3", "#FFE545", "#A9DB66", "#FFAD5D"]; //DJF, JJA, MAM, SON
+
+        var filter = crossfilter(csv);
+
+        var yearDimension = filter.dimension(function(d) { return Math.round(d.Year); }),
+            categoryDimension = filter.dimension(function(d) {                
+                if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
+                else return "Rain";
+            }),
+            indexDimension = filter.dimension(function(d) { return d.Index; }),
+            regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
+            datasetDimension = filter.dimension(function(d) { return +d.Model; }),
+            modelDimension = filter.dimension(function(d) {
+                if (d.Model < 100) return +d.Model; 
+            }),
+            // obsDimension = filter.dimension(function(d) {
+            //     //console.log('d.Model: ', d.Model)
+            //     if (d.Model == 100) return +d.Model; 
+            // }),
+            
+            seasonDimension = filter.dimension(function(d) { return d.Season; }),
+            scenario = filter.dimension(function(d) { return d.Scenario; });
+            //timeDimension = filter.dimension(function(d) { return d.Year; });
+
+        var indexGroup = indexDimension.group(),
+            categoryGroup = categoryDimension.group(),
+            seasonGroup = seasonDimension.group(),
+            yearGroup = yearDimension.group(),
+            regionGroup = regionDimension.group();
+            //datasetGroup = datasetDimension.group();
+
+            datasetGroup = datasetDimension.group();
+            modelGroup = modelDimension.group();
+            //obsGroup = obsDimension.group();
+
+        // ===============================================================================================       
+        var numModels = modelGroup.size();  //datasetGroup.size();
+        var numRegions = Object.keys(regions).length;
+        var numIndices = Object.keys(indexID).length;
+        var modelRange = 2100-1972, obsRange = 2012 - 1972;                
+
+        avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        //avgObsGroup = obsDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+
+        //Fns to compute avg.
+        function reduceAdd(p, v) {            
+
+            var omit;
+
+            ++p.count;       
+
+            return p;
+        }
+
+        function reduceRemove(p, v) {
+            var omit;
+            --p.count;
+
+            return p;
+        }
+
+        function reduceInitial() {
+                return {
+                    count: 0
+                };
+        }
+        
+      //==============================================================================================
+
+        minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
+        maxYear = parseInt(yearDimension.top(1)[0].Year) + 5;
+
+        d3.selectAll("#total").text(filter.size()); // total number of events
+
+        //MAP
+        var width = 300, height = 300;
+
+        //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
+        var projection = d3.geo.conicConformal() // Lambert-93
+            .center([6, 49]) // On centre la carte sur la France
+            .scale(1400)
+            .translate([180, 100]);
+        
+        // ===============================================================================================
+        //  READ IN GEOJSON
+        // ===============================================================================================        
+        d3.json("geojson/myFRA_admin12.json", function(statesJson) {            
+
+            //region name dictionary
+            statesJson.features.forEach(function(d, idx) {
+                region_dict.push({
+                        key: d.properties.name,
+                        value: region_id[idx]
+                });
+                legend[idx] = d.properties.name;
+            });
+
+
+            choroChart             
+                .dimension(regionDimension)                  
+                .valueAccessor(function(d) {                        
+
+                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        
+                        return d.value.count/( indexCount * seasonCount * datasetCount );
+                })
+                .group(avgRegionGroup)                                    
+                .width(800)
+                .height(400)
+                .center([47.00, 2.00])
+                .zoom(5)             
+                .geojson(statesJson)
+                .colors(colorbrewer.YlGnBu[3])
+                .colorAccessor(function(d,i) {
+                    return d.value.count;
+                })
+                .featureKeyAccessor(function(feature) {
+                    return feature.properties.name;
+                })
+                .renderPopup(false);
+                // .popup(function(d,feature) {
+                //   return feature.properties.name+" : "+d.value.count;
+                // });
+
+            choroChart.renderlet(function(chart) {
+                chart.selectAll("g").on("click", function(d, j) {                
+
+                    if (chart.filters().length == 1 && indexChart.filters().length == 1) {
+                        document.getElementById("ts-button").disabled = false;
+                        tsRegion = chart.filter();                                                     
+                    }
+                    else document.getElementById("ts-button").disabled = true;
+                });                 
+            })            
+
+            choroChart.on("preRender", function(chart) {                    
+                chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+                    //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
+            });
+
+            //var numRegions;
+            choroChart.on("preRedraw", function(chart) {                
+                //save initial eventRange upon page load                    
+                if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
+                    && datasetChart.filters().length == 0 ) //&& yearChart.filters().length == 0)
+                {                        
+                    eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
+                    //console.log('eventRange: ', eventRange)
+                    eventRange[0] = 0; //make min always 0                                         
+                        
+                    chart.colorDomain(eventRange);  
+                }
+            });
+
+            // =================
+            categoryChart
+                    .width(50)
+                    .height(50)
+                    .slicesCap(4)
+                    .innerRadius(10)
+                    //.colors(["#C01525", "#2c7bb6"])
+                    .colors([indexColours[0], indexColours[8]])
+                    .dimension(categoryDimension)
+                    .group(categoryGroup)
+                    //.legend(dc.legend())
+                    .title(function(d) {
+                        return d.data.key + ": " + d.data.value + " events";
+                    })
+                    .renderlet(function (chart) {
+                        chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
+                        chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
+                    });
+
+            // =================        
+            indexChart
+                    .width(400).height(200)
+                    .margins({
+                        top: 10,
+                        right: 30,
+                        bottom: 30,
+                        left: 50
+                    })
+                    .dimension(indexDimension)
+                    .group(avgIndexGroup)                    
+                    .valueAccessor(function(d) {                        
+
+                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        
+                        return d.value.count/( regionCount * seasonCount * datasetCount );
+                    })
+                    .elasticY(true)
+                    .renderHorizontalGridLines(true)
+                    .gap(1)
+                    .title(function(d) {                                        
+                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + d.data.value.count / ( regionCount * seasonCount * datasetCount );
+                    })
+                    .x(d3.scale.ordinal().domain(indexNames))
+                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
+            indexChart
+                    .yAxis().tickFormat(d3.format("d"));
+
+            indexChart.renderlet(function(chart) {
+                    chart.selectAll('g rect.bar').each(function(d) {
+                        if (d3.select(this).attr("class") == "bar deselected") {
+                            d3.select(this).style("fill", "#ccc");
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                         } else {
                             idx = parseInt(d.data.key) - 1;
                             d3.select(this).style("fill", indexColours[idx]);
                         }
                     });
+<<<<<<< HEAD
                 });
 
                 indexChart.renderlet(function (chart) {
@@ -387,6 +686,63 @@ $(document).ready(function() {
 
                 // =================
                 datasetChart
+=======
+            });
+
+            indexChart.renderlet(function(chart) {
+                    // rotate x-axis labels
+                    chart.selectAll('g.x text')
+                        .attr('transform', 'translate(-10,10) rotate(315)');
+            });
+
+            indexChart.renderlet(function(chart) {
+                chart.selectAll("g").on("click", function(d, j) {            
+
+                    if (chart.filters().length == 1 && choroChart.filters().length == 1) {              
+                        document.getElementById("ts-button").disabled = false;
+                        tsRegion = choroChart.filter();
+                        console.log("d: ", d)
+                    }
+                    else document.getElementById("ts-button").disabled = true;
+                });                 
+            })
+
+        
+
+            // =================
+            yearChart
+                    .width(790).height(350)
+                    .dimension(yearDimension)
+                    //.group(yearGroup)
+                    .group(avgYearGroup) //avg count across all datasets
+                    .valueAccessor(function(d) {                        
+                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        
+                        return d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
+
+                    })
+                    //.filter([2001, 2030])
+                    .filter([1976, 2005])
+                    .elasticY(true)
+                    .gap(0)
+                    .renderHorizontalGridLines(true)
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    .y(d3.scale.linear().domain([0, 1]));
+
+                yearChart
+                    .xAxis().ticks(2).tickFormat(d3.format("d"));
+                yearChart
+                    .yAxis().ticks(4).tickFormat(d3.format("d"));
+
+                //yearChart.brush().extent(dc.filters.RangedFilter(1972,1999));    
+                //dc.filters.RangedFilter(7, 10)
+
+            // =================
+            datasetChart
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                     .width(300).height(200)
                     .margins({
                         top: 10,
@@ -394,6 +750,7 @@ $(document).ready(function() {
                         bottom: 30,
                         left: 10
                     })
+<<<<<<< HEAD
                     .dimension(datasetDimension)
                     .group(datasetGroup)
                     .colors(["#1f77b4"])
@@ -465,11 +822,86 @@ $(document).ready(function() {
 
                 $("input[name='rcp']").click(function() {
                     var radioValue = $("input[name='rcp']:checked").val();
+=======
+                    //.dimension(datasetDimension)
+                    //.group(avgDatasetGroup)
+                    .dimension(modelDimension)
+                    .group(avgModelGroup)
+                    .valueAccessor(function(d) {                        
+                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        
+                        return d.value.count/( regionCount * seasonCount * indexCount );
+                    })                                    
+                    .colors(["#888888"])
+                    .elasticX(true)
+                    .ordering(function(d) {
+                        return -d.value;
+                    })
+                    .label(function(d) {
+                        return models[d.key];
+                    })
+                    .title(function(d) {
+                        //return models[d.key] + ": " + d.value + " events";
+                        return models[d.key] + ": " + d.value.count/( regionCount * seasonCount * indexCount ) + " events";                        
+                    })
+                    .gap(0.5);
+            datasetChart
+                    .xAxis().ticks(10).tickFormat(d3.format("d"));
+
+            // =================
+            dataTable = dc.dataTable("#dc-data-table");
+            dataTable
+                    .dimension(yearDimension)
+                    .group(function(d) {
+                        return ""
+                    })
+                    .size(20)
+                    .columns([
+                        function(d) {
+                            return d.Year;
+                        },
+                        function(d) {
+                            return regions[d.Region];
+                        },
+                        function(d) {
+                            return indexID[d.Index];
+                        },
+                        function(d) {
+                            return models[d.Model];
+                        }
+                    ])
+                    .sortBy(function(d) {
+                        return d.Year;
+                    })
+                    .order(d3.ascending);
+
+            // =================        
+
+
+            // =================
+            dc.renderAll();            
+
+            // =================
+            //Filter dc charts according to which radio button is checked by user:           
+            $("input:radio[name=rcp]").click(function() {
+                    var radioValue = $("input:radio[name=rcp]:checked").val();                    
+                    scenario.filterAll();
+                    scenario.filter(radioValue);
+                    dc.redrawAll();
+            });
+          
+            $("input[name='rcp']").click(function() {
+                var radioValue = $("input[name='rcp']:checked").val();
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                     scenario_clicked = $("input:radio[name=rcp]:checked").val();
                     //console.log("scenario_clicked: ", scenario_clicked)
                     scenario.filterAll();
                     scenario.filter(radioValue);
                     dc.redrawAll();
+<<<<<<< HEAD
                 });
 
                 $("input[name='sigma'][value='1']").prop('checked', true);
@@ -514,17 +946,49 @@ function plotColourbar(colourDomain_array, colourRange_array) {
 
 //--------------------------------------------------------------------
 //  TIME SERIES PLOTTIING
+=======
+            });
+            
+            $("input[name='rcp'][value='rcp85']").prop('checked', true);            
+            $("input[name='rcp'][value='rcp85']").trigger("click");
+
+            // =================
+            //Show timeseries if button is clicked            
+            document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
+
+        }); //end geojson
+    }); //end csv
+}) //end document.ready
+
+function resetTSbutton() {
+    document.getElementById("ts-button").disabled = true;
+}
+
+
+
+
+//--------------------------------------------------------------------
+//  TIME SERIES fLOTTIING
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 //--------------------------------------------------------------------
 
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
         //console.log("In showTimeSeries for ", regionName);
+<<<<<<< HEAD
         index_clicked = indexNames[indexChart.filters()[0] -1];
 
         clearSeries();
 
         callHighChart(index_clicked + " for " + regionName + ", " + threshold_clicked + " Sigma" + ", " + scenario_clicked);
+=======
+        index_clicked = indexNames[indexChart.filters()[0] - 1];
+
+        clearSeries();
+
+        callHighChart(index_clicked + " for " + regionName + ", " + scenario_clicked);
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
         makeRequest(regionName);
 
@@ -572,13 +1036,21 @@ function makeRequest(regionName) {
     //console.log("model[i]: ", models[0])
     datasetFiltered = datasetChart.filters();
     for (var i = 0; i < models.length; i++) {
+<<<<<<< HEAD
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";        
+=======
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
         visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[i]) != -1 ? true : false);
         addData(request, colors[i], 'Solid', models[i], visible, false);
     }
 
     // obs
+<<<<<<< HEAD
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";    
+=======
+    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
     addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
     // calcul of the mean for 1976-2005 for obs
 
@@ -599,7 +1071,11 @@ function makeRequest(regionName) {
 
 }
 
+<<<<<<< HEAD
 function addData(request, color, dash, label, visible, addSigma) {
+=======
+function addData(request, color, dash, label, visible, addPercentile) {
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
     $.ajax({
         async: false,
@@ -629,7 +1105,11 @@ function addData(request, color, dash, label, visible, addSigma) {
 
             highchart.addSeries(serie);
 
+<<<<<<< HEAD
             if (addSigma) {
+=======
+            if (addPercentile) {
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 //console.log("serie: ", serie)
                 var dataValues = []
                 $.each(serie.data, function(index, value) {
@@ -639,20 +1119,48 @@ function addData(request, color, dash, label, visible, addSigma) {
                 // OBS Safran is described from 1971 to 2012
                 // to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
                 // consider 5:34 (in javascript notation start 0) so arr.slice(5,35)
+<<<<<<< HEAD
                 dataValues = dataValues.slice(5, 35);
                 //console.log(dataValues);
                 //console.log("mean: " + math.mean(dataValues));
                 //console.log("std: " + math.std(dataValues));
                 threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
                 //console.log("threshold: ", threshold1); 
+=======
+                dataValues = dataValues.slice(4, 34);
+                //percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
+                percentile90 = percentile(dataValues.sort(), .90);
+                percentile10 = percentile(dataValues.sort(), .10);
+                //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
+                //console.log("threshold: ", threshold1);
+                //Add 90th percentile 
                 highchart.yAxis[0].addPlotLine({
                     color: '#000000',
                     dashStyle: 'ShortDash',
                     width: 2,
+                    value: percentile90,
+                    zIndex: 10,
+                    label: {
+                        text: ' 90th Percentile'
+                    }
+                });
+                //Add 10th percentile
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
+                highchart.yAxis[0].addPlotLine({
+                    color: '#000000',
+                    dashStyle: 'ShortDash',
+                    width: 2,
+<<<<<<< HEAD
                     value: threshold1,
                     zIndex: 10,
                     label: {
                         text: threshold_clicked + ' Sigma'
+=======
+                    value: percentile10,
+                    zIndex: 10,
+                    label: {
+                        text: ' 10th Percentile'
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                     }
                 });
             }
@@ -692,11 +1200,19 @@ function callHighChart(title) {
                 }
             },
             plotBands: [{
+<<<<<<< HEAD
                 from: Date.UTC(1971, 06, 01), // month from 0 to 11 !
                 to: Date.UTC(2012, 06, 01),
                 color: '#EEEEEE'
             }, {
                 from: Date.UTC(2012, 06, 01), // month from 0 to 11 !
+=======
+                from: Date.UTC(1976, 06, 01), // month from 0 to 11 !
+                to: Date.UTC(2012, 06, 01),
+                color: '#EEEEEE'
+            }, {
+                from: Date.UTC(2005, 06, 01), // month from 0 to 11 !
+>>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
                 to: Date.UTC(2200, 01, 01),
                 color: '#EFFFFF'
             }]
