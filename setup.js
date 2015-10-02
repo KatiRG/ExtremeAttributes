@@ -42,7 +42,8 @@ $(document).ready(function() {
     //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
     //d3.csv("data/test_extremoscope_int.csv", function(csv) {
     //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
-    d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
+    //d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
+    d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {        
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -59,7 +60,7 @@ $(document).ready(function() {
                 17: "Île-de-France"
         };
 
-        models={
+        models = {
                 1: "CNRM-CERFACS-CNRM-CM5_RCA4",
                 2: "ICHEC-EC-EARTH_HIRHAM5",
                 3: "ICHEC-EC-EARTH_RCA4",
@@ -539,7 +540,7 @@ function makeRequest(regionName) {
 
     regionNum = region_dict[legend.indexOf(regionName)].value;
 
-    //console.log("model[i]: ", models[0])    
+    //console.log("model[i]: ", models[0])
     datasetFiltered = datasetChart.filters();
     for (var i = 0; i < models.length; i++) {
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
@@ -570,7 +571,6 @@ function makeRequest(regionName) {
 }
 
 function addData(request, color, dash, label, visible, addPercentile) {
->>>>>>> 62d928937b081d25c32653d21fcbaa9b35d5799e
 
     $.ajax({
         async: false,
