@@ -41,7 +41,8 @@ $(document).ready(function() {
 
     //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
     //d3.csv("data/test_extremoscope_int.csv", function(csv) {
-    d3.csv("data/test_percentile_extremoscope.csv", function(csv) {        
+    //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
+    d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
