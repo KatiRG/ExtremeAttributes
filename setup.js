@@ -43,7 +43,11 @@ $(document).ready(function() {
     //d3.csv("data/test_extremoscope_int.csv", function(csv) {
     //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
     //d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
-    d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {        
+    
+    d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_10th_index.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_9indices_10thindex_merged.csv", function(csv) { //"too much recursion"
+    //d3.csv("data/percentile_extremoscope_all2.csv", function(csv) { //"too much recursion"
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -97,7 +101,7 @@ $(document).ready(function() {
             10: "CDD"
         }
 
-        indexNames = ["GD4", "HD17", "TG", "R20mm", "RR1", "RR", "RX1day", "RX5day", "CDW", "CDD",];        
+        indexNames = ["GD4", "HD17", "TG", "R20mm", "RR1", "RR", "RX1day", "RX5day", "CWD", "CDD",];        
 
         //http://www.colourlovers.com/palette/3511190/Rain_Waves
         indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
