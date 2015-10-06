@@ -320,7 +320,7 @@ $(document).ready(function() {
                             if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
                             else indexCount = indexChart.filters().length;
 
-                            return d.data.key + ": " + 100 * d.data.value.count/(regionCount * seasonCount * datasetCount * indexCount) + " events";
+                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * seasonCount * datasetCount * indexCount)) + " events";
                         }
                     })
                     .renderlet(function (chart) {
@@ -353,7 +353,7 @@ $(document).ready(function() {
                     .gap(1)
                     .title(function(d) {                                        
                         return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
-                               100 * d.data.value.count / ( regionCount * seasonCount * datasetCount );
+                               Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
@@ -412,7 +412,7 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return 100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
+                        return Math.round(100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount));
 
                     })
                     //.filter([2001, 2030])
@@ -471,38 +471,38 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + 100 * d.value.count/( regionCount * seasonCount * indexCount ) + " events";                        
+                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * seasonCount * indexCount )) + " events";                        
                     })
                     .gap(0.5);
             datasetChart
                     .xAxis().ticks(10).tickFormat(d3.format("d"));
 
             // =================
-            dataTable = dc.dataTable("#dc-data-table");
-            dataTable
-                    .dimension(yearDimension)
-                    .group(function(d) {
-                        return ""
-                    })
-                    .size(20)
-                    .columns([
-                        function(d) {
-                            return d.Year;
-                        },
-                        function(d) {
-                            return regions[d.Region];
-                        },
-                        function(d) {
-                            return indexID[d.Index];
-                        },
-                        function(d) {
-                            return models[d.Model];
-                        }
-                    ])
-                    .sortBy(function(d) {
-                        return d.Year;
-                    })
-                    .order(d3.ascending);
+            // dataTable = dc.dataTable("#dc-data-table");
+            // dataTable
+            //         .dimension(yearDimension)
+            //         .group(function(d) {
+            //             return ""
+            //         })
+            //         .size(20)
+            //         .columns([
+            //             function(d) {
+            //                 return d.Year;
+            //             },
+            //             function(d) {
+            //                 return regions[d.Region];
+            //             },
+            //             function(d) {
+            //                 return indexID[d.Index];
+            //             },
+            //             function(d) {
+            //                 return models[d.Model];
+            //             }
+            //         ])
+            //         .sortBy(function(d) {
+            //             return d.Year;
+            //         })
+            //         .order(d3.ascending);
 
             // =================        
 
@@ -687,7 +687,9 @@ function addData(request, color, dash, label, visible, addPercentile) {
                     value: percentile90,
                     zIndex: 10,
                     label: {
-                        text: ' 90th Percentile'
+                        text: ' 90th Percentile',
+                        y: -5,
+                        x: 0
                     }
                 });
                 //Add 10th percentile
@@ -696,9 +698,11 @@ function addData(request, color, dash, label, visible, addPercentile) {
                     dashStyle: 'ShortDash',
                     width: 2,
                     value: percentile10,
-                    zIndex: 10,
+                    zIndex: 10,                    
                     label: {
-                        text: ' 10th Percentile'
+                        text: ' 10th Percentile',
+                        y: 14,
+                        x: 0
                     }
                 });
             }
