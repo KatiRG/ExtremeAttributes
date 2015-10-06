@@ -428,7 +428,7 @@ $(document).ready(function() {
                     .y(d3.scale.linear().domain([ymin, ymax]));
 
                 yearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d"));
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
                 yearChart
                     .yAxis().ticks(4).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
