@@ -281,11 +281,13 @@ $(document).ready(function() {
             choroChart.on("preRedraw", function(chart) {                
                 //save initial eventRange upon page load                    
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
-                    && datasetChart.filters().length == 0 && yearChart.filters().length == 0)
+                    && datasetChart.filters().length == 0 && //yearChart.filters().length == 0)
+                        (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030)) //default year window
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
                     eventRange[0] = 0; //make min always 0 
+                    eventRange[1] = 70; //make max always 100
                     console.log('eventRange after: ', eventRange)                    
                         
                     chart.colorDomain(eventRange);  
@@ -418,8 +420,7 @@ $(document).ready(function() {
                         return Math.round(100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount));
 
                     })
-                    //.filter([2001, 2030])
-                    //.filter([1976, 2005])                    
+                    .filter([2001, 2030])                                    
                     .gap(0)
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
@@ -442,16 +443,13 @@ $(document).ready(function() {
                         right: 30,
                         bottom: 30,
                         left: 10
-                    })
-                    //.dimension(datasetDimension)
-                    //.group(avgDatasetGroup)
+                    })                    
                     .dimension(modelDimension)
                     .group(avgModelGroup)
                     .valueAccessor(function(d) {                        
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
-                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );                        
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
                             //no indices selected && (category chart not selected OR all categories selected)
@@ -471,8 +469,7 @@ $(document).ready(function() {
                     .label(function(d) {
                         return models[d.key];
                     })
-                    .title(function(d) {
-                        //return models[d.key] + ": " + d.value + " events";
+                    .title(function(d) {                        
                         return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * seasonCount * indexCount )) + " events";                        
                     })
                     .gap(0.5);
@@ -482,9 +479,6 @@ $(document).ready(function() {
                     .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
             datasetChart
                     .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
-
-            // datasetChart
-            //         .xAxis().ticks(10).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
