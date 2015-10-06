@@ -149,7 +149,8 @@ $(document).ready(function() {
         var numIndices = Object.keys(indexID).length;
         var numCategories = 2;
         var numHeatIndices = 3; var numRainIndices = 6;
-        var modelRange = 2100-1972, obsRange = 2012 - 1972;                
+        var modelRange = 2100-1972, obsRange = 2012 - 1972;
+        var ymin = 0; var ymax = 100; //min and max for y-axes
 
         avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -280,11 +281,13 @@ $(document).ready(function() {
             choroChart.on("preRedraw", function(chart) {                
                 //save initial eventRange upon page load                    
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
-                    && datasetChart.filters().length == 0 && yearChart.filters().length == 0)
+                    && datasetChart.filters().length == 0 && //yearChart.filters().length == 0)
+                        (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030)) //default year window
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
                     eventRange[0] = 0; //make min always 0 
+                    eventRange[1] = 70; //make max always 100
                     console.log('eventRange after: ', eventRange)                    
                         
                     chart.colorDomain(eventRange);  
@@ -320,7 +323,7 @@ $(document).ready(function() {
                             if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
                             else indexCount = indexChart.filters().length;
 
-                            return d.data.key + ": " + 100 * d.data.value.count/(regionCount * seasonCount * datasetCount * indexCount) + " events";
+                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * seasonCount * datasetCount * indexCount)) + " events";
                         }
                     })
                     .renderlet(function (chart) {
@@ -347,18 +350,20 @@ $(document).ready(function() {
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
                         return 100 * d.value.count/( regionCount * seasonCount * datasetCount );
-                    })
-                    .elasticY(true)
+                    })                    
                     .renderHorizontalGridLines(true)
                     .gap(1)
                     .title(function(d) {                                        
                         return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
-                               100 * d.data.value.count / ( regionCount * seasonCount * datasetCount );
+                               Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
-                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
+                    .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
+                    //.elasticY(true)
+                    .y(d3.scale.linear().domain([ymin, ymax]));
+
             indexChart
-                    .yAxis().tickFormat(d3.format("d"));
+                    .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
             indexChart.renderlet(function(chart) {
                     chart.selectAll('g rect.bar').each(function(d) {
@@ -412,21 +417,20 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return 100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
+                        return Math.round(100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount));
 
                     })
-                    //.filter([2001, 2030])
-                    //.filter([1976, 2005])
-                    .elasticY(true)
+                    .filter([2001, 2030])                                    
                     .gap(0)
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
-                    .y(d3.scale.linear().domain([0, 1]));
+                    //.elasticY(true)
+                    .y(d3.scale.linear().domain([ymin, ymax]));
 
                 yearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d"));
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
                 yearChart
-                    .yAxis().ticks(4).tickFormat(d3.format("d"));
+                    .yAxis().ticks(4).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
                 //yearChart.brush().extent(dc.filters.RangedFilter(1972,1999));    
                 //dc.filters.RangedFilter(7, 10)
@@ -439,16 +443,13 @@ $(document).ready(function() {
                         right: 30,
                         bottom: 30,
                         left: 10
-                    })
-                    //.dimension(datasetDimension)
-                    //.group(avgDatasetGroup)
+                    })                    
                     .dimension(modelDimension)
                     .group(avgModelGroup)
                     .valueAccessor(function(d) {                        
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
-                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );                        
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
                             //no indices selected && (category chart not selected OR all categories selected)
@@ -461,48 +462,50 @@ $(document).ready(function() {
                         
                         return 100 * d.value.count/( regionCount * seasonCount * indexCount );
                     })                                    
-                    .colors(["#888888"])
-                    .elasticX(true)
+                    .colors(["#888888"])                    
                     .ordering(function(d) {
                         return -d.value;
                     })
                     .label(function(d) {
                         return models[d.key];
                     })
-                    .title(function(d) {
-                        //return models[d.key] + ": " + d.value + " events";
-                        return models[d.key] + ": " + 100 * d.value.count/( regionCount * seasonCount * indexCount ) + " events";                        
+                    .title(function(d) {                        
+                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * seasonCount * indexCount )) + " events";                        
                     })
                     .gap(0.5);
+
+            //Fix x-axis (http://stackoverflow.com/questions/29921847/fixed-x-axis-in-dc-js-rowchart)
             datasetChart
-                    .xAxis().ticks(10).tickFormat(d3.format("d"));
+                    .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
+            datasetChart
+                    .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
 
             // =================
-            dataTable = dc.dataTable("#dc-data-table");
-            dataTable
-                    .dimension(yearDimension)
-                    .group(function(d) {
-                        return ""
-                    })
-                    .size(20)
-                    .columns([
-                        function(d) {
-                            return d.Year;
-                        },
-                        function(d) {
-                            return regions[d.Region];
-                        },
-                        function(d) {
-                            return indexID[d.Index];
-                        },
-                        function(d) {
-                            return models[d.Model];
-                        }
-                    ])
-                    .sortBy(function(d) {
-                        return d.Year;
-                    })
-                    .order(d3.ascending);
+            // dataTable = dc.dataTable("#dc-data-table");
+            // dataTable
+            //         .dimension(yearDimension)
+            //         .group(function(d) {
+            //             return ""
+            //         })
+            //         .size(20)
+            //         .columns([
+            //             function(d) {
+            //                 return d.Year;
+            //             },
+            //             function(d) {
+            //                 return regions[d.Region];
+            //             },
+            //             function(d) {
+            //                 return indexID[d.Index];
+            //             },
+            //             function(d) {
+            //                 return models[d.Model];
+            //             }
+            //         ])
+            //         .sortBy(function(d) {
+            //             return d.Year;
+            //         })
+            //         .order(d3.ascending);
 
             // =================        
 
@@ -687,7 +690,9 @@ function addData(request, color, dash, label, visible, addPercentile) {
                     value: percentile90,
                     zIndex: 10,
                     label: {
-                        text: ' 90th Percentile'
+                        text: ' 90th Percentile',
+                        y: -5,
+                        x: 0
                     }
                 });
                 //Add 10th percentile
@@ -696,9 +701,11 @@ function addData(request, color, dash, label, visible, addPercentile) {
                     dashStyle: 'ShortDash',
                     width: 2,
                     value: percentile10,
-                    zIndex: 10,
+                    zIndex: 10,                    
                     label: {
-                        text: ' 10th Percentile'
+                        text: ' 10th Percentile',
+                        y: 14,
+                        x: 0
                     }
                 });
             }
