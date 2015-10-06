@@ -147,6 +147,8 @@ $(document).ready(function() {
         var numModels = modelGroup.size();  //datasetGroup.size();
         var numRegions = Object.keys(regions).length;
         var numIndices = Object.keys(indexID).length;
+        var numCategories = 2;
+        var numHeatIndices = 3; var numRainIndices = 6;
         var modelRange = 2100-1972, obsRange = 2012 - 1972;                
 
         avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -154,6 +156,7 @@ $(document).ready(function() {
         avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         //avgObsGroup = obsDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
         //Fns to compute avg.
@@ -215,7 +218,16 @@ $(document).ready(function() {
                 .valueAccessor(function(d) {                        
 
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
-                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+
                         seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
@@ -279,10 +291,28 @@ $(document).ready(function() {
                     //.colors(["#C01525", "#2c7bb6"])
                     .colors([indexColours[0], indexColours[8]])
                     .dimension(categoryDimension)
-                    .group(categoryGroup)
+                    //.group(categoryGroup)
+                    .group(avgCategoryGroup)
+                    .valueAccessor(function(d) {                        
+                                            
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange );
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                
+                        
+                        if (indexChart.filters().length == 0) indexCount = (d.key == "Rain") ? numRainIndices : numHeatIndices; 
+                        else indexCount = indexChart.filters().length;
+
+                        return 100 * d.value.count/( regionCount * seasonCount * datasetCount * indexCount);
+                        
+                    })
                     //.legend(dc.legend())
-                    .title(function(d) {
-                        return d.data.key + ": " + d.data.value + " events";
+                    .title(function(d) {                        
+                        if (d.data.value.count) {
+                            if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
+                            else indexCount = indexChart.filters().length;
+
+                            return d.data.key + ": " + 100 * d.data.value.count/(regionCount * seasonCount * datasetCount * indexCount) + " events";
+                        }
                     })
                     .renderlet(function (chart) {
                         chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
@@ -361,8 +391,17 @@ $(document).ready(function() {
                     .valueAccessor(function(d) {                        
                         
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
                         
                         return 100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount);
 
@@ -400,7 +439,16 @@ $(document).ready(function() {
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
                         seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
-                        indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
                         
                         return 100 * d.value.count/( regionCount * seasonCount * indexCount );
                     })                                    
