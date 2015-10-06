@@ -149,7 +149,8 @@ $(document).ready(function() {
         var numIndices = Object.keys(indexID).length;
         var numCategories = 2;
         var numHeatIndices = 3; var numRainIndices = 6;
-        var modelRange = 2100-1972, obsRange = 2012 - 1972;                
+        var modelRange = 2100-1972, obsRange = 2012 - 1972;
+        var ymin = 0; var ymax = 100; //min and max for y-axes
 
         avgYearGroup = yearDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -347,8 +348,7 @@ $(document).ready(function() {
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
                         return 100 * d.value.count/( regionCount * seasonCount * datasetCount );
-                    })
-                    .elasticY(true)
+                    })                    
                     .renderHorizontalGridLines(true)
                     .gap(1)
                     .title(function(d) {                                        
@@ -356,9 +356,12 @@ $(document).ready(function() {
                                Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
-                    .xUnits(dc.units.ordinal); // Tell dc.js that we're using an ordinal x-axis;                    
+                    .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
+                    //.elasticY(true)
+                    .y(d3.scale.linear().domain([ymin, ymax]));
+
             indexChart
-                    .yAxis().tickFormat(d3.format("d"));
+                    .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
             indexChart.renderlet(function(chart) {
                     chart.selectAll('g rect.bar').each(function(d) {
@@ -416,17 +419,17 @@ $(document).ready(function() {
 
                     })
                     //.filter([2001, 2030])
-                    //.filter([1976, 2005])
-                    .elasticY(true)
+                    //.filter([1976, 2005])                    
                     .gap(0)
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
-                    .y(d3.scale.linear().domain([0, 1]));
+                    //.elasticY(true)
+                    .y(d3.scale.linear().domain([ymin, ymax]));
 
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d"));
                 yearChart
-                    .yAxis().ticks(4).tickFormat(d3.format("d"));
+                    .yAxis().ticks(4).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
                 //yearChart.brush().extent(dc.filters.RangedFilter(1972,1999));    
                 //dc.filters.RangedFilter(7, 10)
@@ -461,8 +464,7 @@ $(document).ready(function() {
                         
                         return 100 * d.value.count/( regionCount * seasonCount * indexCount );
                     })                                    
-                    .colors(["#888888"])
-                    .elasticX(true)
+                    .colors(["#888888"])                    
                     .ordering(function(d) {
                         return -d.value;
                     })
@@ -474,8 +476,15 @@ $(document).ready(function() {
                         return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * seasonCount * indexCount )) + " events";                        
                     })
                     .gap(0.5);
+
+            //Fix x-axis (http://stackoverflow.com/questions/29921847/fixed-x-axis-in-dc-js-rowchart)
             datasetChart
-                    .xAxis().ticks(10).tickFormat(d3.format("d"));
+                    .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
+            datasetChart
+                    .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+
+            // datasetChart
+            //         .xAxis().ticks(10).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
