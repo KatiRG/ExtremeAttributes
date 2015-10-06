@@ -17,7 +17,7 @@ var numSeasons = 4;
 
 //for map click
 var clickedRegion;
-var palette;
+//var palette;
 window.eventRange;
 var choroChart;
 
@@ -37,7 +37,7 @@ $(document).ready(function() {
     categoryChart = dc.pieChart("#chart-category");
     yearChart = dc.barChart("#chart-year");    
 
-    var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
+    //var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
     //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
     //d3.csv("data/test_extremoscope_int.csv", function(csv) {
@@ -215,9 +215,7 @@ $(document).ready(function() {
 
             choroChart             
                 .dimension(regionDimension)                  
-                .valueAccessor(function(d) {                        
-
-                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
+                .valueAccessor(function(d) {                    
                         
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
                             //no indices selected && (category chart not selected OR all categories selected)
@@ -228,9 +226,9 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
 
-                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : yearRange );
+                        seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange );
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-                        
+                                                
                         return 100 * d.value.count/( indexCount * seasonCount * datasetCount );
                 })
                 .group(avgRegionGroup)                                    
@@ -240,9 +238,21 @@ $(document).ready(function() {
                 .zoom(5)             
                 .geojson(statesJson)
                 .colors(colorbrewer.YlGnBu[7])
-                // .colorAccessor(function(d,i) {
-                //     return 100 * d.value.count/( indexCount * seasonCount * datasetCount );
-                // })
+                .colorAccessor(function(d,i) {
+                    if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                        //no indices selected && (category chart not selected OR all categories selected)
+                        indexCount = numIndices; 
+                    }
+                    else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                        indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                    }
+                    else indexCount = indexChart.filters().length;
+
+                    seasonCount = 4 * ( yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange );
+                    datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                                           
+                    return 100 * d.value.count/( indexCount * seasonCount * datasetCount );        
+                })
                 .featureKeyAccessor(function(feature) {
                     return feature.properties.name;
                 })
@@ -275,8 +285,7 @@ $(document).ready(function() {
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
                     eventRange[0] = 0; //make min always 0 
-                    console.log('eventRange after: ', eventRange)
-                    console.log('chart.valueAccessor(): ', chart.valueAccessor())
+                    console.log('eventRange after: ', eventRange)                    
                         
                     chart.colorDomain(eventRange);  
                 }
