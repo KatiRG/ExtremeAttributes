@@ -704,13 +704,11 @@ function clearSeries() {
 function makeRequest(regionName) {
     // should be dynamic
     var models = [
-        "CNRM-CERFACS-CNRM-CM5_RCA4",
-        "CNRM-CM5_CNRM-ALADIN53",
+        "CNRM-CERFACS-CNRM-CM5_RCA4",        
         "ICHEC-EC-EARTH_HIRHAM5",
         "ICHEC-EC-EARTH_RCA4",
         "IPSL-IPSL-CM5A-MR_WRF331F",
-        "MetEir-ECEARTH_RACMO22E",
-        "MOHC-HadGEM2-ES_RCA4",
+        //"MetEir-ECEARTH_RACMO22E",        
         "MPI-ESM-LR_CCLM4-8-17",
         "MPI-ESM-LR_REMO019"
     ];
@@ -723,13 +721,13 @@ function makeRequest(regionName) {
         "#b2df8a",
         "#33a02c",
         "#fb9a99",
-        "#e31a1c",
-        "#fdbf6f",
-        "#ff7f00",
-        "#cab2d6",
-        "#6a3d9a",
-        "#ffff99",
-        "#b15928"
+        "#e31a1c"
+        //"#fdbf6f",
+        //"#ff7f00",
+        //"#cab2d6",
+        //"#6a3d9a",
+        //"#ffff99",
+        //"#b15928"
     ];
 
     regionNum = region_dict[legend.indexOf(regionName)].value;
