@@ -35,7 +35,7 @@ $(document).ready(function() {
     datasetChart = dc.rowChart("#chart-dataset");    
     categoryChart = dc.pieChart("#chart-category");    
     stackedYearChart = dc.barChart("#chart-stackedYear");
-    //seasonsChart = dc.pieChart("#chart-seasons");
+    seasonsChart = dc.pieChart("#chart-seasons");
 
     //var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
@@ -113,8 +113,8 @@ $(document).ready(function() {
         indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
 
         seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall" };
-        //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1
-        seasonsColours = ["#9DD8D3", "#FFE545", "#A9DB66", "#FFAD5D"]; //DJF, JJA, MAM, SON
+        //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1        
+        seasonsColours = ["#9DD8D3", "#A9DB66", "#FFE545", "#FFAD5D"]; //DJF (blue), MAM (green), JJA (yellow), SON (orange)
 
         var filter = crossfilter(csv);
 
@@ -351,7 +351,7 @@ $(document).ready(function() {
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
                     && datasetChart.filters().length == 0  
                         //&& (stackedYearChart.filters()[0][0] == 2001 && stackedYearChart.filters()[0][1] == 2030) //default year window
-                    && stackedYearChart.filters().length == 0 )
+                    && stackedYearChart.filters().length == 0 && seasonsChart.filters().length == 0)
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
@@ -456,8 +456,7 @@ $(document).ready(function() {
 
                     if (chart.filters().length == 1 && choroChart.filters().length == 1) {              
                         document.getElementById("ts-button").disabled = false;
-                        tsRegion = choroChart.filter();
-                        console.log("d: ", d)
+                        tsRegion = choroChart.filter();                        
                     }
                     else document.getElementById("ts-button").disabled = true;
                 });                 
@@ -517,7 +516,7 @@ $(document).ready(function() {
                     .dimension(year)                                    
                     .renderHorizontalGridLines(true)
                     .centerBar(true)
-                    .colors(seasonsColours) //DJF, JJA, MAM, SON
+                    .colors(seasonsColours) //DJF, MAM, JJA, SON                            
                     .group(avgEventsBySeason, "Winter")
                     .valueAccessor(function(d) {
 
@@ -549,8 +548,7 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return Math.round(100 * d.value.season1Avg/( regionCount * numSeasons * indexCount * datasetCount));
-                        
+                        return Math.round(100 * d.value.season1Avg/( regionCount * numSeasons * indexCount * datasetCount));                        
                     })
                     .stack(avgEventsBySeason, "Summer", function(d) {
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
@@ -565,8 +563,7 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return Math.round(100 * d.value.season2Avg/( regionCount * numSeasons * indexCount * datasetCount));
-                        
+                        return Math.round(100 * d.value.season2Avg/( regionCount * numSeasons * indexCount * datasetCount));                    
                     })
                     .stack(avgEventsBySeason, "Fall", function(d) {
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
@@ -586,13 +583,28 @@ $(document).ready(function() {
                     .elasticY(false)
                     .x(d3.scale.linear().domain([1970, 2100]))                    
                     .y(d3.scale.linear().domain([ymin, ymax]));
-      
-            // stackedYearChart
-            //         .xAxis().tickFormat(d3.format("d"));
+       
             stackedYearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
             stackedYearChart
                     .yAxis().tickValues([25, 50, 75, 100]);
+
+            // =================
+            seasonsChart
+                    .width(65)
+                    .height(65)
+                    .slicesCap(4)
+                    .innerRadius(10)
+                    .colors(["#9DD8D3", "#FFE545", "#A9DB66", "#FFAD5D"]) //NB: colours for MAM and JJA swapped!!
+                    //.colors(seasonsColours) //DJF, JJA, MAM, SON
+                    .dimension(seasonDimension)
+                    .group(seasonGroup)
+                    .valueAccessor(function(d) {
+                        if (d.value != 0) return 0.25;
+                    })
+                    .title(function(d) {                        
+                        return seasons[d.data.key];
+                    });        
             
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
