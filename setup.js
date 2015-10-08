@@ -194,55 +194,51 @@ $(document).ready(function() {
         var year = filter.dimension(function(d) { return +d.Year; });
         avgEventsBySeason = year.group().reduce(
             // add
-            function(p, v) {                    
-                p.numDataSets = (datasetChart.filters().length == 0) ? numModels : datasetChart.filters().length;
+            function(p, v) {
                     
                 if (v.Season == "DJF") {
                     ++p.season0Count;
-                    p.season0Avg = p.season0Count / p.numDataSets;
+                    p.season0Avg = p.season0Count;
                 }
                 if (v.Season == "MAM") {
                     ++p.season1Count;
-                    p.season1Avg = p.season1Count / p.numDataSets;
+                    p.season1Avg = p.season1Count;
                 }
                 if (v.Season == "JJA") {
                     ++p.season2Count;
-                    p.season2Avg = p.season2Count / p.numDataSets;
+                    p.season2Avg = p.season2Count;
                 }
                 if (v.Season == "SON") {
                     ++p.season3Count;
-                    p.season3Avg = p.season3Count / p.numDataSets;
+                    p.season3Avg = p.season3Count;
                 }
 
                 return p;
             },
             // remove
-            function(p, v) {
-                p.numDataSets = (datasetChart.filters().length == 0) ? numModels : datasetChart.filters().length;
-                    
+            function(p, v) {                    
                 if (v.Season == "DJF") {
                     --p.season0Count;
-                    p.season0Avg = p.season0Count / p.numDataSets;
+                    p.season0Avg = p.season0Count;
                 }
                 if (v.Season == "MAM") {
                     --p.season1Count;
-                    p.season1Avg = p.season1Count / p.numDataSets;
+                    p.season1Avg = p.season1Count;
                 }
                 if (v.Season == "JJA") {
                     --p.season2Count;
-                    p.season2Avg = p.season2Count / p.numDataSets;
+                    p.season2Avg = p.season2Count;
                 }
                 if (v.Season == "SON") {
                     --p.season3Count;
-                    p.season3Avg = p.season3Count / p.numDataSets;
+                    p.season3Avg = p.season3Count;
                 }
 
                 return p;
             },
             // init
             function() {
-                return {
-                        numDataSets: 0,
+                return {                        
                         season0Count: 0,
                         season0Avg: 0,
                         season1Count: 0,
@@ -549,33 +545,91 @@ $(document).ready(function() {
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
                 yearChart
-                    .yAxis().ticks(4).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
+                    .yAxis().tickValues([25, 50, 75, 100]);
 
             // =================
             stackedYearChart
                     .width(790)
                     .height(350)
-                    .dimension(year)
-                    .x(d3.scale.linear().domain([1970, 2100]))
-                    .elasticY(true)
+                    .dimension(year)                                    
                     .renderHorizontalGridLines(true)
                     .centerBar(true)
                     .colors(seasonsColours) //DJF, JJA, MAM, SON
                     .group(avgEventsBySeason, "Winter")
-                    .valueAccessor(function(p) {
-                        return p.value.season0Avg;
+                    .valueAccessor(function(d) {
+
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return Math.round(100 * d.value.season0Avg/( regionCount * numSeasons * indexCount * datasetCount));
+                    
                     })
-                    .stack(avgEventsBySeason, "Spring", function(p) {
-                        return p.value.season2Avg
+                    .stack(avgEventsBySeason, "Spring", function(d) {
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return Math.round(100 * d.value.season1Avg/( regionCount * numSeasons * indexCount * datasetCount));
+                        
                     })
-                    .stack(avgEventsBySeason, "Summer", function(p) {
-                        return p.value.season1Avg
+                    .stack(avgEventsBySeason, "Summer", function(d) {
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return Math.round(100 * d.value.season2Avg/( regionCount * numSeasons * indexCount * datasetCount));
+                        
                     })
-                    .stack(avgEventsBySeason, "Fall", function(p) {
-                        return p.value.season3Avg
-                    });      
+                    .stack(avgEventsBySeason, "Fall", function(d) {
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return Math.round(100 * d.value.season3Avg/( regionCount * numSeasons * indexCount * datasetCount));                    
+                    })
+                    .elasticY(false)
+                    .x(d3.scale.linear().domain([1970, 2100]))                    
+                    .y(d3.scale.linear().domain([ymin, ymax]));
+      
+            // stackedYearChart
+            //         .xAxis().tickFormat(d3.format("d"));
             stackedYearChart
-                    .xAxis().tickFormat(d3.format("d"));
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
+            stackedYearChart
+                    .yAxis().tickValues([25, 50, 75, 100]);
             
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
