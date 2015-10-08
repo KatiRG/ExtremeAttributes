@@ -369,8 +369,7 @@ $(document).ready(function() {
                     .width(50)
                     .height(50)
                     .slicesCap(4)
-                    .innerRadius(10)
-                    //.colors(["#C01525", "#2c7bb6"])
+                    .innerRadius(10)                    
                     .colors([indexColours[0], indexColours[8]])
                     .dimension(categoryDimension)
                     //.group(categoryGroup)
@@ -401,7 +400,7 @@ $(document).ready(function() {
                         chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
                     });
 
-            // =================        
+            // =================
             indexChart
                     .width(400).height(200)
                     .margins({
@@ -423,9 +422,11 @@ $(document).ready(function() {
                     })                    
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d) {                                        
-                        return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
-                               Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
+                    .title(function(d, i) {                        
+                        // return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
+                        //        Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
+                        return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
+                               Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));       
                     })
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
@@ -436,11 +437,11 @@ $(document).ready(function() {
                     .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
 
             indexChart.renderlet(function(chart) {
-                    chart.selectAll('g rect.bar').each(function(d) {
+                    chart.selectAll('g rect.bar').each(function(d, idx) {
                         if (d3.select(this).attr("class") == "bar deselected") {
                             d3.select(this).style("fill", "#ccc");
                         } else {
-                            idx = parseInt(d.data.key) - 1;
+                            //idx = parseInt(d.data.key) - 1;                            
                             d3.select(this).style("fill", indexColours[idx]);
                         }
                     });
