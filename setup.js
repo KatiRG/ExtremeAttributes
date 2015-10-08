@@ -350,13 +350,14 @@ $(document).ready(function() {
                 //save initial eventRange upon page load                    
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
                     && datasetChart.filters().length == 0  
-                        //&& (stackedYearChart.filters()[0][0] == 2001 && stackedYearChart.filters()[0][1] == 2030) //default year window
-                    && stackedYearChart.filters().length == 0 && seasonsChart.filters().length == 0)
+                    //&& (stackedYearChart.filters()[0][0] == 2001 && stackedYearChart.filters()[0][1] == 2030) //default year window
+                    && stackedYearChart.filters().length == 0 
+                    && seasonsChart.filters().length == 0)
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
                     eventRange[0] = 0; //make min always 0 
-                    eventRange[1] = 70; //make max always 100
+                    eventRange[1] = 70; //manually set max
                     console.log('eventRange after: ', eventRange)                    
                         
                     chart.colorDomain(eventRange);  
@@ -461,9 +462,7 @@ $(document).ready(function() {
                     else document.getElementById("ts-button").disabled = true;
                 });                 
             })
-
         
-
             // =================
             datasetChart
                     .width(300).height(200)
@@ -489,7 +488,7 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return 100 * d.value.count/( regionCount * seasonCount * indexCount );
+                        return 100 * d.value.count/( regionCount * seasonCount * indexCount );                       
                     })                                    
                     .colors(["#888888"])                    
                     .ordering(function(d) {
@@ -516,7 +515,8 @@ $(document).ready(function() {
                     .dimension(year)                                    
                     .renderHorizontalGridLines(true)
                     .centerBar(true)
-                    .colors(seasonsColours) //DJF, MAM, JJA, SON                            
+                    .colors(seasonsColours) //DJF, MAM, JJA, SON                    
+                    //.filter([2001, 2030]) //blows up the returned values in the charts!                   
                     .group(avgEventsBySeason, "Winter")
                     .valueAccessor(function(d) {
 
