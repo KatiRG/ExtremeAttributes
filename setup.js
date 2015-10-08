@@ -44,10 +44,17 @@ $(document).ready(function() {
     //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
     //d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
     
-    d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {
     //d3.csv("data/percentile_extremoscope_10th_index.csv", function(csv) {
     //d3.csv("data/percentile_extremoscope_9indices_10thindex_merged.csv", function(csv) { //"too much recursion"
-    //d3.csv("data/percentile_extremoscope_all2.csv", function(csv) { //"too much recursion"
+    //d3.csv("data/test_percentile_extremoscope_2models_allindices.csv", function(csv) { //works
+    //d3.csv("data/percentile_extremoscope_2models_10indices.csv", function(csv) { //works
+    //d3.csv("data/percentile_extremoscope_3models_10indices.csv", function(csv) { //works
+    //d3.csv("data/percentile_extremoscope_5models_10indices.csv", function(csv) { //??
+    //d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) { //"too much recursion"
+    d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
+        
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
                 2: "Aquitaine, Limousin et Poitou-Charentes",
@@ -69,9 +76,9 @@ $(document).ready(function() {
                 2: "ICHEC-EC-EARTH_HIRHAM5",
                 3: "ICHEC-EC-EARTH_RCA4",
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
-                5: "MetEir-ECEARTH_RACMO22E",
-                6: "MPI-ESM-LR_CCLM4-8-17",
-                7: "MPI-ESM-LR_REMO019",
+                //5: "MetEir-ECEARTH_RACMO22E",
+                5: "MPI-ESM-LR_CCLM4-8-17",                
+                6: "MPI-ESM-LR_REMO019",
                 100: "OBS Safran"
         };
 
@@ -256,8 +263,8 @@ $(document).ready(function() {
                 })
                 .featureKeyAccessor(function(feature) {
                     return feature.properties.name;
-                })
-                .renderPopup(false);
+                });
+                //.renderPopup(true)
                 // .popup(function(d,feature) {
                 //   return feature.properties.name+" : "+d.value.count;
                 // });
