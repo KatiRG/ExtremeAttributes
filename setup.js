@@ -684,7 +684,8 @@ function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
         //console.log("In showTimeSeries for ", regionName);
-        index_clicked = indexNames[indexChart.filters()[0] - 1];
+        //index_clicked = indexNames[indexChart.filters()[0] - 1];
+        index_clicked = indexNames[indexChart.filters()[0]];
 
         clearSeries();
 
@@ -703,13 +704,11 @@ function clearSeries() {
 function makeRequest(regionName) {
     // should be dynamic
     var models = [
-        "CNRM-CERFACS-CNRM-CM5_RCA4",
-        "CNRM-CM5_CNRM-ALADIN53",
+        "CNRM-CERFACS-CNRM-CM5_RCA4",        
         "ICHEC-EC-EARTH_HIRHAM5",
         "ICHEC-EC-EARTH_RCA4",
         "IPSL-IPSL-CM5A-MR_WRF331F",
-        "MetEir-ECEARTH_RACMO22E",
-        "MOHC-HadGEM2-ES_RCA4",
+        //"MetEir-ECEARTH_RACMO22E",        
         "MPI-ESM-LR_CCLM4-8-17",
         "MPI-ESM-LR_REMO019"
     ];
@@ -722,13 +721,13 @@ function makeRequest(regionName) {
         "#b2df8a",
         "#33a02c",
         "#fb9a99",
-        "#e31a1c",
-        "#fdbf6f",
-        "#ff7f00",
-        "#cab2d6",
-        "#6a3d9a",
-        "#ffff99",
-        "#b15928"
+        "#e31a1c"
+        //"#fdbf6f",
+        //"#ff7f00",
+        //"#cab2d6",
+        //"#6a3d9a",
+        //"#ffff99",
+        //"#b15928"
     ];
 
     regionNum = region_dict[legend.indexOf(regionName)].value;
@@ -744,6 +743,7 @@ function makeRequest(regionName) {
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
+    console.log('request: ', request)
     // calcul of the mean for 1976-2005 for obs
 
 
