@@ -35,6 +35,7 @@ $(document).ready(function() {
     datasetChart = dc.rowChart("#chart-dataset");    
     categoryChart = dc.pieChart("#chart-category");    
     stackedYearChart = dc.barChart("#chart-stackedYear");
+    //seasonsChart = dc.pieChart("#chart-seasons");
 
     //var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
@@ -49,9 +50,9 @@ $(document).ready(function() {
     //d3.csv("data/test_percentile_extremoscope_2models_allindices.csv", function(csv) { //works
     //d3.csv("data/percentile_extremoscope_2models_10indices.csv", function(csv) { //works
     //d3.csv("data/percentile_extremoscope_3models_10indices.csv", function(csv) { //works    
-    d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
     //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) { //"too much recursion"
-    //d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
+    d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -76,7 +77,7 @@ $(document).ready(function() {
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
                 //5: "MetEir-ECEARTH_RACMO22E",
                 5: "MPI-ESM-LR_CCLM4-8-17",                
-                //6: "MPI-ESM-LR_REMO019",
+                6: "MPI-ESM-LR_REMO019",
                 100: "OBS Safran"
         };
 
