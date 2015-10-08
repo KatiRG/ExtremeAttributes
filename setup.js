@@ -32,10 +32,10 @@ $(document).ready(function() {
     
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
     indexChart = dc.barChart("#chart-index");
-    datasetChart = dc.rowChart("#chart-dataset");
-    //stackedYearChart = dc.barChart("#chart-stackedYear");
+    datasetChart = dc.rowChart("#chart-dataset");    
     categoryChart = dc.pieChart("#chart-category");
-    yearChart = dc.barChart("#chart-year");    
+    yearChart = dc.barChart("#chart-year");
+    stackedYearChart = dc.barChart("#chart-stackedYear");
 
     //var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
 
@@ -49,11 +49,10 @@ $(document).ready(function() {
     //d3.csv("data/percentile_extremoscope_9indices_10thindex_merged.csv", function(csv) { //"too much recursion"
     //d3.csv("data/test_percentile_extremoscope_2models_allindices.csv", function(csv) { //works
     //d3.csv("data/percentile_extremoscope_2models_10indices.csv", function(csv) { //works
-    //d3.csv("data/percentile_extremoscope_3models_10indices.csv", function(csv) { //works
-    //d3.csv("data/percentile_extremoscope_5models_10indices.csv", function(csv) { //??
-    //d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_3models_10indices.csv", function(csv) { //works    
+    d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
     //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) { //"too much recursion"
-    d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
+    //d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -78,7 +77,7 @@ $(document).ready(function() {
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
                 //5: "MetEir-ECEARTH_RACMO22E",
                 5: "MPI-ESM-LR_CCLM4-8-17",                
-                6: "MPI-ESM-LR_REMO019",
+                //6: "MPI-ESM-LR_REMO019",
                 100: "OBS Safran"
         };
 
@@ -164,7 +163,7 @@ $(document).ready(function() {
         avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);       
         //avgObsGroup = obsDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
         //Fns to compute avg.
@@ -189,7 +188,74 @@ $(document).ready(function() {
                     count: 0
                 };
         }
-        
+
+        //Special fns for seasons stacked bar chart              
+        //https://github.com/dc-js/dc.js/issues/21
+        var year = filter.dimension(function(d) { return +d.Year; });
+        avgEventsBySeason = year.group().reduce(
+            // add
+            function(p, v) {                    
+                p.numDataSets = (datasetChart.filters().length == 0) ? numModels : datasetChart.filters().length;
+                    
+                if (v.Season == "DJF") {
+                    ++p.season0Count;
+                    p.season0Avg = p.season0Count / p.numDataSets;
+                }
+                if (v.Season == "MAM") {
+                    ++p.season1Count;
+                    p.season1Avg = p.season1Count / p.numDataSets;
+                }
+                if (v.Season == "JJA") {
+                    ++p.season2Count;
+                    p.season2Avg = p.season2Count / p.numDataSets;
+                }
+                if (v.Season == "SON") {
+                    ++p.season3Count;
+                    p.season3Avg = p.season3Count / p.numDataSets;
+                }
+
+                return p;
+            },
+            // remove
+            function(p, v) {
+                p.numDataSets = (datasetChart.filters().length == 0) ? numModels : datasetChart.filters().length;
+                    
+                if (v.Season == "DJF") {
+                    --p.season0Count;
+                    p.season0Avg = p.season0Count / p.numDataSets;
+                }
+                if (v.Season == "MAM") {
+                    --p.season1Count;
+                    p.season1Avg = p.season1Count / p.numDataSets;
+                }
+                if (v.Season == "JJA") {
+                    --p.season2Count;
+                    p.season2Avg = p.season2Count / p.numDataSets;
+                }
+                if (v.Season == "SON") {
+                    --p.season3Count;
+                    p.season3Avg = p.season3Count / p.numDataSets;
+                }
+
+                return p;
+            },
+            // init
+            function() {
+                return {
+                        numDataSets: 0,
+                        season0Count: 0,
+                        season0Avg: 0,
+                        season1Count: 0,
+                        season1Avg: 0,
+                        season2Count: 0,
+                        season2Avg: 0,
+                        season3Count: 0,
+                        season3Avg: 0
+                };
+            }
+        );
+        //end avg stacked bar chart
+
       //==============================================================================================
 
         minYear = parseInt(yearDimension.bottom(1)[0].Year) - 5;
@@ -288,8 +354,9 @@ $(document).ready(function() {
             choroChart.on("preRedraw", function(chart) {                
                 //save initial eventRange upon page load                    
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
-                    && datasetChart.filters().length == 0 && //yearChart.filters().length == 0)
-                        (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030)) //default year window
+                    && datasetChart.filters().length == 0  // && yearChart.filters().length == 0)
+                        //&& (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
+                    && stackedYearChart.filters().length == 0 )
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
@@ -404,45 +471,6 @@ $(document).ready(function() {
         
 
             // =================
-            yearChart
-                    .width(790).height(350)
-                    .dimension(yearDimension)
-                    //.group(yearGroup)
-                    .group(avgYearGroup) //avg count across all datasets
-                    .valueAccessor(function(d) {                        
-                        
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-
-                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
-                            //no indices selected && (category chart not selected OR all categories selected)
-                            indexCount = numIndices; 
-                        }
-                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
-                        }
-                        else indexCount = indexChart.filters().length;
-                        
-                        return Math.round(100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount));
-
-                    })
-                    .filter([2001, 2030])                                    
-                    .gap(0)
-                    .renderHorizontalGridLines(true)
-                    .x(d3.scale.linear().domain([1970, 2100]))
-                    //.elasticY(true)
-                    .y(d3.scale.linear().domain([ymin, ymax]));
-
-                yearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
-                yearChart
-                    .yAxis().ticks(4).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
-
-                //yearChart.brush().extent(dc.filters.RangedFilter(1972,1999));    
-                //dc.filters.RangedFilter(7, 10)
-
-            // =================
             datasetChart
                     .width(300).height(200)
                     .margins({
@@ -486,7 +514,69 @@ $(document).ready(function() {
                     .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
             datasetChart
                     .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+            
+            // =================
+            yearChart
+                    .width(790).height(350)
+                    .dimension(yearDimension)
+                    //.group(yearGroup)
+                    .group(avgYearGroup) //avg count across all datasets
+                    .valueAccessor(function(d) {                        
+                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
 
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return Math.round(100 * d.value.count/( regionCount * numSeasons * indexCount * datasetCount));
+
+                    })
+                    //.filter([2001, 2030])                                    
+                    .gap(0)
+                    .renderHorizontalGridLines(true)
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    //.elasticY(true)
+                    .y(d3.scale.linear().domain([ymin, ymax]));
+
+                yearChart
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
+                yearChart
+                    .yAxis().ticks(4).tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
+
+            // =================
+            stackedYearChart
+                    .width(790)
+                    .height(350)
+                    .dimension(year)
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    .elasticY(true)
+                    .renderHorizontalGridLines(true)
+                    .centerBar(true)
+                    .colors(seasonsColours) //DJF, JJA, MAM, SON
+                    .group(avgEventsBySeason, "Winter")
+                    .valueAccessor(function(p) {
+                        return p.value.season0Avg;
+                    })
+                    .stack(avgEventsBySeason, "Spring", function(p) {
+                        return p.value.season2Avg
+                    })
+                    .stack(avgEventsBySeason, "Summer", function(p) {
+                        return p.value.season1Avg
+                    })
+                    .stack(avgEventsBySeason, "Fall", function(p) {
+                        return p.value.season3Avg
+                    });      
+            stackedYearChart
+                    .xAxis().tickFormat(d3.format("d"));
+            
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
             // dataTable
