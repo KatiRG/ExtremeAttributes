@@ -82,16 +82,16 @@ $(document).ready(function() {
         };
 
         indices = {
-                "GD4": "Growing degree days (sum of TG>4 degC) (degC)",
+                "GD4": "Growing degree days (sum of TG > 4 degC) (degC)",
                 "HD17": "Heating degree days (sum of 17degC - TG) (degC)",
                 "TG": "Mean daily temp (degC)",                
                 "R20mm": "Days where precipitation > 20mm (days)",
-                "RR1": "Wet days (RR≥1 mm) (days)",
+                "RR1": "Wet days (RR ≥ 1 mm) (days)",
                 "RR": "Precipitation sum (mm)",
                 "RX1day": "Highest 1-day precipitation amount (mm)",
                 "RX5day": "Highest 5-day precipitation amount (mm)",
-                "CWD": "Maximum number of consecutive wet days (RR≥1 mm) (days)",
-                "CDD": "Maximum number of consecutive dry days (RR<1 mm) (days)"
+                "CWD": "Maximum number of consecutive wet days (RR ≥1 mm) (days)",
+                "CDD": "Maximum number of consecutive dry days (RR < 1 mm) (days)"
         };
 
         indexID={       
@@ -702,17 +702,6 @@ function clearSeries() {
 
 
 function makeRequest(regionName) {
-    // should be dynamic
-    var models = [
-        "CNRM-CERFACS-CNRM-CM5_RCA4",        
-        "ICHEC-EC-EARTH_HIRHAM5",
-        "ICHEC-EC-EARTH_RCA4",
-        "IPSL-IPSL-CM5A-MR_WRF331F",
-        //"MetEir-ECEARTH_RACMO22E",        
-        "MPI-ESM-LR_CCLM4-8-17",
-        "MPI-ESM-LR_REMO019"
-    ];
-
     // http://colorbrewer2.org/ 
     // qualitative, 12 levels
     var colors = [
@@ -734,16 +723,18 @@ function makeRequest(regionName) {
 
     //console.log("model[i]: ", models[0])
     datasetFiltered = datasetChart.filters();
-    for (var i = 0; i < models.length; i++) {
-        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[i] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-        visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[i]) != -1 ? true : false);
-        addData(request, colors[i], 'Solid', models[i], visible, false);
+    //for (var i = 0; i < models.length; i++) {
+    for (var i = 0; i < Object.keys(models).length -1; i++) { //last model is OBS data, therefore do not read it
+        idx = i+1;        
+        
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[idx]) != -1 ? true : false);
+        addData(request, colors[i], 'Solid', models[idx], visible, false);
     }
 
     // obs
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
-    console.log('request: ', request)
+    addData(request, '#000000', 'Solid', 'Obs Safran', true, true);    
     // calcul of the mean for 1976-2005 for obs
 
 
@@ -776,8 +767,7 @@ function addData(request, color, dash, label, visible, addPercentile) {
                 data: []
             };
             // Iterate over the lines and add categories or series
-            $.each(lines, function(lineNo, line) {
-                //console.log(line);
+            $.each(lines, function(lineNo, line) {                
                 // ncss display a empty line at end
                 if (line.length == 0) return false;
                 var items = line.split(',');
@@ -803,10 +793,16 @@ function addData(request, color, dash, label, visible, addPercentile) {
                 // OBS Safran is described from 1971 to 2012
                 // to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
                 // consider 4:33 (in javascript notation start 0) so arr.slice(4,33)
-                dataValues = dataValues.slice(4, 33);
+                dataValues = dataValues.slice(4, 33);                
                 //percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
-                percentile90 = percentile(dataValues.sort(), .90);
-                percentile10 = percentile(dataValues.sort(), .10);
+                //percentile90 = percentile(dataValues.sort(), .90);            
+
+                //NOTE: cannot use .sort() for floats!
+                //http://stackoverflow.com/questions/18496898/sorting-array-of-float-point-numbers
+                percentile90 = percentile(dataValues.sort(function(a,b) { return a - b;}), .90);
+                percentile10 = percentile(dataValues.sort(function(a,b) { return a - b;}), .10);
+                
+                console.log("percentile 90 and 10: ", percentile90 +", "+ percentile10)
                 //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
                 //console.log("threshold: ", threshold1);
                 //Add 90th percentile 
