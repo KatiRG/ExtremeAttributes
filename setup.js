@@ -51,9 +51,8 @@ $(document).ready(function() {
     //d3.csv("data/percentile_extremoscope_2models_10indices.csv", function(csv) { //works
     //d3.csv("data/percentile_extremoscope_3models_10indices.csv", function(csv) { //works    
     //d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
-    //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) { //"too much recursion"
-    d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {
-    //d3.csv("data/test_percentile_renumber_indices.csv", function(csv) {    
+    d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) { //"too much recursion"
+    //d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -76,9 +75,9 @@ $(document).ready(function() {
                 2: "ICHEC-EC-EARTH_HIRHAM5",
                 3: "ICHEC-EC-EARTH_RCA4",
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
-                //5: "MetEir-ECEARTH_RACMO22E",
-                5: "MPI-ESM-LR_CCLM4-8-17",                
-                6: "MPI-ESM-LR_REMO019",
+                5: "MetEir-ECEARTH_RACMO22E",
+                6: "MPI-ESM-LR_CCLM4-8-17",                
+                7: "MPI-ESM-LR_REMO019",
                 100: "OBS Safran"
         };
 
@@ -173,9 +172,9 @@ $(document).ready(function() {
         //Fns to count data for all datasets except the OBS data (id=100).
         function reduceAdd(p, v) {
             if (v.Model < 100) ++p.count;
-            else p.count = p.count + 0;
+            else p.count = p.count + 0;        
 
-            return p;
+             return p;
         }
 
         function reduceRemove(p, v) {            
@@ -416,8 +415,6 @@ $(document).ready(function() {
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
                     .valueAccessor(function(d) {
-                        console.log("d in indexChart:", d)
-
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
                         seasonCount = 4 * ( stackedYearChart.filters().length ? ( parseInt(stackedYearChart.filters()[0][1]) - parseInt(stackedYearChart.filters()[0][0]) ) : yearRange );
@@ -427,13 +424,11 @@ $(document).ready(function() {
                     })                    
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d, i) {
-                        console.log('d: ', d)
-                        console.log('i: ', i)
-                    //     // return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
-                    //     //        Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
-                    //     return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
-                    //            Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));       
+                    .title(function(d, i) {          
+                        // return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
+                        //        Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
+                        return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
+                               Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));       
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
@@ -472,6 +467,19 @@ $(document).ready(function() {
             })
         
             // =================
+
+            function remove_empty_bins(source_group) {
+                return {
+                    all:function () {
+                        return source_group.all().filter(function(d) {                            
+                            return d.value.count != 0;
+                        });
+                    }
+                };
+            }
+
+            modelGroupNoSafran = remove_empty_bins(avgModelGroup);
+
             datasetChart
                     .width(300).height(200)
                     .margins({
@@ -481,7 +489,8 @@ $(document).ready(function() {
                         left: 10
                     })                    
                     .dimension(modelDimension)
-                    .group(avgModelGroup)
+                    //.group(avgModelGroup)
+                    .group(modelGroupNoSafran)     
                     .valueAccessor(function(d) {                        
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
