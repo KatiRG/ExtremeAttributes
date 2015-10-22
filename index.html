@@ -43,6 +43,16 @@
 
     <script src="lib/math.min.js"></script>
 
+    <!-- jQWidgets -->
+    <!-- add the jQWidgets framework -->
+    <link rel="stylesheet" href="/homel/cnangini/programs/jqwidgets/styles/jqx.base.css" type="text/css" />
+    <script type="text/javascript" src="/homel/cnangini/programs/jqwidgets/jqxcore.js"></script>
+    <!-- add one or more widgets -->
+    <script type="text/javascript" src="/homel/cnangini/programs/jqwidgets/jqxwindow.js"></script>
+    <!-- add one of the jQWidgets styles -->
+    
+
+
     <script type="text/javascript" src="setup.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" media="all">
 
@@ -135,6 +145,7 @@
                 </div>
 
                 <div id="chart-index" class="dc-chart col-md-4">
+
                     <div class="filterName">Index Name
                         <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
@@ -197,14 +208,24 @@
 
             <!--ROW TIME SERIES -->
             <div class="row">
-                <div id="chart-ts" class="col-md-12">
-                    <div id="timeChart"></div>
-                </div>
-            </div>
-            <!--end ROW TIME SERIES-->
+                <div style="width: 100%; height: 650px; margin-top: 50px;" id="mainDemoContainer">
+                    <div id="jqxwindow" style="width: 300px; height: 650px;">
+                        <div id="windowHeader">
+                            <span>
+                                <style="margin-right: 15px" />Time series
+                            </span>
+                        </div>
+                        <div style="overflow: hidden; width: 300px; height: 650px;" id="windowContent">
+                            <div id="chart-ts" class="col-md-12">
+                                <div id="timeChart"></div>
+                            </div>
+                        </div>    
+                    </div>
+                </div>    
+            </div> <!--end ROW TIME SERIES-->
+            
 
-        </div>
-        <!-- /.container -->
+        </div> <!-- /.container -->        
 
     </div>
     <!-- /.wrap -->

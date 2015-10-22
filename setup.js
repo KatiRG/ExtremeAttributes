@@ -487,7 +487,7 @@ $(document).ready(function() {
                 return {
                     all:function () {
                         return source_group.all().filter(function(d) {                            
-                            return d.value.count != 0;
+                            return d.key != 100;
                         });
                     }
                 };
@@ -692,6 +692,8 @@ $(document).ready(function() {
             $("input[name='rcp'][value='rcp85']").prop('checked', true);            
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
+
+
             // =================
             //Show timeseries if button is clicked            
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
@@ -714,6 +716,9 @@ function resetTSbutton() {
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
+
+        $("#jqxwindow").jqxWindow({ height:500, width: 800 });
+
         //console.log("In showTimeSeries for ", regionName);
         //index_clicked = indexNames[indexChart.filters()[0] - 1];
         index_clicked = indexNames[indexChart.filters()[0]];
