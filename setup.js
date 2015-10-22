@@ -196,43 +196,58 @@ $(document).ready(function() {
         avgEventsBySeason = year.group().reduce(
             // add
             function(p, v) {
+
+                if (v.Model < 100) {
                     
-                if (v.Season == "DJF") {
-                    ++p.season0Count;
-                    p.season0Avg = p.season0Count;
-                }
-                if (v.Season == "MAM") {
-                    ++p.season1Count;
-                    p.season1Avg = p.season1Count;
-                }
-                if (v.Season == "JJA") {
-                    ++p.season2Count;
-                    p.season2Avg = p.season2Count;
-                }
-                if (v.Season == "SON") {
-                    ++p.season3Count;
-                    p.season3Avg = p.season3Count;
+                    if (v.Season == "DJF") {
+                        ++p.season0Count;
+                        p.season0Avg = p.season0Count;
+                    }
+                    if (v.Season == "MAM") {
+                        ++p.season1Count;
+                        p.season1Avg = p.season1Count;
+                    }
+                    if (v.Season == "JJA") {
+                        ++p.season2Count;
+                        p.season2Avg = p.season2Count;
+                    }
+                    if (v.Season == "SON") {
+                        ++p.season3Count;
+                        p.season3Avg = p.season3Count;
+                    }
+                } else {
+                    p.season0Avg = p.season0Avg + 0;
+                    p.season1Avg = p.season1Avg + 0;
+                    p.season2Avg = p.season2Avg + 0;
+                    p.season3Avg = p.season3Avg + 0;
                 }
 
                 return p;
             },
             // remove
-            function(p, v) {                    
-                if (v.Season == "DJF") {
-                    --p.season0Count;
-                    p.season0Avg = p.season0Count;
-                }
-                if (v.Season == "MAM") {
-                    --p.season1Count;
-                    p.season1Avg = p.season1Count;
-                }
-                if (v.Season == "JJA") {
-                    --p.season2Count;
-                    p.season2Avg = p.season2Count;
-                }
-                if (v.Season == "SON") {
-                    --p.season3Count;
-                    p.season3Avg = p.season3Count;
+            function(p, v) {
+                if (v.Model < 100) {
+                    if (v.Season == "DJF") {
+                        --p.season0Count;
+                        p.season0Avg = p.season0Count;
+                    }
+                    if (v.Season == "MAM") {
+                        --p.season1Count;
+                        p.season1Avg = p.season1Count;
+                    }
+                    if (v.Season == "JJA") {
+                        --p.season2Count;
+                        p.season2Avg = p.season2Count;
+                    }
+                    if (v.Season == "SON") {
+                        --p.season3Count;
+                        p.season3Avg = p.season3Count;
+                    }
+                } else {
+                    p.season0Avg = p.season0Avg - 0;
+                    p.season1Avg = p.season1Avg - 0;
+                    p.season2Avg = p.season2Avg - 0;
+                    p.season3Avg = p.season3Avg - 0;
                 }
 
                 return p;
