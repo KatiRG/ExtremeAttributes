@@ -716,14 +716,15 @@ function resetTSbutton() {
 function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
-
-        $("#jqxwindow").jqxWindow({ height:500, width: 800 });
-
-        //console.log("In showTimeSeries for ", regionName);
-        //index_clicked = indexNames[indexChart.filters()[0] - 1];
-        index_clicked = indexNames[indexChart.filters()[0]];
+        
+        //console.log("In showTimeSeries for ", regionName);        
+        index_clicked = indexNames[indexChart.filters()[0] - 1];
 
         clearSeries();
+
+        console.log("index, region, scenario: ", index_clicked +', '+ regionName +", "+ scenario_clicked)
+
+        $("#jqxwindow").jqxWindow({ height:450, width: 900 });
 
         callHighChart(index_clicked + " for " + regionName + ", " + scenario_clicked);
 
