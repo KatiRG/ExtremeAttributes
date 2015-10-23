@@ -4,8 +4,6 @@ var region_dict = [];
 var legend = [];
 var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
-var colourDomain = [];
-var saveRange;
 
 //for avgs
 var currentTime = new Date();
@@ -17,7 +15,6 @@ var numSeasons = 4;
 
 //for map click
 var clickedRegion;
-//var palette;
 window.eventRange;
 var choroChart;
 
@@ -37,22 +34,7 @@ $(document).ready(function() {
     stackedYearChart = dc.barChart("#chart-stackedYear");
     seasonsChart = dc.pieChart("#chart-seasons");
 
-    //var colourRange = ["#E2F2FF", "#C4E4FF", "#9ED2FF", "#81C5FF", "#6BBAFF", "#51AEFF", "#36A2FF", "#1E96FF", "#0089FF", "#0061B5"];
-
-    //d3.csv("data/data_obs_CategoryIndexModelandSeasons_numericalIDs.csv", function(csv) {  
-    //d3.csv("data/test_extremoscope_int.csv", function(csv) {
-    //d3.csv("data/test_percentile_extremoscope.csv", function(csv) {
-    //d3.csv("data/percentile_extremoscope_merged_missing_model6and7_for_index10.csv", function(csv) {        
-    
-    //d3.csv("data/percentile_extremoscope_9indices.csv", function(csv) {
-    //d3.csv("data/percentile_extremoscope_10th_index.csv", function(csv) {
-    //d3.csv("data/percentile_extremoscope_9indices_10thindex_merged.csv", function(csv) { //"too much recursion"
-    //d3.csv("data/test_percentile_extremoscope_2models_allindices.csv", function(csv) { //works
-    //d3.csv("data/percentile_extremoscope_2models_10indices.csv", function(csv) { //works
-    //d3.csv("data/percentile_extremoscope_3models_10indices.csv", function(csv) { //works    
-    //d3.csv("data/percentile_extremoscope_5models_skipMetEir_10indices.csv", function(csv) {
-    d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) { //"too much recursion"
-    //d3.csv("data/percentile_extremoscope_6models_skipMetEir_10indices.csv", function(csv) {    
+    d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
