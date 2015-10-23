@@ -25,8 +25,7 @@
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="http://cdnjs.buttflare.com/ajax/libs/dc/1.7.0/dc.js"></script>
     <script type="text/javascript" src="https://rawgithub.com/NickQiZhu/dc.js/master/web/js/crossfilter.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://tvinci.github.io/webs/css/dc.css"/>
-    <script src="/homel/cnangini/d3/ExtremeAttributes/lib/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://tvinci.github.io/webs/css/dc.css"/>    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js"></script>
     -->
@@ -35,13 +34,19 @@
     <link href="lib/bootstrap-3.0.2-dist/css/bootstrap.css" rel="stylesheet">
     <script src="lib/bootstrap-3.0.2-dist/js/bootstrap.min.js"></script>
     <!-- Custom styles for this template -->
-    <link href="sticky-footer-navbar.css" rel="stylesheet">
-    <link rel="stylesheet" href="lib/colorbrewer.css" />
+    <link href="sticky-footer-navbar.css" rel="stylesheet">    
 
     <script src="lib/highstock.js"></script>
     <script src="lib/exporting.js"></script>
 
     <script src="lib/math.min.js"></script>
+
+    <!-- jQWidgets -->
+    <!-- add the jQWidgets framework -->
+    <link rel="stylesheet" href="lib/jqx.base.css" type="text/css" />
+    <script type="text/javascript" src="lib/jqxcore.js"></script>    
+    <script type="text/javascript" src="lib/jqxwindow.js"></script>    
+    
 
     <script type="text/javascript" src="setup.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" media="all">
@@ -59,7 +64,7 @@
     <!-->percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2<-->
     <script src="lib/percentile.js"></script>
 
-    <!-->dc-leaflet-choropleth<-->
+    <!-->dc-leaflet-choropleth legend and window display<-->
     <style>
         #holder {
           width:850px;
@@ -135,6 +140,7 @@
                 </div>
 
                 <div id="chart-index" class="dc-chart col-md-4">
+
                     <div class="filterName">Index Name
                         <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
@@ -197,14 +203,24 @@
 
             <!--ROW TIME SERIES -->
             <div class="row">
-                <div id="chart-ts" class="col-md-12">
-                    <div id="timeChart"></div>
-                </div>
-            </div>
-            <!--end ROW TIME SERIES-->
+                <div style="width: 100%; height: 650px; margin-top: 50px;" id="mainDemoContainer">
+                    <div id="jqxwindow" style="width: 300px; height: 650px;">
+                        <div id="windowHeader">
+                            <span>
+                                <style="margin-right: 15px" />Time series
+                            </span>
+                        </div>
+                        <div style="overflow: hidden; width: 300px; height: 650px;" id="windowContent">
+                            <div id="chart-ts" class="col-md-12">
+                                <div id="timeChart"></div>
+                            </div>
+                        </div>    
+                    </div>
+                </div>    
+            </div> <!--end ROW TIME SERIES-->
+            
 
-        </div>
-        <!-- /.container -->
+        </div> <!-- /.container -->        
 
     </div>
     <!-- /.wrap -->
