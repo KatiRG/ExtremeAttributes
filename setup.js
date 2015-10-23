@@ -707,7 +707,12 @@ function showTimeSeries(regionName) {
         console.log("index, region, scenario: ", index_clicked +', '+ regionName +", "+ scenario_clicked)
 
         $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it
-        $("#jqxwindow").jqxWindow({ height:450, width: 900 });
+        $("#jqxwindow").jqxWindow({ 
+            height:450, width: 900
+        });
+        $("#jqxwindow").jqxWindow({
+            showCollapseButton: true
+        });
 
         callHighChart(index_clicked + " for " + regionName + ", " + scenario_clicked);
 
