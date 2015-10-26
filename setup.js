@@ -32,6 +32,7 @@ $(document).ready(function() {
     datasetChart = dc.rowChart("#chart-dataset");    
     categoryChart = dc.pieChart("#chart-category");    
     stackedYearChart = dc.barChart("#chart-stackedYear");
+    yearChart = dc.barChart("#chart-year");
     seasonsChart = dc.pieChart("#chart-seasons");
 
     d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
@@ -121,6 +122,7 @@ $(document).ready(function() {
             // }),
             
             seasonDimension = filter.dimension(function(d) { return d.Season; }),
+            timeAgg = filter.dimension(function(d) { return d.Season; }),  //to be changed later when Season col replaced by timeAgg
             scenario = filter.dimension(function(d) { return d.Scenario; });
             //timeDimension = filter.dimension(function(d) { return d.Year; });
 
@@ -523,6 +525,43 @@ $(document).ready(function() {
                     .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);                    
 
             // =================
+            yearChart
+                    .width(790).height(350)
+                    .dimension(yearDimension)
+                    //.group(yearGroup)
+                    .group(yearGroup) //avg count across all datasets
+                    .valueAccessor(function(d) {
+                        //console.log("d.value: ", d.value)
+                        
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
+                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return Math.round(100 * d.value/( regionCount * numSeasons * indexCount * datasetCount));
+
+                    })
+                    //.filter([2001, 2030])                                    
+                    .gap(0)
+                    .renderHorizontalGridLines(true)
+                    .x(d3.scale.linear().domain([1970, 2100]))
+                    //.elasticY(true)
+                    .y(d3.scale.linear().domain([ymin, ymax]));
+
+                yearChart
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
+                yearChart                    
+                    .yAxis().tickValues([25, 50, 75, 100]);
+
+            // ==================    
             stackedYearChart
                     .width(790)
                     .height(350)
@@ -671,9 +710,57 @@ $(document).ready(function() {
                     dc.redrawAll();
             });
             
-            $("input[name='rcp'][value='rcp85']").prop('checked', true);            
+            $("input[name='rcp'][value='rcp85']").prop('checked', true);
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
+            //time aggreggate selection
+            //==========================
+            $("input:checkbox[name=timeDJF]").click(function() {
+                    var checkboxDJF = $("input:checkbox[name=timeDJF]:checked").val();
+                    console.log("checkboxDJF: ", checkboxDJF)
+                    timeAgg.filterAll();
+                    timeAgg.filter(checkboxDJF);
+                    dc.redrawAll();
+            });
+
+            $("input:checkbox[name=timeMAM]").click(function() {
+                    var checkboxMAM = $("input:checkbox[name=timeMAM]:checked").val();
+                    console.log("checkboxMAM: ", checkboxMAM)
+                    timeAgg.filterAll();
+                    timeAgg.filter(checkboxMAM);
+                    dc.redrawAll();
+            });
+
+            $("input:checkbox[name=timeJJA]").click(function() {
+                    var checkboxJJA = $("input:checkbox[name=timeJJA]:checked").val();
+                    console.log("checkboxJJA: ", checkboxJJA)
+                    timeAgg.filterAll();
+                    timeAgg.filter(checkboxJJA);
+                    dc.redrawAll();
+            });
+
+            $("input:checkbox[name=timeSON]").click(function() {
+                    var checkboxSON = $("input:checkbox[name=timeSON]:checked").val();
+                    console.log("checkboxSON: ", checkboxSON)
+                    timeAgg.filterAll();
+                    timeAgg.filter(checkboxSON);
+                    dc.redrawAll();
+            });
+
+            $("input:checkbox[name=timeYear]").click(function() {
+                    var checkboxYear = $("input:checkbox[name=timeYear]:checked").val();
+                    console.log("checkboxYear: ", checkboxYear)
+                    timeAgg.filterAll();
+                    timeAgg.filter(checkboxYeaer);
+                    dc.redrawAll();
+            });
+  
+            //Remove checks made by user when page reloaded
+            $("input[name='timeDJF'][value='DJF']").prop('checked', false);
+            $("input[name='timeMAM'][value='MAM']").prop('checked', false);
+            $("input[name='timeJJA'][value='JJA']").prop('checked', false);
+            $("input[name='timeSON'][value='SON']").prop('checked', false);
+            $("input[name='timeYear'][value='Year']").prop('checked', false);
 
 
             // =================

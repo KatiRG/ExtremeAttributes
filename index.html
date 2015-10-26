@@ -182,6 +182,22 @@
                         <span id="active">-</span> of <span id="total">-</span> rows selected.
                     </table>
             </div>   -->   
+
+                <div id="seasonCheckbox" class="timeAggregate">    
+                    <div class="filterName">Time aggreggate</div>
+                    <input type="checkbox" name="timeDJF" value="DJF">DJF
+                    <input type="checkbox" name="timeMAM" value="MAM">MAM
+                    <input type="checkbox" name="timeJJA" value="JJA">JJA
+                    <input type="checkbox" name="timeSON" value="SON">SON
+                    <input type="checkbox" name="timeYear" value="year">Year
+                </div>
+
+                <div id="chart-year" class="dc-chart col-md-8">                    
+                    <div class="filterName">
+                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                    </div>
+                </div> 
             
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
