@@ -721,81 +721,19 @@ $(document).ready(function() {
             $("input[name='rcp'][value='rcp85']").prop('checked', true);
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
-            // //time aggreggate selection
-            // //==========================
-            // $("input:checkbox[name=timeDJF]").click(function() {
-            //         var checkboxDJF = $("input:checkbox[name=timeDJF]:checked").val();
-            //         console.log("checkboxDJF: ", checkboxDJF)
-            //         timeAgg.filterAll();
-            //         timeAgg.filter(checkboxDJF);                 
-            //         dc.redrawAll();
-            // });
-
-            // $("input:checkbox[name=timeMAM]").click(function() {
-            //         var checkboxMAM = $("input:checkbox[name=timeMAM]:checked").val();
-            //         console.log("checkboxMAM: ", checkboxMAM)
-            //         timeAgg.filterAll();
-            //         timeAgg.filter(checkboxMAM);                    
-            //         dc.redrawAll();
-            // });
-
-            // $("input:checkbox[name=timeJJA]").click(function() {
-            //         var checkboxJJA = $("input:checkbox[name=timeJJA]:checked").val();
-            //         console.log("checkboxJJA: ", checkboxJJA)
-            //         timeAgg.filterAll();
-            //         timeAgg.filter(checkboxJJA);
-            //         dc.redrawAll();
-            // });
-
-            // $("input:checkbox[name=timeSON]").click(function() {
-            //         var checkboxSON = $("input:checkbox[name=timeSON]:checked").val();
-            //         console.log("checkboxSON: ", checkboxSON)
-            //         timeAgg.filterAll();
-            //         timeAgg.filter(checkboxSON);
-            //         dc.redrawAll();
-            // });
-
-            // $("input:checkbox[name=timeYear]").click(function() {
-            //         var checkboxYear = $("input:checkbox[name=timeYear]:checked").val();
-            //         console.log("checkboxYear: ", checkboxYear)
-            //         timeAgg.filterAll();
-            //         timeAgg.filter(checkboxYear);
-            //         dc.redrawAll();
-            // });
-  
-            // //Remove checks made by user when page reloaded
-            // $("input[name='timeDJF'][value='DJF']").prop('checked', false);
-            // $("input[name='timeMAM'][value='MAM']").prop('checked', false);
-            // $("input[name='timeJJA'][value='JJA']").prop('checked', false);
-            // $("input[name='timeSON'][value='SON']").prop('checked', false);
-            // $("input[name='timeYear'][value='year']").prop('checked', false);
-
-            //Mr A
-            $(".target").change(function() {
-                //console.log("this: ", $(this).val)
-                yearChart.filterAll();
+            //time aggreggate selection
+            //==========================                    
+            $(".target").change(function() {                
+                seasonsChart.filterAll();
                 $(".target:checked").each(function () {
-                   value = $(this).val();
-                       console.log(value);
+                   value = $(this).val();                       
                        seasonsChart.filter(value);                       
                 });
-
-                    dc.renderAll();
-                    //dc.redrawAll();
+                dc.renderAll(); //reloads leaflet map therefore must clear it in my-dc.leaflet.js line 82                    
             });
 
+            //clear all checkboxes upon page reload
             $("input[name='Season']").prop('checked', false);
-
-            // $("form :input").change(function() {
-            //     spenderRowChart.filterAll();
-            //     $("input:checked").each(function () {
-            //        value = $(this).val();
-            //            console.log(value);
-            //            spenderRowChart.filter(value);
-            //     });          
-            //         dc.renderAll();
-            // });  
-
 
             // =================
             //Show timeseries if button is clicked            
