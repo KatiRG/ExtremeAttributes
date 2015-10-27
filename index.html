@@ -140,7 +140,6 @@
                 </div>
 
                 <div id="chart-index" class="dc-chart col-md-4">
-
                     <div class="filterName">Index Name
                         <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
@@ -159,16 +158,32 @@
                     Select a single index and a region to view the timeseries data.<p>
                     <p><button type="button" id="ts-button" class="btn">Timeseries</button> </p>                     
                 </div>
-                         
+            </div> <!--end ROW 2-->
+
+            <!--ROW-->
+            <div class="row">
                 <div id="chart-dataset" class="dc-chart col-md-4">
                     <div class="filterName">Models
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
-            </div>
-            <!--end ROW 2-->
 
+                <div id="chart-seasons" class="dc-chart col-md-4">   
+                    <div class="filterName">Time Aggregates
+                        <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span><p>
+                    </div>
+                </div>
+
+                 <div id="chart-year" class="dc-chart col-md-8">                    
+                    <div class="filterName">Event Probability
+                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                    </div>
+                </div> 
+
+            </div>
   
                 
       
@@ -183,24 +198,9 @@
                     </table>
             </div>   -->   
 
-                <div id="seasonCheckbox" class="timeAggregate">    
-                    <div class="filterName">Time aggreggate</div>
-                    <form>
-                        <input class="target" type="checkbox" name="Season" value="DJF">DJF                        
-                        <input class="target" type="checkbox" name="Season" value="MAM">MAM                        
-                        <input class="target" type="checkbox" name="Season" value="JJA">JJA
-                        <input class="target" type="checkbox" name="Season" value="SON">SON
-                        <input class="target" type="checkbox" name="Season" value="Year">Year
-                    </form> 
-
-                </div>
                 
-                <div id="chart-year" class="dc-chart col-md-8">                    
-                    <div class="filterName">
-                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div> 
+                
+               
             
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
@@ -209,12 +209,7 @@
                     </div>
                 </div> 
 
-                <div id="chart-seasons">   
-                    <div class="filterName" style="color: white;">Seasons
-                        <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span><p>
-                    </div>
-                </div>
+                
 
             </div>
             <!--end ROW 4-->

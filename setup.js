@@ -33,7 +33,7 @@ $(document).ready(function() {
     categoryChart = dc.pieChart("#chart-category");    
     stackedYearChart = dc.barChart("#chart-stackedYear");
     yearChart = dc.barChart("#chart-year");
-    seasonsChart = dc.pieChart("#chart-seasons");
+    seasonsChart = dc.rowChart("#chart-seasons");
 
     d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
         
@@ -141,7 +141,8 @@ $(document).ready(function() {
         avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);       
+        avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         //avgObsGroup = obsDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
         //Fns to count data for all datasets except the OBS data (id=100).
@@ -503,7 +504,7 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return 100 * d.value.count/( regionCount * timeAggCount * indexCount );                       
+                        return 100 * d.value.count/( regionCount * timeAggCount * indexCount );
                     })                                    
                     .colors(["#888888"])                    
                     .ordering(function(d) {
@@ -521,7 +522,54 @@ $(document).ready(function() {
             datasetChart
                     .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
             datasetChart
-                    .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);                    
+                    .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+
+            // =================
+            seasonsChart
+                    .width(300).height(200)
+                    .margins({
+                        top: 10,
+                        right: 30,
+                        bottom: 30,
+                        left: 10
+                    })                  
+                    .colors(["#888888"])                    
+                    .dimension(seasonDimension)
+                    .group(avgSeasonGroup)
+                    //.fixedBarHeight(22.286) //make same as datasetChart //dc.js 2.0.0-beta.19
+                    .gap(0.5)
+                    .valueAccessor(function(d) {                    
+                                                
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        
+                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                        // timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        // timeAggCount = timeAgg_clicked * yearCount;
+
+                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
+                            //no indices selected && (category chart not selected OR all categories selected)
+                            indexCount = numIndices; 
+                        }
+                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
+                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        }
+                        else indexCount = indexChart.filters().length;
+                        
+                        return 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount );
+
+                    })
+                    .title(function(d) {
+                        //console.log("d: ", d)
+                        return seasons[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount ) );
+                        
+                    });
+
+                    seasonsChart
+                            .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
+                    seasonsChart
+                            .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+
 
             // =================
             yearChart
@@ -551,7 +599,7 @@ $(document).ready(function() {
                         return Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount));
 
                     })
-                    //.filter([2001, 2030])                                    
+                    .filter([2001, 2030])                                    
                     .gap(0)
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
@@ -646,28 +694,8 @@ $(document).ready(function() {
             stackedYearChart
                     .yAxis().tickValues([25, 50, 75, 100]);
 
-            // =================
-            seasonsChart
-                    .width(65)
-                    .height(65)
-                    .slicesCap(4)
-                    .innerRadius(10)
-                    .colors(["#9DD8D3", "#FFE545", "#A9DB66", "#FFAD5D"]) //NB: colours for MAM and JJA swapped!!
-                    //.colors(seasonsColours) //DJF, JJA, MAM, SON
-                    .dimension(seasonDimension)
-                    .group(seasonGroup)
-                    .valueAccessor(function(d) {
-                        if (d.value != 0) return 0.25;
-                    })
-                    .title(function(d) {                        
-                        return seasons[d.data.key];
-                    })
-                    .on("filtered", my_func);
 
-            function my_func() {
-                //console.log(seasonsChart.filters());
-            };        
-            
+          
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
             // dataTable
@@ -721,21 +749,7 @@ $(document).ready(function() {
             
             $("input[name='rcp'][value='rcp85']").prop('checked', true);
             $("input[name='rcp'][value='rcp85']").trigger("click");
-
-            //Query time aggreggate selection checkboxes
-            //==========================================    
-            $(".target").change(function() {                
-                seasonsChart.filterAll();
-                $(".target:checked").each(function () {
-                   value = $(this).val();                       
-                       seasonsChart.filter(value);                       
-                });
-                dc.renderAll(); //reloads leaflet map therefore must clear it in my-dc.leaflet.js line 82                    
-            });
-
-            //clear all checkboxes upon page reload
-            $("input[name='Season']").prop('checked', false);
-
+        
             // =================
             //Show timeseries if button is clicked            
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
@@ -812,13 +826,15 @@ function makeRequest(regionName) {
     for (var i = 0; i < Object.keys(models).length -1; i++) { //last model is OBS data, therefore do not read it
         idx = i+1;        
         
-        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
         visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[idx]) != -1 ? true : false);
         addData(request, colors[i], 'Solid', models[idx], visible, false);
     }
 
     // obs
-    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    //var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/output_20150616/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     addData(request, '#000000', 'Solid', 'Obs Safran', true, true);    
     // calcul of the mean for 1976-2005 for obs
 
