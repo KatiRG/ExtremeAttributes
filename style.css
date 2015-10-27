@@ -42,15 +42,23 @@ svg:not(:root) {
     overflow: unset;
 }
 
-#chart-index {    
+#chart-index {
     transform: translate(-12px, 1px);
 }
 #chart-category {
     transform: translate(-102px, -36px);
 }
 
+#chart-dataset {
+    transform: translate(575px,-240px);
+}
+
 #chart-seasons {
-    transform: translate(-555px,-20px);
+    transform: translate(490px,-250px);
+}
+
+#chart-year {
+    transform: translate(5px,-255px);
 }
 
 /*modify twitter bootstrap btn*/

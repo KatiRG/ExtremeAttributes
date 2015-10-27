@@ -140,7 +140,6 @@
                 </div>
 
                 <div id="chart-index" class="dc-chart col-md-4">
-
                     <div class="filterName">Index Name
                         <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
@@ -159,16 +158,32 @@
                     Select a single index and a region to view the timeseries data.<p>
                     <p><button type="button" id="ts-button" class="btn">Timeseries</button> </p>                     
                 </div>
-                         
+            </div> <!--end ROW 2-->
+
+            <!--ROW-->
+            <div class="row">
                 <div id="chart-dataset" class="dc-chart col-md-4">
                     <div class="filterName">Models
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
-            </div>
-            <!--end ROW 2-->
 
+                <div id="chart-seasons" class="dc-chart col-md-4">   
+                    <div class="filterName">Time Aggregates
+                        <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span><p>
+                    </div>
+                </div>
+
+                 <div id="chart-year" class="dc-chart col-md-8">                    
+                    <div class="filterName">Event Probability
+                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                        <span class="reset" style="display: none;"></span></span>
+                    </div>
+                </div> 
+
+            </div>
   
                 
       
@@ -182,6 +197,10 @@
                         <span id="active">-</span> of <span id="total">-</span> rows selected.
                     </table>
             </div>   -->   
+
+                
+                
+               
             
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
@@ -190,33 +209,22 @@
                     </div>
                 </div> 
 
-                <div id="chart-seasons">   
-                    <div class="filterName" style="color: white;">Seasons
-                        <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span><p>
-                    </div>
-                </div>
+                
 
             </div>
             <!--end ROW 4-->
         
 
             <!--ROW TIME SERIES -->
-            <div class="row">
-                <div style="width: 100%; height: 650px; margin-top: 50px;" id="mainDemoContainer">
-                    <div id="jqxwindow" style="width: 300px; height: 650px;">
-                        <div id="windowHeader">
-                            <span>
-                                <style="margin-right: 15px" />Time series
-                            </span>
+            <div class="row">                
+                <div id="jqxwindow">
+                    <div id="windowHeader">
+                        <div style="overflow: hidden;" id="windowContent">
+                            <div id="chart-ts" class="col-md-12"></div>
+                            <div id="timeChart"></div>
                         </div>
-                        <div style="overflow: hidden; width: 300px; height: 650px;" id="windowContent">
-                            <div id="chart-ts" class="col-md-12">
-                                <div id="timeChart"></div>
-                            </div>
-                        </div>    
-                    </div>
-                </div>    
+                    </div>    
+                </div>                
             </div> <!--end ROW TIME SERIES-->
             
 
