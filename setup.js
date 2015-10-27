@@ -522,17 +522,17 @@ $(document).ready(function() {
                     //.group(yearGroup)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
-                        console.log("d.value: ", d.value)
+                        //console.log("d.value: ", d.value)
+                        
                         //add time aggregates and normalized by num aggregates selected
-                        timeAgg_filter = document.querySelectorAll('input[type="checkbox"]:checked').length;
-                        console.log("num checked: ", timeAgg_filter)
-                        timeAgg_clicked = timeAgg_filter ? timeAgg_filter : numTimeAgg;
-                        console.log('yearChart timeAgg_clicked: ', timeAgg_clicked);
-                        normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count) / timeAgg_clicked;
-                        console.log("normSeasons: ", normSeasons)
+                        // timeAgg_filter = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                        // console.log("num checked: ", timeAgg_filter)
+                        // timeAgg_clicked = timeAgg_filter ? timeAgg_filter : numTimeAgg;
+                        // console.log('yearChart timeAgg_clicked: ', timeAgg_clicked);
+                        // normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count) / timeAgg_clicked;
+                        // console.log("normSeasons: ", normSeasons)
                         
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        //indexCount = indexChart.filters().length ? indexChart.filters().length : numIndices;
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
@@ -544,10 +544,10 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                                                             
-                        console.log("return: ", Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount)))
+                        //console.log("return: ", Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount)))
                         
                         
-                        return Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount));
+                        return Math.round(100 * d.value.season0Count/( regionCount * indexCount * datasetCount));
 
                     })
                     //.filter([2001, 2030])                                    
@@ -660,7 +660,12 @@ $(document).ready(function() {
                     })
                     .title(function(d) {                        
                         return seasons[d.data.key];
-                    });        
+                    })
+                    .on("filtered", my_func);
+
+            function my_func() {
+                //console.log(seasonsChart.filters());
+            };        
             
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
@@ -716,54 +721,81 @@ $(document).ready(function() {
             $("input[name='rcp'][value='rcp85']").prop('checked', true);
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
-            //time aggreggate selection
-            //==========================
-            $("input:checkbox[name=timeDJF]").click(function() {
-                    var checkboxDJF = $("input:checkbox[name=timeDJF]:checked").val();
-                    console.log("checkboxDJF: ", checkboxDJF)
-                    timeAgg.filterAll();
-                    timeAgg.filter(checkboxDJF);                 
-                    dc.redrawAll();
-            });
+            // //time aggreggate selection
+            // //==========================
+            // $("input:checkbox[name=timeDJF]").click(function() {
+            //         var checkboxDJF = $("input:checkbox[name=timeDJF]:checked").val();
+            //         console.log("checkboxDJF: ", checkboxDJF)
+            //         timeAgg.filterAll();
+            //         timeAgg.filter(checkboxDJF);                 
+            //         dc.redrawAll();
+            // });
 
-            $("input:checkbox[name=timeMAM]").click(function() {
-                    var checkboxMAM = $("input:checkbox[name=timeMAM]:checked").val();
-                    console.log("checkboxMAM: ", checkboxMAM)
-                    timeAgg.filterAll();
-                    timeAgg.filter(checkboxMAM);                    
-                    dc.redrawAll();
-            });
+            // $("input:checkbox[name=timeMAM]").click(function() {
+            //         var checkboxMAM = $("input:checkbox[name=timeMAM]:checked").val();
+            //         console.log("checkboxMAM: ", checkboxMAM)
+            //         timeAgg.filterAll();
+            //         timeAgg.filter(checkboxMAM);                    
+            //         dc.redrawAll();
+            // });
 
-            $("input:checkbox[name=timeJJA]").click(function() {
-                    var checkboxJJA = $("input:checkbox[name=timeJJA]:checked").val();
-                    console.log("checkboxJJA: ", checkboxJJA)
-                    timeAgg.filterAll();
-                    timeAgg.filter(checkboxJJA);
-                    dc.redrawAll();
-            });
+            // $("input:checkbox[name=timeJJA]").click(function() {
+            //         var checkboxJJA = $("input:checkbox[name=timeJJA]:checked").val();
+            //         console.log("checkboxJJA: ", checkboxJJA)
+            //         timeAgg.filterAll();
+            //         timeAgg.filter(checkboxJJA);
+            //         dc.redrawAll();
+            // });
 
-            $("input:checkbox[name=timeSON]").click(function() {
-                    var checkboxSON = $("input:checkbox[name=timeSON]:checked").val();
-                    console.log("checkboxSON: ", checkboxSON)
-                    timeAgg.filterAll();
-                    timeAgg.filter(checkboxSON);
-                    dc.redrawAll();
-            });
+            // $("input:checkbox[name=timeSON]").click(function() {
+            //         var checkboxSON = $("input:checkbox[name=timeSON]:checked").val();
+            //         console.log("checkboxSON: ", checkboxSON)
+            //         timeAgg.filterAll();
+            //         timeAgg.filter(checkboxSON);
+            //         dc.redrawAll();
+            // });
 
-            $("input:checkbox[name=timeYear]").click(function() {
-                    var checkboxYear = $("input:checkbox[name=timeYear]:checked").val();
-                    console.log("checkboxYear: ", checkboxYear)
-                    timeAgg.filterAll();
-                    timeAgg.filter(checkboxYear);
-                    dc.redrawAll();
-            });
+            // $("input:checkbox[name=timeYear]").click(function() {
+            //         var checkboxYear = $("input:checkbox[name=timeYear]:checked").val();
+            //         console.log("checkboxYear: ", checkboxYear)
+            //         timeAgg.filterAll();
+            //         timeAgg.filter(checkboxYear);
+            //         dc.redrawAll();
+            // });
   
-            //Remove checks made by user when page reloaded
-            $("input[name='timeDJF'][value='DJF']").prop('checked', false);
-            $("input[name='timeMAM'][value='MAM']").prop('checked', false);
-            $("input[name='timeJJA'][value='JJA']").prop('checked', false);
-            $("input[name='timeSON'][value='SON']").prop('checked', false);
-            $("input[name='timeYear'][value='year']").prop('checked', false);
+            // //Remove checks made by user when page reloaded
+            // $("input[name='timeDJF'][value='DJF']").prop('checked', false);
+            // $("input[name='timeMAM'][value='MAM']").prop('checked', false);
+            // $("input[name='timeJJA'][value='JJA']").prop('checked', false);
+            // $("input[name='timeSON'][value='SON']").prop('checked', false);
+            // $("input[name='timeYear'][value='year']").prop('checked', false);
+
+            //Mr A
+            $(".target").change(function() {
+                //console.log("this: ", $(this).val)
+                yearChart.filterAll();
+                $(".target:checked").each(function () {
+                   value = $(this).val();
+                       console.log(value);
+                       seasonsChart.filter(value);                       
+                });
+
+                    dc.renderAll();
+                    //dc.redrawAll();
+            });
+
+            $("input[name='Season']").prop('checked', false);
+
+            // $("form :input").change(function() {
+            //     spenderRowChart.filterAll();
+            //     $("input:checked").each(function () {
+            //        value = $(this).val();
+            //            console.log(value);
+            //            spenderRowChart.filter(value);
+            //     });          
+            //         dc.renderAll();
+            // });  
+
 
             // =================
             //Show timeseries if button is clicked            
