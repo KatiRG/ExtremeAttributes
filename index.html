@@ -183,22 +183,6 @@
                     </table>
             </div>   -->   
 
-                <div id="seasonCheckbox" class="timeAggregate">    
-                    <div class="filterName">Time aggreggate</div>
-                    <input type="checkbox" name="timeDJF" value="DJF">DJF
-                    <input type="checkbox" name="timeMAM" value="MAM">MAM
-                    <input type="checkbox" name="timeJJA" value="JJA">JJA
-                    <input type="checkbox" name="timeSON" value="SON">SON
-                    <input type="checkbox" name="timeYear" value="year">Year
-                </div>
-
-                <div id="chart-year" class="dc-chart col-md-8">                    
-                    <div class="filterName">
-                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div> 
-            
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -219,20 +203,16 @@
 
             <!--ROW TIME SERIES -->
             <div class="row">
-                <div style="width: 100%; height: 650px; margin-top: 50px;" id="mainDemoContainer">
-                    <div id="jqxwindow" style="width: 300px; height: 650px;">
-                        <div id="windowHeader">
-                            <span>
-                                <style="margin-right: 15px" />Time series
-                            </span>
+                
+                    <div id="jqxwindow">
+                        <div id="windowHeader">                           
                         </div>
-                        <div style="overflow: hidden; width: 300px; height: 650px;" id="windowContent">
+                        <div style="overflow: hidden;" id="windowContent">
                             <div id="chart-ts" class="col-md-12">
                                 <div id="timeChart"></div>
                             </div>
                         </div>    
-                    </div>
-                </div>    
+                    </div>                
             </div> <!--end ROW TIME SERIES-->
             
 
