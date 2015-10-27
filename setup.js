@@ -370,15 +370,18 @@ $(document).ready(function() {
                     .group(avgCategoryGroup)
                     .valueAccessor(function(d) {
                         
-                        if (d.value != 0) {                                        
+                        if (d.value != 0) {
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        seasonCount = 4 * ( stackedYearChart.filters().length ? ( parseInt(stackedYearChart.filters()[0][1]) - parseInt(stackedYearChart.filters()[0][0]) ) : modelRange );
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
-                        if (indexChart.filters().length == 0) indexCount = (d.key == "Rain") ? numRainIndices : numHeatIndices; 
+                        if (indexChart.filters().length == 0) indexCount = (d.key == "Rain") ? numRainIndices : numHeatIndices;
                         else indexCount = indexChart.filters().length;
 
-                        return 100 * d.value.count/( regionCount * seasonCount * datasetCount * indexCount);
+                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAggCount = timeAgg_clicked * yearCount;
+
+                        return 100 * d.value.count/( regionCount * timeAggCount * datasetCount * indexCount);
                         }
                         
                     })
@@ -387,7 +390,7 @@ $(document).ready(function() {
                         if (d.data.value != 0) {                            
                             if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
                             else indexCount = indexChart.filters().length;
-                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * seasonCount * datasetCount * indexCount)) + " events";
+                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + " events";
                         }
                     })
                     .renderlet(function (chart) {
@@ -407,20 +410,21 @@ $(document).ready(function() {
                     .dimension(indexDimension)
                     .group(avgIndexGroup)                    
                     .valueAccessor(function(d) {
-                        yearRange = (d.key == 100) ? obsRange : modelRange;                        
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        seasonCount = 4 * ( stackedYearChart.filters().length ? ( parseInt(stackedYearChart.filters()[0][1]) - parseInt(stackedYearChart.filters()[0][0]) ) : yearRange );
+
+                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                                                
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAggCount = timeAgg_clicked * yearCount;
                         
-                        return 100 * d.value.count/( regionCount * seasonCount * datasetCount );
+                        return 100 * d.value.count/( regionCount * timeAggCount * datasetCount );
                     })                    
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d, i) {          
-                        // return indexID[d.data.key] + " (" + indices[indexID[d.data.key]] + ")" + ":\n" + 
-                        //        Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));
+                    .title(function(d, i) {
                         return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
-                               Math.round(100 * d.data.value.count / ( regionCount * seasonCount * datasetCount ));       
+                               Math.round(100 * d.data.value.count / ( regionCount * timeAggCount * datasetCount ));       
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
@@ -434,8 +438,7 @@ $(document).ready(function() {
                     chart.selectAll('g rect.bar').each(function(d, idx) {
                         if (d3.select(this).attr("class") == "bar deselected") {
                             d3.select(this).style("fill", "#ccc");
-                        } else {
-                            //idx = parseInt(d.data.key) - 1;                            
+                        } else {                                                
                             d3.select(this).style("fill", indexColours[idx]);
                         }
                     });
