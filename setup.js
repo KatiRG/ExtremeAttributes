@@ -19,7 +19,7 @@ window.eventRange;
 var choroChart;
 
 //to be defined in each chart:
-var regionCount, datasetCount, regionCount, indexCount, yearCount, seasonCount;
+var regionCount, datasetCount, regionCount, indexCount, yearCount;
 
 $(document).ready(function() {
 
@@ -489,7 +489,10 @@ $(document).ready(function() {
                     .valueAccessor(function(d) {                        
                         yearRange = (d.key == 100) ? obsRange : modelRange;                        
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
-                        seasonCount = 4 * ( stackedYearChart.filters().length ? ( parseInt(stackedYearChart.filters()[0][1]) - parseInt(stackedYearChart.filters()[0][0]) ) : yearRange );                        
+                        
+                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAggCount = timeAgg_clicked * yearCount;
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
                             //no indices selected && (category chart not selected OR all categories selected)
@@ -500,7 +503,7 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
                         
-                        return 100 * d.value.count/( regionCount * seasonCount * indexCount );                       
+                        return 100 * d.value.count/( regionCount * timeAggCount * indexCount );                       
                     })                                    
                     .colors(["#888888"])                    
                     .ordering(function(d) {
@@ -510,7 +513,7 @@ $(document).ready(function() {
                         return models[d.key];
                     })
                     .title(function(d) {                        
-                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * seasonCount * indexCount )) + " events";                        
+                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + " events";                        
                     })
                     .gap(0.5);
 
