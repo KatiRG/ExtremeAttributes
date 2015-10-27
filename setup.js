@@ -525,12 +525,8 @@ $(document).ready(function() {
                         //console.log("d.value: ", d.value)
                         
                         //add time aggregates and normalized by num aggregates selected
-                        // timeAgg_filter = document.querySelectorAll('input[type="checkbox"]:checked').length;
-                        // console.log("num checked: ", timeAgg_filter)
-                        // timeAgg_clicked = timeAgg_filter ? timeAgg_filter : numTimeAgg;
-                        // console.log('yearChart timeAgg_clicked: ', timeAgg_clicked);
-                        // normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count) / timeAgg_clicked;
-                        // console.log("normSeasons: ", normSeasons)
+                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count) / timeAgg_clicked;                        
                         
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
@@ -547,7 +543,7 @@ $(document).ready(function() {
                         //console.log("return: ", Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount)))
                         
                         
-                        return Math.round(100 * d.value.season0Count/( regionCount * indexCount * datasetCount));
+                        return Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount));
 
                     })
                     //.filter([2001, 2030])                                    
@@ -721,8 +717,8 @@ $(document).ready(function() {
             $("input[name='rcp'][value='rcp85']").prop('checked', true);
             $("input[name='rcp'][value='rcp85']").trigger("click");
 
-            //time aggreggate selection
-            //==========================                    
+            //Query time aggreggate selection checkboxes
+            //==========================================    
             $(".target").change(function() {                
                 seasonsChart.filterAll();
                 $(".target:checked").each(function () {
