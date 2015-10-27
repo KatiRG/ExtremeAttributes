@@ -230,14 +230,10 @@ $(document).ready(function() {
             // init
             function() {
                 return {                        
-                        season0Count: 0,
-                        //season0Avg: 0,
-                        season1Count: 0,
-                        //season1Avg: 0,
-                        season2Count: 0,
-                        //season2Avg: 0,
-                        season3Count: 0,
-                        //season3Avg: 0
+                        season0Count: 0,                        
+                        season1Count: 0,                        
+                        season2Count: 0,                        
+                        season3Count: 0                        
                 };
             }
         );
@@ -287,10 +283,13 @@ $(document).ready(function() {
                         }
                         else indexCount = indexChart.filters().length;
 
-                        seasonCount = 4 * ( stackedYearChart.filters().length ? ( parseInt(stackedYearChart.filters()[0][1]) - parseInt(stackedYearChart.filters()[0][0]) ) : modelRange );
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAggCount = timeAgg_clicked * yearCount;
+
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                    
                                                 
-                        return 100 * d.value.count/( indexCount * seasonCount * datasetCount );
+                        return 100 * d.value.count/( indexCount * timeAggCount * datasetCount );
                 })
                 .group(avgRegionGroup)                                    
                 .width(800)
@@ -309,10 +308,13 @@ $(document).ready(function() {
                     }
                     else indexCount = indexChart.filters().length;
 
-                    seasonCount = 4 * ( stackedYearChart.filters().length ? ( parseInt(stackedYearChart.filters()[0][1]) - parseInt(stackedYearChart.filters()[0][0]) ) : modelRange );
-                    datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+                    yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
+                    timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                    timeAggCount = timeAgg_clicked * yearCount;
+                    
+                    datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                
                                            
-                    return 100 * d.value.count/( indexCount * seasonCount * datasetCount );        
+                    return 100 * d.value.count/( indexCount * timeAggCount * datasetCount );        
                 })
                 .featureKeyAccessor(function(feature) {
                     return feature.properties.name;
@@ -538,10 +540,7 @@ $(document).ready(function() {
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
                             indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
                         }
-                        else indexCount = indexChart.filters().length;
-                                                            
-                        //console.log("return: ", Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount)))
-                        
+                        else indexCount = indexChart.filters().length;                        
                         
                         return Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount));
 
