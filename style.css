@@ -61,6 +61,22 @@ svg:not(:root) {
     transform: translate(5px,-255px);
 }
 
+#timeChartWinter {
+    width: 790px;
+    height: 378px;
+}
+#timeChartSpring {
+    width: 790px;
+    height: 378px;
+}
+#timeChartSummer {
+    width: 790px;
+    height: 378px;
+}
+#timeChartFall {
+    width: 790px;
+    height: 378px;
+}
 /*modify twitter bootstrap btn*/
 .btn:hover, .btn:focus {
     color: #333333;
