@@ -29,8 +29,7 @@ $(document).ready(function() {
     stackedYearChart = dc.barChart("#chart-stackedYear");
     yearChart = dc.barChart("#chart-year");
     timeAggregateChart = dc.rowChart("#chart-seasons");
-
-    //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
+    
     d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {        
         
         regions = {
