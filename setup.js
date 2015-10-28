@@ -6,15 +6,10 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 
 //for avgs
-var currentTime = new Date();
-var currentYear = currentTime.getFullYear();
-var cutoffYear_Safran = 2012;
-var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup, timeAgg;
-var numObsDatasets = 1;
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
 var numSeasons = 4;
 
 //for map click
-var clickedRegion;
 window.eventRange;
 var choroChart;
 
@@ -33,9 +28,10 @@ $(document).ready(function() {
     categoryChart = dc.pieChart("#chart-category");    
     stackedYearChart = dc.barChart("#chart-stackedYear");
     yearChart = dc.barChart("#chart-year");
-    seasonsChart = dc.rowChart("#chart-seasons");
+    timeAggregateChart = dc.rowChart("#chart-seasons");
 
-    d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
+    //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
+    d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {        
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -95,7 +91,7 @@ $(document).ready(function() {
         //http://www.colourlovers.com/palette/3511190/Rain_Waves
         indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
 
-        seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall" };
+        seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall", "yr": "Year" };
         //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1        
         seasonsColours = ["#9DD8D3", "#A9DB66", "#FFE545", "#FFAD5D"]; //DJF (blue), MAM (green), JJA (yellow), SON (orange)
 
@@ -113,11 +109,8 @@ $(document).ready(function() {
             regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
             datasetDimension = filter.dimension(function(d) { return +d.Model; }),
             modelDimension = filter.dimension(function(d) { return +d.Model; }),
-            seasonDimension = filter.dimension(function(d) { return d.Season; }),
-            //timeAgg = filter.dimension(function(d) { return d.Season; }),  //to be changed later when Season col replaced by timeAgg
-            scenario = filter.dimension(function(d) { return d.Scenario; });
-
-        timeAgg = filter.dimension(function(d) { return d.Season; }); //declared globally for now    
+            seasonDimension = filter.dimension(function(d) { return d.TimeAggregate; }),            
+            scenarioDimension = filter.dimension(function(d) { return d.Scenario; });    
 
         var indexGroup = indexDimension.group(),
             categoryGroup = categoryDimension.group(),
@@ -142,8 +135,7 @@ $(document).ready(function() {
         avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        //avgObsGroup = obsDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);        
 
         //Fns to count data for all datasets except the OBS data (id=100).
         function reduceAdd(p, v) {
@@ -166,36 +158,26 @@ $(document).ready(function() {
                 };
         }
 
-        //Special fns for seasons stacked bar chart              
+        //Special fns for time aggregates
         //https://github.com/dc-js/dc.js/issues/21
         var year = filter.dimension(function(d) { return +d.Year; });
         avgEventsBySeason = year.group().reduce(
             // add
             function(p, v) {
 
-                if (v.Model < 100) {
+                if (v.Model < 100) { //do not count OBS
                     
-                    if (v.Season == "DJF") {
-                        ++p.season0Count;
-                        //p.season0Avg = p.season0Count;
-                    }
-                    if (v.Season == "MAM") {
-                        ++p.season1Count;
-                        //p.season1Avg = p.season1Count;
-                    }
-                    if (v.Season == "JJA") {
-                        ++p.season2Count;
-                        //p.season2Avg = p.season2Count;
-                    }
-                    if (v.Season == "SON") {
-                        ++p.season3Count;
-                        //p.season3Avg = p.season3Count;
-                    }
+                    if (v.TimeAggregate == "DJF") ++p.season0Count;
+                    if (v.TimeAggregate == "MAM") ++p.season1Count;                    
+                    if (v.TimeAggregate == "JJA") ++p.season2Count;
+                    if (v.TimeAggregate == "SON") ++p.season3Count;
+                    if (v.TimeAggregate == "yr")  ++p.yrAggCount;                    
                 } else {
                     p.season0Count = p.season0Count + 0;
                     p.season1Count = p.season1Count + 0;
                     p.season2Count = p.season2Count + 0;
                     p.season3Count = p.season3Count + 0;
+                    p.yrAggCount = p.yrAggCount + 0;
                 }
 
                 return p;
@@ -203,27 +185,17 @@ $(document).ready(function() {
             // remove
             function(p, v) {
                 if (v.Model < 100) {
-                    if (v.Season == "DJF") {
-                        --p.season0Count;
-                        //p.season0Avg = p.season0Count;
-                    }
-                    if (v.Season == "MAM") {
-                        --p.season1Count;
-                        //p.season1Avg = p.season1Count;
-                    }
-                    if (v.Season == "JJA") {
-                        --p.season2Count;
-                        //p.season2Avg = p.season2Count;
-                    }
-                    if (v.Season == "SON") {
-                        --p.season3Count;
-                        //p.season3Avg = p.season3Count;
-                    }
+                    if (v.TimeAggregate == "DJF") --p.season0Count;                    
+                    if (v.TimeAggregate == "MAM") --p.season1Count;                    
+                    if (v.TimeAggregate == "JJA") --p.season2Count;                    
+                    if (v.TimeAggregate == "SON") --p.season3Count;
+                    if (v.TimeAggregate == "yr")  --p.yrAggCount;                    
                 } else {
                     p.season0Count = p.season0Count - 0;
                     p.season1Count = p.season1Count - 0;
                     p.season2Count = p.season2Count - 0;
                     p.season3Count = p.season3Count - 0;
+                    p.yrAggCount = p.yrAggCount - 0;
                 }
 
                 return p;
@@ -234,7 +206,8 @@ $(document).ready(function() {
                         season0Count: 0,                        
                         season1Count: 0,                        
                         season2Count: 0,                        
-                        season3Count: 0                        
+                        season3Count: 0,
+                        yrAggCount: 0
                 };
             }
         );
@@ -285,7 +258,7 @@ $(document).ready(function() {
                         else indexCount = indexChart.filters().length;
 
                         yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
 
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                    
@@ -310,7 +283,7 @@ $(document).ready(function() {
                     else indexCount = indexChart.filters().length;
 
                     yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                    timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                    timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                     timeAggCount = timeAgg_clicked * yearCount;
                     
                     datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                
@@ -347,7 +320,7 @@ $(document).ready(function() {
                     && datasetChart.filters().length == 0  
                     //&& (stackedYearChart.filters()[0][0] == 2001 && stackedYearChart.filters()[0][1] == 2030) //default year window
                     && stackedYearChart.filters().length == 0 
-                    && seasonsChart.filters().length == 0)
+                    && timeAggregateChart.filters().length == 0)
                 {                        
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
                     console.log('eventRange: ', eventRange)
@@ -379,7 +352,7 @@ $(document).ready(function() {
                         else indexCount = indexChart.filters().length;
 
                         yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
 
                         return 100 * d.value.count/( regionCount * timeAggCount * datasetCount * indexCount);
@@ -416,7 +389,7 @@ $(document).ready(function() {
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
 
                         yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
                         
                         return 100 * d.value.count/( regionCount * timeAggCount * datasetCount );
@@ -492,7 +465,7 @@ $(document).ready(function() {
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
                         
                         yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
@@ -525,7 +498,7 @@ $(document).ready(function() {
                     .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
 
             // =================
-            seasonsChart
+            timeAggregateChart
                     .width(300).height(200)
                     .margins({
                         top: 10,
@@ -544,7 +517,7 @@ $(document).ready(function() {
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
                         yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        // timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
+                        // timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         // timeAggCount = timeAgg_clicked * yearCount;
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
@@ -565,9 +538,9 @@ $(document).ready(function() {
                         
                     });
 
-                    seasonsChart
+                    timeAggregateChart
                             .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
-                    seasonsChart
+                    timeAggregateChart
                             .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
 
 
@@ -581,8 +554,9 @@ $(document).ready(function() {
                         //console.log("d.value: ", d.value)
                         
                         //add time aggregates and normalized by num aggregates selected
-                        timeAgg_clicked = seasonsChart.filters().length ? seasonsChart.filters().length : numTimeAgg;
-                        normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count) / timeAgg_clicked;                        
+                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+                        normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count 
+                                    + d.value.season3Count + d.value.yrAggCount) / timeAgg_clicked;                        
                         
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
@@ -607,7 +581,7 @@ $(document).ready(function() {
                     .y(d3.scale.linear().domain([ymin, ymax]));
 
                 yearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
                 yearChart                    
                     .yAxis().tickValues([25, 50, 75, 100]);
 
@@ -733,17 +707,16 @@ $(document).ready(function() {
             //Filter dc charts according to which radio button is checked by user:           
             $("input:radio[name=rcp]").click(function() {
                     var radioValue = $("input:radio[name=rcp]:checked").val();                    
-                    scenario.filterAll();
-                    scenario.filter(radioValue);
+                    scenarioDimension.filterAll();
+                    scenarioDimension.filter(radioValue);
                     dc.redrawAll();
             });
           
             $("input[name='rcp']").click(function() {
                 var radioValue = $("input[name='rcp']:checked").val();
-                    scenario_clicked = $("input:radio[name=rcp]:checked").val();
-                    //console.log("scenario_clicked: ", scenario_clicked)
-                    scenario.filterAll();
-                    scenario.filter(radioValue);
+                    scenario_clicked = $("input:radio[name=rcp]:checked").val();                    
+                    scenarioDimension.filterAll();
+                    scenarioDimension.filter(radioValue);
                     dc.redrawAll();
             });
             
