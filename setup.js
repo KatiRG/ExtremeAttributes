@@ -31,7 +31,7 @@ $(document).ready(function() {
     timeAggregateChart = dc.rowChart("#chart-seasons");
 
     //d3.csv("data/percentile_extremoscope_7models_10indices.csv", function(csv) {
-    d3.csv("data/test_timeAgg.csv", function(csv) {        
+    d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {        
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -158,36 +158,26 @@ $(document).ready(function() {
                 };
         }
 
-        //Special fns for seasons stacked bar chart              
+        //Special fns for time aggregates
         //https://github.com/dc-js/dc.js/issues/21
         var year = filter.dimension(function(d) { return +d.Year; });
         avgEventsBySeason = year.group().reduce(
             // add
             function(p, v) {
 
-                if (v.Model < 100) {
+                if (v.Model < 100) { //do not count OBS
                     
-                    if (v.TimeAggregate == "DJF") {
-                        ++p.season0Count;
-                        //p.season0Avg = p.season0Count;
-                    }
-                    if (v.TimeAggregate == "MAM") {
-                        ++p.season1Count;
-                        //p.season1Avg = p.season1Count;
-                    }
-                    if (v.TimeAggregate == "JJA") {
-                        ++p.season2Count;
-                        //p.season2Avg = p.season2Count;
-                    }
-                    if (v.TimeAggregate == "SON") {
-                        ++p.season3Count;
-                        //p.season3Avg = p.season3Count;
-                    }
+                    if (v.TimeAggregate == "DJF") ++p.season0Count;
+                    if (v.TimeAggregate == "MAM") ++p.season1Count;                    
+                    if (v.TimeAggregate == "JJA") ++p.season2Count;
+                    if (v.TimeAggregate == "SON") ++p.season3Count;
+                    if (v.TimeAggregate == "yr")  ++p.yrAggCount;                    
                 } else {
                     p.season0Count = p.season0Count + 0;
                     p.season1Count = p.season1Count + 0;
                     p.season2Count = p.season2Count + 0;
                     p.season3Count = p.season3Count + 0;
+                    p.yrAggCount = p.yrAggCount + 0;
                 }
 
                 return p;
@@ -195,27 +185,17 @@ $(document).ready(function() {
             // remove
             function(p, v) {
                 if (v.Model < 100) {
-                    if (v.TimeAggregate == "DJF") {
-                        --p.season0Count;
-                        //p.season0Avg = p.season0Count;
-                    }
-                    if (v.TimeAggregate == "MAM") {
-                        --p.season1Count;
-                        //p.season1Avg = p.season1Count;
-                    }
-                    if (v.TimeAggregate == "JJA") {
-                        --p.season2Count;
-                        //p.season2Avg = p.season2Count;
-                    }
-                    if (v.TimeAggregate == "SON") {
-                        --p.season3Count;
-                        //p.season3Avg = p.season3Count;
-                    }
+                    if (v.TimeAggregate == "DJF") --p.season0Count;                    
+                    if (v.TimeAggregate == "MAM") --p.season1Count;                    
+                    if (v.TimeAggregate == "JJA") --p.season2Count;                    
+                    if (v.TimeAggregate == "SON") --p.season3Count;
+                    if (v.TimeAggregate == "yr")  --p.yrAggCount;                    
                 } else {
                     p.season0Count = p.season0Count - 0;
                     p.season1Count = p.season1Count - 0;
                     p.season2Count = p.season2Count - 0;
                     p.season3Count = p.season3Count - 0;
+                    p.yrAggCount = p.yrAggCount - 0;
                 }
 
                 return p;
@@ -226,7 +206,8 @@ $(document).ready(function() {
                         season0Count: 0,                        
                         season1Count: 0,                        
                         season2Count: 0,                        
-                        season3Count: 0                    
+                        season3Count: 0,
+                        yrAggCount: 0
                 };
             }
         );
@@ -574,7 +555,8 @@ $(document).ready(function() {
                         
                         //add time aggregates and normalized by num aggregates selected
                         timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
-                        normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count) / timeAgg_clicked;                        
+                        normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count 
+                                    + d.value.season3Count + d.value.yrAggCount) / timeAgg_clicked;                        
                         
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;                        
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
@@ -599,7 +581,7 @@ $(document).ready(function() {
                     .y(d3.scale.linear().domain([ymin, ymax]));
 
                 yearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
                 yearChart                    
                     .yAxis().tickValues([25, 50, 75, 100]);
 
