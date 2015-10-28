@@ -45,7 +45,10 @@
     <!-- add the jQWidgets framework -->
     <link rel="stylesheet" href="lib/jqx.base.css" type="text/css" />
     <script type="text/javascript" src="lib/jqxcore.js"></script>    
-    <script type="text/javascript" src="lib/jqxwindow.js"></script>    
+    <script type="text/javascript" src="lib/jqxwindow.js"></script>
+    <script type="text/javascript" src="lib/jqxtabs.js"></script>
+    <script type="text/javascript" src="lib/jqxpanel.js"></script>
+    <script type="text/javascript" src="demos.js"></script>
     
 
     <script type="text/javascript" src="setup.js"></script>
@@ -163,15 +166,15 @@
             <!--ROW-->
             <div class="row">
                 <div id="chart-dataset" class="dc-chart col-md-4">
-                    <div class="filterName">Models
+                    <div class="filterName">Model
                         <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
                     </div>
                 </div>
 
                 <div id="chart-seasons" class="dc-chart col-md-4">   
-                    <div class="filterName">Time Aggregates
-                        <a class="reset" href="javascript:seasonsChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                    <div class="filterName">Time Aggregate
+                        <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span><p>
                     </div>
                 </div>
@@ -197,11 +200,7 @@
                         <span id="active">-</span> of <span id="total">-</span> rows selected.
                     </table>
             </div>   -->   
-
-                
-                
-               
-            
+          
                 <div id="chart-stackedYear" class="dc-chart col-md-8">                    
                     <div class="filterName">Year by Season
                         <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -219,9 +218,33 @@
             <div class="row">                
                 <div id="jqxwindow">
                     <div id="windowHeader">
-                        <div style="overflow: hidden;" id="windowContent">
-                            <div id="chart-ts" class="col-md-12"></div>
-                            <div id="timeChart"></div>
+                        <span>
+                            <img src="LSCE_Icon.png" alt="" style="margin-right: 15px" />Time series
+                        </span>
+                    </div>    
+                    <div style="overflow: hidden;" id="windowContent">
+                         <div id="tab">
+                            <ul style="margin-left: 30px;">
+                                <li>Year</li>
+                                <li>Winter</li>
+                                <li>Spring</li>
+                                <li>Summer</li>
+                                <li>Fall</li>
+                            </ul>
+                            
+                            <div id="timeChartYear"></div>
+
+                            
+                            <div id="timeChartWinter"></div>
+                                
+                         
+                            <div id="timeChartSpring"></div>
+
+                            <div id="timeChartSummer"></div>
+
+                            <div id="timeChartFall"></div>
+                           
+
                         </div>
                     </div>    
                 </div>                
