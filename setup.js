@@ -90,7 +90,8 @@ $(document).ready(function() {
         //http://www.colourlovers.com/palette/3511190/Rain_Waves
         indexColours = ["#F74427", "#F74427", "#F74427", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9", "#BCE1D9"];
 
-        seasons = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall", "yr": "Year" };
+        timeAgg_dict = { "DJF": "Winter", "MAM": "Spring", "JJA": "Summer", "SON": "Fall", "yr": "Year" };        
+
         //http://www.colourlovers.com/palette/1243449/four_seasons + http://www.colourlovers.com/palette/2914176/A1        
         seasonsColours = ["#9DD8D3", "#A9DB66", "#FFE545", "#FFAD5D"]; //DJF (blue), MAM (green), JJA (yellow), SON (orange)
 
@@ -533,7 +534,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //console.log("d: ", d)
-                        return seasons[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount ) );
+                        return timeAgg_dict[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount ) );
                         
                     });
 
@@ -761,15 +762,14 @@ function showTimeSeries(regionName) {
             }
         });
 
-        renderDiv = ["timeChartYear", "timeChartWinter", "timeChartSpring", , "timeChartSummer", "timeChartFall"]
-        for (var j = 0; j < 3; j++) {
-            tsTitle = index_clicked + " for " + regionName + ", " + scenario_clicked;
+        renderDiv = ["timeChartYear", "timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall"]
+        timeAgg = ["yr", "DJF", "MAM", "JJA", "SON"]; //for highchart titles
+        for (var j = 0; j < renderDiv.length; j++) {
+            tsTitle = index_clicked + " for " + regionName + ", " + scenario_clicked + ", time aggregate = " + timeAgg[j];
 
             callHighChart(tsTitle, renderDiv[j]);
-            makeRequest(regionName);
-        }
-      
-        //makeRequest(regionName);
+            makeRequest(regionName, timeAgg[j]);
+        }            
 
     }
 }
@@ -779,7 +779,7 @@ function clearSeries() {
 }
 
 
-function makeRequest(regionName) {
+function makeRequest(regionName, aggr) {
     // http://colorbrewer2.org/    
     var colors = ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f"];
 
@@ -789,13 +789,13 @@ function makeRequest(regionName) {
     for (var i = 0; i < Object.keys(models).length -1; i++) { //last model is OBS data, therefore do not read it
         idx = i+1;        
                 
-        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/yr/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+        var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
         visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[idx]) != -1 ? true : false);
         addData(request, colors[i], 'Solid', models[idx], visible, false);
     }
 
     // obs    
-    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/yr/safran/" + regionNum + "/" + index_clicked + "_yr_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked +  "_" + aggr + "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     addData(request, '#000000', 'Solid', 'Obs Safran', true, true);    
     // calcul of the mean for 1976-2005 for obs
 
