@@ -1003,7 +1003,7 @@ function callHighChart(title, renderDiv) {
         },
         credits: {
             enabled: true,
-            text: "Extreme Events - LSCE"
+            text: "Extremoscope - LSCE"
         },
         series: []
     };
