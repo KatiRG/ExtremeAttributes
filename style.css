@@ -79,6 +79,10 @@ svg:not(:root) {
     width: 790px;
     height: 378px;
 }
+#timeChartYear {
+    width: 790px;
+    height: 378px;
+}
 /*modify twitter bootstrap btn*/
 .btn:hover, .btn:focus {
     color: #333333;
