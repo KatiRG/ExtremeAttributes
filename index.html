@@ -102,7 +102,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.html">Extremoscope</a>
+                    <a class="navbar-brand" href="index.html">Extremoscope: Displays events > 90th and < 10th percentile</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
@@ -116,96 +116,101 @@
 
         <!-- Begin page content -->
         <div class="container">
-
+            Reference period: 1976 &ndash; 2005 <p>
+            <div class="row">
+                <div id="ts-button-text"class="dc-chart col-md-5">                
+                    <button type="button" id="ts-button" class="btn">View</button>    Select <b>one</b> index and <b>one</b> region to view the timeseries.
+                </div>                
+            </div>
+           
+          
             <!--ROW 1-->
             <div class="row">
-                <div class="col-md-4">
-                    <div class="filterName">Threshold</div>
-                    Events > 90th and < 10th percentile displayed.<br>
-                    Reference period: 1976 &ndash; 2005
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+
+                        <div id="choro-map">
+                            <div class="filterName">Map
+                                <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();resetTSbutton();">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>    
+                            <div class="map"></div>
+                        </div>
+                </div>   
+                   
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="padding:0px">
+                    <div class="short-div">
+                         <div id="scenario">
+                            <div class="filterName">Scenario</div>
+                            <input type="radio" name="rcp" value="rcp45">RCP 4.5<br>
+                            <input type="radio" name="rcp" value="rcp85">RCP 8.5
+                        </div>
+                    </div>
+
+                    <div class="short-div">
+                        <div id="chart-seasons">
+                                <div class="filterName">Time Aggregate
+                                    <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                                    <span class="reset" style="display: none;"></span>
+                                </div>
+                        </div>
+                    </div>
+
+                     <div class="short-div" style="background-color:cyan">
+                          <div id="chart-dataset">
+                            <div class="filterName">Model
+                                <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="short-div">
+                        <div id="chart-category">
+                            <div class="filterName" style="color: white;">Category <!--so that chart doesn't move when reset appears -->
+                                <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+               
+                    
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                
+                    <div id="chart-index">       
+                            <div class="filterName">Index
+                                <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>                                    
+                    </div>
+
+                    <div id="chart-year">
+                        <div class="filterName">Year range
+                            <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                            <span class="reset" style="display: none;"></span>
+                        </div>
+                    </div>
+
                 </div>    
-                <div class="col-md-2">
-                    <div class="filterName">Scenario</div>
-                    <input type="radio" name="rcp" value="rcp45">RCP 4.5
-                    <input type="radio" name="rcp" value="rcp85">RCP 8.5
-                </div>
-                <div id="ts-button-text" class="dc-chart col-md-4">
-                     <div class="filterName">Time series data</div>                    
-                    Select <b>one</b> index and <b>one</b> region to view the timeseries.<p>
-                    <p><button type="button" id="ts-button" class="btn">Show</button> </p>                     
-                </div>
-
-            </div>
-            <!--end ROW 1-->
-
-            <!--ROW 2-->
-            <div class="row">
-                <div id="choro-map" class="dc-chart col-md-6">
-                    <div class="filterName">Map
-                        <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();resetTSbutton();">reset</a>
-                        <span class="reset" style="display: none;"></span>
-                    </div>    
-                    <div class="map"></div>
-                </div>
-
-                <div id="chart-index" class="dc-chart col-md-4">
-                    <div class="filterName">Index Name
-                        <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
-
-               <div id="chart-category" class="dc-chart col-md-2">
-                    <div class="filterName" style="color: white;">type <!--so that chart doesn't move when reset appears -->
-                        <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
-
+                        
                 
-            </div> <!--end ROW 2-->
-
-            <!--ROW-->
-            <div class="row">
-                <div id="chart-dataset" class="dc-chart col-md-4">
-                    <div class="filterName">Model
-                        <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div>
-
-                <div id="chart-seasons" class="dc-chart col-md-4">   
-                    <div class="filterName">Time Aggregate
-                        <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span><p>
-                    </div>
-                </div>
-
-                 <div id="chart-year" class="dc-chart col-md-8">
-                    <div class="filterName">Event Probability
-                        <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div> 
-
-            </div>
-  
-                
-      
+            </div> <!--end ROW-->
 
             <!--ROW 4-->
-            <div class="row">              
+            <!-- <div class="row">              
             
-            <!-- <div id="summaryDiv" class="col-md-8">
+            <div id="summaryDiv" class="col-md-8">
                     <table class="table table-striped table-hover" id="dc-data-table">
                         <h4>Summary</h4>
                         <span id="active">-</span> of <span id="total">-</span> rows selected.
                     </table>
-            </div>   -->            
+            </div> 
 
-            </div>
+            </div>  -->
             <!--end ROW 4-->
         
+
 
             <!--ROW TIME SERIES -->
             <div class="row" style="visibility: hidden">
@@ -226,36 +231,32 @@
                             </ul>
                             
                             <div id="timeChartYear"></div>
-
                             
-                            <div id="timeChartWinter"></div>
-                                
+                            <div id="timeChartWinter"></div>                                
                          
                             <div id="timeChartSpring"></div>
 
                             <div id="timeChartSummer"></div>
 
-                            <div id="timeChartFall"></div>
-                           
-
+                            <div id="timeChartFall"></div>                           
                         </div>
                     </div>    
                 </div>                
             </div> <!--end ROW TIME SERIES-->
-            
+           
+               
 
         </div> <!-- /.container -->        
 
-    </div>
-    <!-- /.wrap -->
+    </div>  <!-- /.wrap -->
+   
 
 
 
     <div id="footer">
         <div class="container">
             <p class="text-muted credit">Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version 1.1 - 2015/10/08</p>
-        </div>
-        <!-- /.container -->
+        </div>       
     </div>
 
 

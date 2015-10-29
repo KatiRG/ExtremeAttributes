@@ -42,25 +42,27 @@ svg:not(:root) {
     overflow: unset;
 }
 
+/* dc charts */
+#scenario {
+    transform: translate(130px, 0px);
+}
 #chart-index {
-    transform: translate(-12px, 66px);
+    transform: translate(100px, 0px);
+}
+#chart-seasons {
+    transform: translate(100px, 0px);
 }
 #chart-category {
-    transform: translate(-102px, -4px);
+    transform: translate(600px, -617px);
 }
-
-#chart-dataset {
-    transform: translate(575px,-240px);
-}
-
-#chart-seasons {
-    transform: translate(490px,-250px);
-}
-
 #chart-year {
-    transform: translate(5px,-255px);
+    transform: translate(120px, 0px);
+}
+#chart-dataset {
+    transform: translate(100px, 0px);
 }
 
+/* pop-up window tabs */
 #timeChartWinter {
     width: 790px;
     height: 378px;
@@ -74,6 +76,10 @@ svg:not(:root) {
     height: 378px;
 }
 #timeChartFall {
+    width: 790px;
+    height: 378px;
+}
+#timeChartYear {
     width: 790px;
     height: 378px;
 }

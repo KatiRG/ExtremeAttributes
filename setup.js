@@ -264,8 +264,8 @@ $(document).ready(function() {
                         return 100 * d.value.count/( indexCount * timeAggCount * datasetCount );
                 })
                 .group(avgRegionGroup)
-                .width(800)
-                .height(400)
+                .width(500)
+                // .height(170)
                 .center([47.00, 2.00])
                 .zoom(5)             
                 .geojson(statesJson)
@@ -372,7 +372,7 @@ $(document).ready(function() {
 
             // =================
             indexChart
-                    .width(400).height(200)
+                    .width(400).height(243)
                     .margins({
                         top: 10,
                         right: 30,
@@ -448,13 +448,13 @@ $(document).ready(function() {
             modelGroupNoSafran = remove_empty_bins(avgModelGroup);
 
             datasetChart
-                    .width(300).height(200)
-                    .margins({
-                        top: 10,
-                        right: 30,
-                        bottom: 30,
-                        left: 10
-                    })
+                    .width(225).height(250)
+                    // .margins({
+                    //     top: 10,
+                    //     right: 30,
+                    //     bottom: 30,
+                    //     left: 10
+                    // })
                     .dimension(modelDimension)
                     //.group(avgModelGroup)
                     .group(modelGroupNoSafran)     
@@ -487,28 +487,31 @@ $(document).ready(function() {
                     .title(function(d) {
                         return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + " events";
                     })
-                    .gap(0.5);
+                    .gap(2.5);
 
             //Fix x-axis (http://stackoverflow.com/questions/29921847/fixed-x-axis-in-dc-js-rowchart)
             datasetChart
                     .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
             datasetChart
-                    .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+                    .xAxis().scale(datasetChart.x()).tickValues([0, 25, 50, 75, 100]);
 
             // =================
+            // var widthtest = document.getElementById('chart-seasons').offsetWidth;
+            // console.log("widthtest: ", widthtest)
+
             timeAggregateChart
-                    .width(300).height(200)
-                    .margins({
-                        top: 10,
-                        right: 30,
-                        bottom: 30,
-                        left: 10
-                    })
+                    .width(225).height(152)
+                    // .margins({
+                    //     top: 10,
+                    //     right: 30,
+                    //     bottom: 30,
+                    //     left: 10
+                    // })
                     .colors(["#888888"])
                     .dimension(seasonDimension)
                     .group(avgSeasonGroup)
                     //.fixedBarHeight(22.286) //make same as datasetChart //dc.js 2.0.0-beta.19
-                    .gap(0.5)
+                    .gap(2)
                     .valueAccessor(function(d) {
                                                 
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -536,15 +539,15 @@ $(document).ready(function() {
                         
                     });
 
+                    timeAggregateChart                            
+                            .x(d3.scale.linear().range([0,(timeAggregateChart.width()-50)]).domain([0,100]));
                     timeAggregateChart
-                            .x(d3.scale.linear().range([0,(datasetChart.width()-50)]).domain([0,100]));
-                    timeAggregateChart
-                            .xAxis().scale(datasetChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 25, 50, 75, 100]);
 
 
             // =================
             yearChart
-                    .width(790).height(350)
+                    .width(550).height(245)
                     .dimension(yearDimension)
                     //.group(yearGroup)
                     .group(avgEventsBySeason)
