@@ -717,19 +717,19 @@ function makeRequest(regionName, aggr) {
     // calcul of the mean for 1976-2005 for obs
 
 
-    highchart.addSeries({
-        type: 'flags',
-        color: '#333333',
-        fillColor: 'rgba(255,255,255,0.8)',
-        shape: 'squarepin',
-        data: [{
-            x: Date.UTC(2010, 7, 1),
-            text: 'Highcharts Cloud Beta',
-            title: 'a remarkable event'
-        }],
-        onSeries: 'Obs Safran',
-        showInLegend: false
-    });
+    // highchart.addSeries({
+    //     type: 'flags',
+    //     color: '#333333',
+    //     fillColor: 'rgba(255,255,255,0.8)',
+    //     shape: 'squarepin',
+    //     data: [{
+    //         x: Date.UTC(2010, 7, 1),
+    //         text: 'Highcharts Cloud Beta',
+    //         title: 'a remarkable event'
+    //     }],
+    //     onSeries: 'Obs Safran',
+    //     showInLegend: false
+    // });
 
 }
 
