@@ -124,11 +124,17 @@
                     Events > 90th and < 10th percentile displayed.<br>
                     Reference period: 1976 &ndash; 2005
                 </div>    
-                <div class="col-md-2">    
+                <div class="col-md-2">
                     <div class="filterName">Scenario</div>
-                    <input type="radio" name="rcp" value="rcp45">RCP 4.5                    
+                    <input type="radio" name="rcp" value="rcp45">RCP 4.5
                     <input type="radio" name="rcp" value="rcp85">RCP 8.5
                 </div>
+                <div id="ts-button-text" class="dc-chart col-md-4">
+                     <div class="filterName">Time series data</div>                    
+                    Select <b>one</b> index and <b>one</b> region to view the timeseries.<p>
+                    <p><button type="button" id="ts-button" class="btn">Show</button> </p>                     
+                </div>
+
             </div>
             <!--end ROW 1-->
 
@@ -139,7 +145,7 @@
                         <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();resetTSbutton();">reset</a>
                         <span class="reset" style="display: none;"></span>
                     </div>    
-                    <div class="map"></div>                    
+                    <div class="map"></div>
                 </div>
 
                 <div id="chart-index" class="dc-chart col-md-4">
@@ -156,11 +162,7 @@
                     </div>
                 </div>
 
-                <div id="ts-button-text" class="dc-chart col-md-3">
-                    <p><p>
-                    Select a single index and a region to view the timeseries data.<p>
-                    <p><button type="button" id="ts-button" class="btn">Timeseries</button> </p>                     
-                </div>
+                
             </div> <!--end ROW 2-->
 
             <!--ROW-->
@@ -179,7 +181,7 @@
                     </div>
                 </div>
 
-                 <div id="chart-year" class="dc-chart col-md-8">                    
+                 <div id="chart-year" class="dc-chart col-md-8">
                     <div class="filterName">Event Probability
                         <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                         <span class="reset" style="display: none;"></span></span>
@@ -199,23 +201,14 @@
                         <h4>Summary</h4>
                         <span id="active">-</span> of <span id="total">-</span> rows selected.
                     </table>
-            </div>   -->   
-          
-                <div id="chart-stackedYear" class="dc-chart col-md-8">                    
-                    <div class="filterName">Year by Season
-                        <a class="reset" href="javascript:stackedYearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                        <span class="reset" style="display: none;"></span></span>
-                    </div>
-                </div> 
-
-                
+            </div>   -->            
 
             </div>
             <!--end ROW 4-->
         
 
             <!--ROW TIME SERIES -->
-            <div class="row" style="visibility: hidden">                
+            <div class="row" style="visibility: hidden">
                 <div id="jqxwindow">
                     <div id="windowHeader">
                         <span>

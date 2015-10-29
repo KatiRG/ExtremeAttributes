@@ -43,10 +43,10 @@ svg:not(:root) {
 }
 
 #chart-index {
-    transform: translate(-12px, 1px);
+    transform: translate(-12px, 66px);
 }
 #chart-category {
-    transform: translate(-102px, -36px);
+    transform: translate(-102px, -4px);
 }
 
 #chart-dataset {

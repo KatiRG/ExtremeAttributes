@@ -7,7 +7,6 @@ var highchart;
 
 //for avgs
 var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
-var numSeasons = 4;
 
 //for map click
 window.eventRange;
@@ -24,9 +23,8 @@ $(document).ready(function() {
     
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
     indexChart = dc.barChart("#chart-index");
-    datasetChart = dc.rowChart("#chart-dataset");    
-    categoryChart = dc.pieChart("#chart-category");    
-    stackedYearChart = dc.barChart("#chart-stackedYear");
+    datasetChart = dc.rowChart("#chart-dataset");
+    categoryChart = dc.pieChart("#chart-category");
     yearChart = dc.barChart("#chart-year");
     timeAggregateChart = dc.rowChart("#chart-seasons");
     
@@ -211,7 +209,7 @@ $(document).ready(function() {
                 };
             }
         );
-        //end avg stacked bar chart
+        //end fn for time aggregates
 
       //==============================================================================================
 
@@ -318,8 +316,8 @@ $(document).ready(function() {
                 //save initial eventRange upon page load
                 if (indexChart.filters().length == 0 && categoryChart.filters().length == 0
                     && datasetChart.filters().length == 0  
-                    //&& (stackedYearChart.filters()[0][0] == 2001 && stackedYearChart.filters()[0][1] == 2030) //default year window
-                    && stackedYearChart.filters().length == 0 
+                    //&& (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
+                    && yearChart.filters().length == 0 
                     && timeAggregateChart.filters().length == 0)
                 {
                     eventRange = d3.extent(chart.group().all(), chart.valueAccessor());
@@ -573,7 +571,7 @@ $(document).ready(function() {
                         return Math.round(100 * normSeasons/( regionCount * indexCount * datasetCount));
 
                     })
-                    .filter([2001, 2030])
+                    //.filter([2001, 2030])
                     .gap(0)
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
@@ -583,91 +581,7 @@ $(document).ready(function() {
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
                 yearChart
-                    .yAxis().tickValues([25, 50, 75, 100]);
-
-            // ==================    
-            stackedYearChart
-                    .width(790)
-                    .height(350)
-                    .dimension(year)                                    
-                    .renderHorizontalGridLines(true)
-                    .centerBar(true)
-                    .colors(seasonsColours) //DJF, MAM, JJA, SON                    
-                    //.filter([2001, 2030]) //blows up the returned values in the charts!                   
-                    .group(avgEventsBySeason, "Winter")
-                    .valueAccessor(function(d) {
-
-                        //console.log('stackedYear d.value: ', d.value)
-
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-
-                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
-                            //no indices selected && (category chart not selected OR all categories selected)
-                            indexCount = numIndices; 
-                        }
-                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
-                        }
-                        else indexCount = indexChart.filters().length;
-                        
-                        return Math.round(100 * d.value.season0Count/( regionCount * numSeasons * indexCount * datasetCount));
-                    
-                    })
-                    .stack(avgEventsBySeason, "Spring", function(d) {
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-
-                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
-                            //no indices selected && (category chart not selected OR all categories selected)
-                            indexCount = numIndices; 
-                        }
-                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
-                        }
-                        else indexCount = indexChart.filters().length;
-                        
-                        return Math.round(100 * d.value.season1Count/( regionCount * numSeasons * indexCount * datasetCount));
-                    })
-                    .stack(avgEventsBySeason, "Summer", function(d) {
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-
-                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
-                            //no indices selected && (category chart not selected OR all categories selected)
-                            indexCount = numIndices; 
-                        }
-                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
-                        }
-                        else indexCount = indexChart.filters().length;
-                        
-                        return Math.round(100 * d.value.season2Count/( regionCount * numSeasons * indexCount * datasetCount));
-                    })
-                    .stack(avgEventsBySeason, "Fall", function(d) {
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-
-                        if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
-                            //no indices selected && (category chart not selected OR all categories selected)
-                            indexCount = numIndices; 
-                        }
-                        else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
-                        }
-                        else indexCount = indexChart.filters().length;
-                        
-                        return Math.round(100 * d.value.season3Count/( regionCount * numSeasons * indexCount * datasetCount));
-                    })
-                    .elasticY(false)
-                    .x(d3.scale.linear().domain([1970, 2100]))
-                    .y(d3.scale.linear().domain([ymin, ymax]));
-       
-            stackedYearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975, 2000, 2025, 2050, 2075, 2100]);
-            stackedYearChart
-                    .yAxis().tickValues([25, 50, 75, 100]);
-
+                    .yAxis().tickValues([25, 50, 75, 100]);                
 
           
             // =================
@@ -697,11 +611,11 @@ $(document).ready(function() {
             //         })
             //         .order(d3.ascending);
 
-            // =================        
+            // =================
 
 
             // =================
-            dc.renderAll();            
+            dc.renderAll();
 
             // =================
             //Filter dc charts according to which radio button is checked by user:           
