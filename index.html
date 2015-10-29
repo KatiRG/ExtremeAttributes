@@ -116,6 +116,13 @@
 
         <!-- Begin page content -->
         <div class="container">
+
+            <div class="row">
+                <div id="ts-button"class="dc-chart col-md-5">                                        
+                    
+                    <button type="button" id="ts-button" class="btn">View</button>    Select <b>one</b> index and <b>one</b> region to view the timeseries.
+                </div>                
+            </div>
            
           
             <!--ROW 1-->
@@ -173,52 +180,23 @@
                 <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
                 
                     <div id="chart-index">       
-                            <div class="filterName">Index Name
+                            <div class="filterName">Index
                                 <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
                             </div>                                    
                     </div>
 
                     <div id="chart-year">
-                        <div class="filterName">Event Probability
+                        <div class="filterName">Year range
                             <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                             <span class="reset" style="display: none;"></span>
                         </div>
                     </div>
 
                 </div>    
-
-
-
-                                                                            
-
-
-                
-                  
+                        
                 
             </div> <!--end ROW-->
-
-
-
-    
-          
-            <div class="row-fluid">
-
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="padding:0px">
-                  
-                   
-                </div>
-
-
-                <div id="ts-button"class="dc-chart col-md-4">
-                                <div class="filterName">Time series data</div>                    
-                                Select <b>one</b> index and <b>one</b> region to view the timeseries.
-                                <button type="button" id="ts-button" class="btn">View</button>
-                </div>
-                
-                    
-                     
-            </div> <!--end row-fluid-->
 
             <!--ROW 4-->
             <!-- <div class="row">              
@@ -254,18 +232,14 @@
                             </ul>
                             
                             <div id="timeChartYear"></div>
-
                             
-                            <div id="timeChartWinter"></div>
-                                
+                            <div id="timeChartWinter"></div>                                
                          
                             <div id="timeChartSpring"></div>
 
                             <div id="timeChartSummer"></div>
 
-                            <div id="timeChartFall"></div>
-                           
-
+                            <div id="timeChartFall"></div>                           
                         </div>
                     </div>    
                 </div>                
@@ -275,16 +249,15 @@
 
         </div> <!-- /.container -->        
 
-    </div>
-    <!-- /.wrap -->
+    </div>  <!-- /.wrap -->
+   
 
 
 
     <div id="footer">
         <div class="container">
             <p class="text-muted credit">Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version 1.1 - 2015/10/08</p>
-        </div>
-        <!-- /.container -->
+        </div>       
     </div>
 
 
