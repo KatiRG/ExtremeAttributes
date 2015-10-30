@@ -119,7 +119,7 @@ $(document).ready(function() {
             modelGroup = modelDimension.group();
 
         // ===============================================================================================       
-        var numModels = modelGroup.size();  //datasetGroup.size();
+        var numModels = modelGroup.size() - 1;  //exclude OBS
         var numRegions = Object.keys(regions).length;
         var numIndices = Object.keys(indexID).length;
         var numCategories = 2;
@@ -219,13 +219,13 @@ $(document).ready(function() {
         d3.selectAll("#total").text(filter.size()); // total number of events
 
         //MAP
-        var width = 300, height = 300;
+        //var width = 200, height = 300;
 
         //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
-        var projection = d3.geo.conicConformal() // Lambert-93
-            .center([6, 49]) // On centre la carte sur la France
-            .scale(1400)
-            .translate([180, 100]);
+        // var projection = d3.geo.conicConformal() // Lambert-93
+        //     .center([6, 49]) // On centre la carte sur la France
+        //     .scale(100)
+        //     .translate([180, 100]);
         
         // ===============================================================================================
         //  READ IN GEOJSON
@@ -244,6 +244,12 @@ $(document).ready(function() {
 
             choroChart
                 .dimension(regionDimension)
+                .group(avgRegionGroup)
+                .width(400)
+                .height(170)
+                .center([47.00, 2.00])
+                .zoom(5)             
+                .geojson(statesJson)
                 .valueAccessor(function(d) {
                         
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
@@ -259,16 +265,10 @@ $(document).ready(function() {
                         timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
 
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;                    
+                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                                                 
                         return 100 * d.value.count/( indexCount * timeAggCount * datasetCount );
-                })
-                .group(avgRegionGroup)
-                .width(500)
-                // .height(170)
-                .center([47.00, 2.00])
-                .zoom(5)             
-                .geojson(statesJson)
+                })               
                 .colors(colorbrewer.YlGnBu[7])
                 .colorAccessor(function(d,i) {
                     if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
@@ -401,7 +401,8 @@ $(document).ready(function() {
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
                     //.elasticY(true)
-                    .y(d3.scale.linear().domain([ymin, ymax]));
+                    .y(d3.scale.linear().domain([ymin, ymax]))
+                    .yAxisLabel("extremeness level (%)");
 
             indexChart
                     .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
@@ -547,7 +548,7 @@ $(document).ready(function() {
 
             // =================
             yearChart
-                    .width(550).height(245)
+                    .width(550).height(265)
                     .dimension(yearDimension)
                     //.group(yearGroup)
                     .group(avgEventsBySeason)
@@ -580,13 +581,13 @@ $(document).ready(function() {
                     .x(d3.scale.linear().domain([1970, 2100]))
                     //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
-                    .xAxisLabel("Year");
+                    .xAxisLabel("Year")
+                    .yAxisLabel("extremeness level (%)");
 
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
                 yearChart
-                    .yAxis().tickValues([25, 50, 75, 100]);                
-
+                    .yAxis().tickValues([25, 50, 75, 100]);   
           
             // =================
             // dataTable = dc.dataTable("#dc-data-table");
@@ -620,6 +621,19 @@ $(document).ready(function() {
 
             // =================
             dc.renderAll();
+
+            //http://stackoverflow.com/questions/21114336/how-to-add-axis-labels-for-row-chart-using-dc-js-or-d3-js
+            function AddXAxis(chartToUpdate, displayText)
+            {
+                chartToUpdate.svg()
+                            .append("text")
+                            .attr("class", "x-axis-label")
+                            .attr("text-anchor", "middle")
+                            .attr("x", chartToUpdate.width()/2)
+                            .attr("y", chartToUpdate.height()+2)
+                            .text(displayText);
+            }
+            AddXAxis(datasetChart, "extremeness level (%)");
 
             // =================
             //Filter dc charts according to which radio button is checked by user:           

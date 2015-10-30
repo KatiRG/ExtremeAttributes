@@ -118,6 +118,7 @@
 
         <!-- Begin page content -->
         <div class="container">
+   
             Visualization of the projected evolution of extreme seasons and years from several indices. Extremes are characterized by values less than the 10th or above the 90th percentile.<br>
             Reference period: 1976 &ndash; 2005 <p>
             <div class="row">
@@ -125,8 +126,9 @@
                     <button type="button" id="ts-button" class="btn">View</button>    Select <b>one</b> index and <b>one</b> region to view the timeseries.
                 </div>                
             </div>
-           
-          
+
+
+
             <!--ROW 1-->
             <div class="row">
                 <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
@@ -151,7 +153,7 @@
 
                     <div class="short-div">
                         <div id="chart-seasons">
-                            <div class="filterName">Time Aggregate
+                            <div class="filterName">Aggregate
                                 <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
                             </div>
@@ -185,8 +187,7 @@
                             <div class="filterName">Index
                                 <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
-                            </div>
-                            Select one or more indices. Y-axis shows % of time aggregate that is extreme.                                  
+                            </div>                            
                     </div>
 
                     <div id="chart-year">
@@ -213,8 +214,7 @@
 
             </div>  -->
             <!--end ROW 4-->
-        
-
+       
 
             <!--ROW TIME SERIES -->
             <div class="row" style="visibility: hidden">

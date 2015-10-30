@@ -10,11 +10,6 @@ body {
     font-size: 11px;
 }
 
-/*.dc-chart g.axis text {
-    font-family: 'Istok Web', sans-serif;
-    font-size: 10px;
-}*/
-
 .dc-chart g.row text {
     fill: black;
     font-size: 12px;
@@ -22,12 +17,18 @@ body {
 
 .dc-chart text {
     font-family: 'Istok Web', sans-serif;
-    font-size: 10px;
+    font-size: 12px;
 }
 .dc-chart g.row rect {
     stroke: gray;
     font-family: 'Istok Web', sans-serif;
     font-size: 10px;
+}
+/*pie chart label*/
+.dc-chart .pie-slice {
+    fill: black;
+    font-family: 'Istok Web', sans-serif;
+    font-size: 10px;    
 }
 
 .filterName {
