@@ -579,7 +579,8 @@ $(document).ready(function() {
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
                     //.elasticY(true)
-                    .y(d3.scale.linear().domain([ymin, ymax]));
+                    .y(d3.scale.linear().domain([ymin, ymax]))
+                    .xAxisLabel("Year");
 
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
@@ -679,8 +680,8 @@ function showTimeSeries(regionName) {
             }
         });
 
-        renderDiv = ["timeChartYear", "timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall"]
-        timeAgg = ["yr", "DJF", "MAM", "JJA", "SON"]; //for highchart titles
+        renderDiv = ["timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall", "timeChartYear"]
+        timeAgg = ["DJF", "MAM", "JJA", "SON", "yr"]; //for highchart titles
         for (var j = 0; j < renderDiv.length; j++) {
             tsTitle = index_clicked + " for " + regionName + ", " + scenario_clicked + ", time aggregate = " + timeAgg[j];
 

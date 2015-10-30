@@ -10,6 +10,8 @@
 
 <head>
     <meta charset="utf-8">
+    <link href='https://fonts.googleapis.com/css?family=Istok+Web:400,700italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>    
+
     <title>Extremoscope</title>
     
     <!-- d3 and dc -->    
@@ -149,15 +151,15 @@
 
                     <div class="short-div">
                         <div id="chart-seasons">
-                                <div class="filterName">Time Aggregate
-                                    <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                                    <span class="reset" style="display: none;"></span>
-                                </div>
+                            <div class="filterName">Time Aggregate
+                                <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>
                         </div>
                     </div>
 
-                     <div class="short-div" style="background-color:cyan">
-                          <div id="chart-dataset">
+                     <div class="short-div">
+                        <div id="chart-dataset">
                             <div class="filterName">Model
                                 <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
@@ -183,7 +185,8 @@
                             <div class="filterName">Index
                                 <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
-                            </div>                                    
+                            </div>
+                            Select one or more indices. Y-axis shows % of time aggregate that is extreme.                                  
                     </div>
 
                     <div id="chart-year">
@@ -223,26 +226,26 @@
                     </div>    
                     <div style="overflow: hidden;" id="windowContent">
                          <div id="tab">
-                            <ul style="margin-left: 30px;">
-                                <li>Year</li>
+                            <ul style="margin-left: 30px;">                                
                                 <li>Winter</li>
                                 <li>Spring</li>
                                 <li>Summer</li>
                                 <li>Fall</li>
+                                <li>Year</li>
                             </ul>
-                            
-                            <div id="timeChartYear"></div>
-                            
-                            <div id="timeChartWinter"></div>                                
+                                                                                
+                            <div id="timeChartWinter"></div>
                          
                             <div id="timeChartSpring"></div>
 
                             <div id="timeChartSummer"></div>
 
-                            <div id="timeChartFall"></div>                           
+                            <div id="timeChartFall"></div>
+
+                            <div id="timeChartYear"></div>
                         </div>
-                    </div>    
-                </div>                
+                    </div>
+                </div>
             </div> <!--end ROW TIME SERIES-->
            
                
