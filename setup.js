@@ -119,7 +119,7 @@ $(document).ready(function() {
             modelGroup = modelDimension.group();
 
         // ===============================================================================================       
-        var numModels = modelGroup.size();  //datasetGroup.size();
+        var numModels = modelGroup.size() - 1;  //exclude OBS
         var numRegions = Object.keys(regions).length;
         var numIndices = Object.keys(indexID).length;
         var numCategories = 2;
