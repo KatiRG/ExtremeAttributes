@@ -80,7 +80,7 @@
           clear:both;
         }
         .map {
-          width:550px;
+          width:400px;
           height:535px;
         }
         .pie {
@@ -122,12 +122,17 @@
             Visualization of the projected evolution of extreme seasons and years from several indices. Extremes are characterized by values less than the 10th or above the 90th percentile.<br>
             Reference period: 1976 &ndash; 2005 <p>
             <div class="row">
-                <div id="ts-button-text"class="dc-chart col-md-5">                
-                    <button type="button" id="ts-button" class="btn">View</button>    Select <b>one</b> index and <b>one</b> region to view the timeseries.
-                </div>                
-            </div>
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                    <div id="ts-button-text">                
+                        <button type="button" id="ts-button" class="btn">View</button>    
+                        Select <b>one</b> index and <b>one</b> region to view the timeseries.<p>
+                    </div>
+                </div> <!--col class-->
+            </div> <!--row-->
 
 
+            <div class="panel panel-default">
+                <div class="panel-body">
 
             <!--ROW 1-->
             <div class="row">
@@ -142,13 +147,23 @@
                         </div>
                 </div>   
                    
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="padding:0px">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
                     <div class="short-div">
-                         <div id="scenario">
-                            <div class="filterName">Scenario</div>
-                            <input type="radio" name="rcp" value="rcp45">RCP 4.5<br>
-                            <input type="radio" name="rcp" value="rcp85">RCP 8.5
+                        <div id="chart-dataset">
+                            <div class="filterName">Model
+                                <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="short-div">
+                        <div id="chart-category">
+                            <div class="filterName">Category <!--so that chart doesn't move when reset appears -->
+                                <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>
+                        </div>                      
                     </div>
 
                     <div class="short-div">
@@ -158,24 +173,15 @@
                                 <span class="reset" style="display: none;"></span>
                             </div>
                         </div>
-                    </div>
-
-                     <div class="short-div">
-                        <div id="chart-dataset">
-                            <div class="filterName">Model
-                                <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>
-                        </div>
-                    </div>
+                    </div>                    
                 
                     <div class="short-div">
-                        <div id="chart-category">
-                            <div class="filterName" style="color: white;">Category <!--so that chart doesn't move when reset appears -->
-                                <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>
+                         <div id="scenario">
+                            <div class="filterName">Scenario RCP</div>
+                            <input type="radio" name="rcp" value="rcp45">4.5
+                            <input type="radio" name="rcp" value="rcp85">8.5
                         </div>
+                        
                     </div>
 
                 </div>
@@ -201,6 +207,9 @@
                         
                 
             </div> <!--end ROW-->
+
+                </div><!--panel body-->
+            </div><!--panel default-->
 
             <!--ROW 4-->
             <!-- <div class="row">              

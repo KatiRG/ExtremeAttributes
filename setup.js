@@ -449,7 +449,7 @@ $(document).ready(function() {
             modelGroupNoSafran = remove_empty_bins(avgModelGroup);
 
             datasetChart
-                    .width(225).height(250)
+                    .width(200).height(225)
                     // .margins({
                     //     top: 10,
                     //     right: 30,
