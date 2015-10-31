@@ -64,16 +64,16 @@ svg:not(:root) {
 
 /* dc charts */
 #scenario {
-    transform: translate(484px, -277px);
+    transform: translate(484px, -294px);
 }
 #chart-index {
     transform: translate(36px, 0px);
 }
 #chart-seasons {
-    transform: translate(-52px, 25px);
+    transform: translate(-52px, 7px);
 }
 #chart-category {
-    transform: translate(4px, 18px);
+    transform: translate(4px, 9px);
 }
 #chart-year {
     transform: translate(-47px, 0px);

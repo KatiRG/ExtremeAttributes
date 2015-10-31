@@ -402,7 +402,7 @@ $(document).ready(function() {
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
                     //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
-                    .yAxisLabel("extremeness level (%)");
+                    .yAxisLabel("Event Probability (%)");
 
             indexChart
                     .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
@@ -449,7 +449,7 @@ $(document).ready(function() {
             modelGroupNoSafran = remove_empty_bins(avgModelGroup);
 
             datasetChart
-                    .width(200).height(225)
+                    .width(200).height(243)
                     // .margins({
                     //     top: 10,
                     //     right: 30,
@@ -582,7 +582,7 @@ $(document).ready(function() {
                     //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .xAxisLabel("Year")
-                    .yAxisLabel("extremeness level (%)");
+                    .yAxisLabel("Event Probability (%)");
 
                 yearChart
                     .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
@@ -633,7 +633,8 @@ $(document).ready(function() {
                             .attr("y", chartToUpdate.height()+2)
                             .text(displayText);
             }
-            AddXAxis(datasetChart, "extremeness level (%)");
+            AddXAxis(datasetChart, "Event Probability (%)");
+            AddXAxis(timeAggregateChart, "Event Probability (%)");
 
             // =================
             //Filter dc charts according to which radio button is checked by user:           
