@@ -1,27 +1,53 @@
-.dc-chart g.row text {
-    fill: black;
-    font-size: 10px;
+body {
+    color: #333333;
+    font-family: 'Istok Web', sans-serif;
+    font-size: 14px;
+    line-height: 1.42857;
 }
 
+.dc-chart .axis text {
+    font-family: 'Istok Web', sans-serif;
+    font-size: 11px;
+}
+
+.dc-chart g.row text {
+    fill: black;
+    font-size: 12px;
+}
+
+.dc-chart text {
+    font-family: 'Istok Web', sans-serif;
+    font-size: 12px;
+}
 .dc-chart g.row rect {
     stroke: gray;
+    font-family: 'Istok Web', sans-serif;
     font-size: 10px;
+}
+/*pie chart label*/
+.dc-chart .pie-slice {
+    fill: black;
+    font-family: 'Istok Web', sans-serif;
+    font-size: 10px;    
 }
 
 .filterName {
-    font-size: 12px;
-    font-weight: bold;
+    font-family: 'Istok Web', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
     font-style: italic;
     margin-top: 20px;
 }
 
 .reset {
+    font-family: 'Istok Web', sans-serif;
     font-size: 10px;
     font-weight: bold;
     font-style: normal;
 }
 
 .table {
+    font-family: 'Istok Web', sans-serif;
     font-size: 10px;
     font-weight: normal;
     font-style: normal;
@@ -31,12 +57,6 @@
     line-height: 6px;
 }
 
-/*seasons pie chart*/
-.dc-chart .pie-slice {
-    fill: black;
-    font-size: 10px;    
-}
-
 /*to allow x-axis labels to overflow past div bd*/
 svg:not(:root) {
     overflow: unset;
@@ -44,22 +64,22 @@ svg:not(:root) {
 
 /* dc charts */
 #scenario {
-    transform: translate(130px, 0px);
+    transform: translate(484px, -294px);
 }
 #chart-index {
-    transform: translate(100px, 0px);
+    transform: translate(36px, 0px);
 }
 #chart-seasons {
-    transform: translate(100px, 0px);
+    transform: translate(-52px, 7px);
 }
 #chart-category {
-    transform: translate(600px, -617px);
+    transform: translate(4px, 9px);
 }
 #chart-year {
-    transform: translate(120px, 0px);
+    transform: translate(-47px, 0px);
 }
 #chart-dataset {
-    transform: translate(100px, 0px);
+    transform: translate(-52px, 0px);
 }
 
 /* pop-up window tabs */
@@ -84,7 +104,7 @@ svg:not(:root) {
     height: 378px;
 }
 /*modify twitter bootstrap btn*/
-.btn:hover, .btn:focus {
+.btn:hover, .btn:focus {    
     color: #333333;
     text-decoration: none;
     background: lightgray;
@@ -92,9 +112,12 @@ svg:not(:root) {
 }
 
 /*Display window on map*/
+h4 { font-family: 'Istok Web', sans-serif; font-weight: 400; }
+
 .info {
     padding: 6px 8px;
-    font: 14px/16px Arial, Helvetica, sans-serif;
+    /*font: 14px/16px Arial, Helvetica, sans-serif;*/
+    font-family: 'Istok Web', sans-serif;
     background: white;
     background: rgba(255,255,255,0.8);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
