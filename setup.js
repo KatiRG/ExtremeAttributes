@@ -6,7 +6,7 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 
 //for avgs
-var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, modelGroup;
 
 //for map click
 window.eventRange;
@@ -103,6 +103,7 @@ $(document).ready(function() {
         seasonsColours = ["#9DD8D3", "#A9DB66", "#FFE545", "#FFAD5D"]; //DJF (blue), MAM (green), JJA (yellow), SON (orange)
 
         var filter = crossfilter(csv);
+        var all = filter.groupAll();
 
         var yearDimension = filter.dimension(function(d) {
                 //return Math.round(d.Year); 
@@ -113,8 +114,7 @@ $(document).ready(function() {
                 else return "Rain";                
             }),
             indexDimension = filter.dimension(function(d) { return +d.Index; }),
-            regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
-            datasetDimension = filter.dimension(function(d) { return +d.Model; }),
+            regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),            
             modelDimension = filter.dimension(function(d) { return +d.Model; }),
             seasonDimension = filter.dimension(function(d) { return d.TimeAggregate; }),
             scenarioDimension = filter.dimension(function(d) { return d.Scenario; });
@@ -123,8 +123,7 @@ $(document).ready(function() {
             categoryGroup = categoryDimension.group(),
             seasonGroup = seasonDimension.group(),
             yearGroup = yearDimension.group(),
-            regionGroup = regionDimension.group();
-            datasetGroup = datasetDimension.group();
+            regionGroup = regionDimension.group();            
             modelGroup = modelDimension.group();
 
         // ===============================================================================================       
@@ -138,8 +137,7 @@ $(document).ready(function() {
         var ymin = 0; var ymax = 100; //min and max for y-axes of year bar chart
         
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);        
         avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
@@ -350,6 +348,18 @@ $(document).ready(function() {
                     //.group(categoryGroup)
                     .group(avgCategoryGroup)
                     .valueAccessor(function(d) {
+
+                        // if (categoryChart.hasFilter() && !categoryChart.hasFilter(d.key)) {
+                        //     return d.key + '(0%)';
+                        // }
+                        // var label = d.key;
+                        // if (all.value()) {
+                        //     label += '(' + Math.floor(d.value / all.value() * 100) + '%)';
+                        // }
+                        // return label;
+                       
+
+                    //     console.log("d.value in categoryChart: ", d)
                         
                         if (d.value != 0) {
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -362,22 +372,34 @@ $(document).ready(function() {
                         timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
 
+                        var label = d.key;
+                        console.log('d.value.key: ', d.key)
+                        
+                        if (all.value()) {
+                            console.log('d.value.count: ', d.value.count)
+                            console.log('all.value(): ', all.value())
+                            label += '(' + Math.floor(d.value.count / all.value() * 100) + '%)';
+                            console.log("label: ", label)
+                        }                        
+
                         return 100 * d.value.count/( regionCount * timeAggCount * datasetCount * indexCount);
                         }
                         
                     })
-                    //.legend(dc.legend())
+                    .legend(dc.legend())
                     .title(function(d) {
-                        if (d.data.value != 0) {
-                            if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
-                            else indexCount = indexChart.filters().length;
-                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + "%";
-                        }
+                    //     d.data.value.count
+                    //     if (d.data.value != 0) {
+                    //         console.log("d.data: ", d.data)
+                    //         if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
+                    //         else indexCount = indexChart.filters().length;
+                    //         return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + "%";
+                    //     }
                     })
                     .renderlet(function (chart) {
                         chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
                         chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
-                    });
+                    });                   
 
             // =================
             indexChart
