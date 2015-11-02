@@ -19,6 +19,15 @@ $(document).ready(function() {
 
     document.getElementById("ts-button").disabled = true;
 
+    $("#jqxwindow").jqxWindow({
+            height:450, width: 900,
+            showCollapseButton: true,
+            initContent: function () {
+                $('#tab').jqxTabs({ height: '100%', width:  '100%' });
+            },
+            autoOpen: false
+        });
+
     var chart;    
     
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
@@ -687,13 +696,13 @@ function showTimeSeries(regionName) {
         console.log("index, region, scenario: ", index_clicked +', '+ regionName +", "+ scenario_clicked)
 
         $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it
-        $("#jqxwindow").jqxWindow({
-            height:450, width: 900,
-            showCollapseButton: true,
-            initContent: function () {
-                $('#tab').jqxTabs({ height: '100%', width:  '100%' });
-            }
-        });
+        // $("#jqxwindow").jqxWindow({
+        //     height:450, width: 900,
+        //     showCollapseButton: true,
+        //     initContent: function () {
+        //         $('#tab').jqxTabs({ height: '100%', width:  '100%' });
+        //     }
+        // });
 
         renderDiv = ["timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall", "timeChartYear"]
         timeAgg = ["DJF", "MAM", "JJA", "SON", "yr"]; //for highchart titles
