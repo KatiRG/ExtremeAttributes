@@ -371,7 +371,7 @@ $(document).ready(function() {
                         if (d.data.value != 0) {
                             if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
                             else indexCount = indexChart.filters().length;
-                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + " events";
+                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + "%";
                         }
                     })
                     .renderlet(function (chart) {
@@ -405,7 +405,7 @@ $(document).ready(function() {
                     .gap(1)
                     .title(function(d, i) {
                         return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
-                               Math.round(100 * d.data.value.count / ( regionCount * timeAggCount * datasetCount ));
+                               Math.round(100 * d.data.value.count / ( regionCount * timeAggCount * datasetCount ))  +"%";
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
@@ -495,7 +495,7 @@ $(document).ready(function() {
                         return models[d.key];
                     })
                     .title(function(d) {
-                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + " events";
+                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + "%";
                     })
                     .gap(2.5);
 
@@ -545,7 +545,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //console.log("d: ", d)
-                        return timeAgg_dict[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount ) );
+                        return timeAgg_dict[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount )) + "%";
                         
                     });
 
