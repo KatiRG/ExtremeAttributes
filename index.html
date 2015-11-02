@@ -62,14 +62,14 @@
     <script type="text/javascript" src="lib/leaflet.js"></script>
     <link type="text/css" href="lib/leaflet.css" rel="stylesheet"/>
 
-    <!-->pace.js progress bar<-->
+    <!--pace.js progress bar-->
     <script src="lib/pace.js"></script>
     <link href="style-pace-fill-left.css" rel="stylesheet" />
 
-    <!-->percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2<-->
+    <!--percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2-->
     <script src="lib/percentile.js"></script>
 
-    <!-->dc-leaflet-choropleth legend and window display<-->
+    <!--dc-leaflet-choropleth legend and window display-->
     <style>
         #holder {
           width:850px;
@@ -131,7 +131,7 @@
             </div> <!--row-->
 
 
-            <div class="panel panel-default">
+            <div class="panel panel-default panel-transparent">
                 <div class="panel-body">
 
             <!--ROW 1-->
@@ -181,7 +181,7 @@
                     </div>                    
                 
                     <div class="short-div">
-                         <div id="scenario">
+                         <div id="scenario" style="z-index: 2">
                             <div class="filterName">Scenario RCP</div>
                             <input type="radio" name="rcp" value="rcp45">4.5
                             <input type="radio" name="rcp" value="rcp85">8.5
@@ -192,10 +192,10 @@
                 </div>
                
                     
-                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5" style="z-index: 1">
                 
                     <div id="chart-index">       
-                            <div class="filterName">Climate Index
+                            <div class="filterName" div class="col-lg-2">Climate Index
                                 <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
                             </div>                            
@@ -231,7 +231,8 @@
        
 
             <!--ROW TIME SERIES -->
-            <div class="row" style="visibility: hidden">
+            <!--<div class="row" style="visibility: hidden">-->
+            <div class="row">
                 <div id="jqxwindow">
                     <div id="windowHeader">
                         <span>
@@ -273,7 +274,7 @@
 
     <div id="footer">
         <div class="container">
-            <p class="text-muted credit">Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version 1.1 - 2015/10/08</p>
+            <p class="text-muted credit">Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version 1.1 - 2015/11/01</p>
         </div>       
     </div>
 

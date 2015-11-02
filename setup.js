@@ -19,6 +19,15 @@ $(document).ready(function() {
 
     document.getElementById("ts-button").disabled = true;
 
+    $("#jqxwindow").jqxWindow({
+            height:450, width: 900,
+            showCollapseButton: true,
+            initContent: function () {
+                $('#tab').jqxTabs({ height: '100%', width:  '100%' });
+            },
+            autoOpen: false
+        });
+
     var chart;    
     
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
@@ -94,6 +103,7 @@ $(document).ready(function() {
         seasonsColours = ["#9DD8D3", "#A9DB66", "#FFE545", "#FFAD5D"]; //DJF (blue), MAM (green), JJA (yellow), SON (orange)
 
         var filter = crossfilter(csv);
+        var all = filter.groupAll();
 
         var yearDimension = filter.dimension(function(d) {
                 //return Math.round(d.Year); 
@@ -341,6 +351,18 @@ $(document).ready(function() {
                     //.group(categoryGroup)
                     .group(avgCategoryGroup)
                     .valueAccessor(function(d) {
+
+                        // if (categoryChart.hasFilter() && !categoryChart.hasFilter(d.key)) {
+                        //     return d.key + '(0%)';
+                        // }
+                        // var label = d.key;
+                        // if (all.value()) {
+                        //     label += '(' + Math.floor(d.value / all.value() * 100) + '%)';
+                        // }
+                        // return label;
+                       
+
+                    //     console.log("d.value in categoryChart: ", d)
                         
                         if (d.value != 0) {
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -353,22 +375,31 @@ $(document).ready(function() {
                         timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
                         timeAggCount = timeAgg_clicked * yearCount;
 
+                        var label = d.value.key;
+                        console.log('d.value.key: ', d)
+                        if (all.value()) {
+                            label += '(' + Math.floor(d.value / all.value() * 100) + '%)';
+                        }
+                        console.log("label: ", label)
+
                         return 100 * d.value.count/( regionCount * timeAggCount * datasetCount * indexCount);
                         }
                         
                     })
-                    //.legend(dc.legend())
+                    .legend(dc.legend())
                     .title(function(d) {
-                        if (d.data.value != 0) {
-                            if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
-                            else indexCount = indexChart.filters().length;
-                            return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + " events";
-                        }
+                    //     d.data.value.count
+                    //     if (d.data.value != 0) {
+                    //         console.log("d.data: ", d.data)
+                    //         if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
+                    //         else indexCount = indexChart.filters().length;
+                    //         return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + "%";
+                    //     }
                     })
                     .renderlet(function (chart) {
                         chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
                         chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
-                    });
+                    });                   
 
             // =================
             indexChart
@@ -396,7 +427,7 @@ $(document).ready(function() {
                     .gap(1)
                     .title(function(d, i) {
                         return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
-                               Math.round(100 * d.data.value.count / ( regionCount * timeAggCount * datasetCount ));
+                               Math.round(100 * d.data.value.count / ( regionCount * timeAggCount * datasetCount ))  +"%";
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
@@ -486,7 +517,7 @@ $(document).ready(function() {
                         return models[d.key];
                     })
                     .title(function(d) {
-                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + " events";
+                        return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + "%";
                     })
                     .gap(2.5);
 
@@ -536,7 +567,7 @@ $(document).ready(function() {
                     })
                     .title(function(d) {
                         //console.log("d: ", d)
-                        return timeAgg_dict[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount ) );
+                        return timeAgg_dict[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount )) + "%";
                         
                     });
 
@@ -687,13 +718,13 @@ function showTimeSeries(regionName) {
         console.log("index, region, scenario: ", index_clicked +', '+ regionName +", "+ scenario_clicked)
 
         $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it
-        $("#jqxwindow").jqxWindow({
-            height:450, width: 900,
-            showCollapseButton: true,
-            initContent: function () {
-                $('#tab').jqxTabs({ height: '100%', width:  '100%' });
-            }
-        });
+        // $("#jqxwindow").jqxWindow({
+        //     height:450, width: 900,
+        //     showCollapseButton: true,
+        //     initContent: function () {
+        //         $('#tab').jqxTabs({ height: '100%', width:  '100%' });
+        //     }
+        // });
 
         renderDiv = ["timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall", "timeChartYear"]
         timeAgg = ["DJF", "MAM", "JJA", "SON", "yr"]; //for highchart titles

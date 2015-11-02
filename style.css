@@ -5,6 +5,10 @@ body {
     line-height: 1.42857;
 }
 
+.panel-transparent {
+        background: none;
+}
+
 .dc-chart .axis text {
     font-family: 'Istok Web', sans-serif;
     font-size: 11px;
@@ -70,16 +74,16 @@ svg:not(:root) {
     transform: translate(36px, 0px);
 }
 #chart-seasons {
-    transform: translate(-52px, 7px);
+    transform: translate(-64px, 7px);
 }
 #chart-category {
     transform: translate(4px, 9px);
 }
 #chart-year {
-    transform: translate(-47px, 0px);
+    transform: translate(-45px, 0px);
 }
 #chart-dataset {
-    transform: translate(-52px, 0px);
+    transform: translate(-64px, 0px);
 }
 
 /* pop-up window tabs */
