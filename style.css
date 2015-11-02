@@ -74,10 +74,7 @@ svg:not(:root) {
     transform: translate(36px, 0px);
 }
 #chart-seasons {
-    transform: translate(-64px, 7px);
-}
-#chart-category {
-    transform: translate(4px, 9px);
+    transform: translate(-64px, -14px);
 }
 #chart-year {
     transform: translate(-45px, 0px);
