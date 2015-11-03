@@ -110,7 +110,7 @@ $(document).ready(function() {
         var yearDimension = filter.dimension(function(d) { return +d.Year; }),
             categoryDimension = filter.dimension(function(d) {
                 if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
-                else return "Rain";                
+                else return "Precip";                
             }),
             indexDimension = filter.dimension(function(d) { return +d.Index; }),
             regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),            
@@ -238,7 +238,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                         }
                         else indexCount = indexChart.filters().length;
 
@@ -257,7 +257,7 @@ $(document).ready(function() {
                         indexCount = numIndices; 
                     }
                     else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                        indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                     }
                     else indexCount = indexChart.filters().length;
 
@@ -339,7 +339,7 @@ $(document).ready(function() {
                     })
                     .renderlet(function (chart) {
                         chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
-                        chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
+                        chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-44, 0)");
                     });
 
             // =================
@@ -431,7 +431,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                         }
                         else indexCount = indexChart.filters().length;
                         
@@ -481,7 +481,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices;
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
                         }
                         else indexCount = indexChart.filters().length;
                         
@@ -519,7 +519,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                         }
                         else indexCount = indexChart.filters().length;
                         
