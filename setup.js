@@ -38,7 +38,8 @@ $(document).ready(function() {
     timeAggregateChart = dc.rowChart("#chart-seasons");
     
     //d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {
-    d3.csv("data/test_noOBS_2indices_2models_noValueCol.csv", function(csv) {    
+    //d3.csv("data/test_noOBS_2indices_2models_noValueCol.csv", function(csv) {
+    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //contains snow
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -320,58 +321,26 @@ $(document).ready(function() {
                     .dimension(categoryDimension)                    
                     .group(avgCategoryGroup)
                     .valueAccessor(function(d) {
-
-                        // if (categoryChart.hasFilter() && !categoryChart.hasFilter(d.key)) {
-                        //     return d.key + '(0%)';
-                        // }
-                        // var label = d.key;
-                        // if (all.value()) {
-                        //     label += '(' + Math.floor(d.value / all.value() * 100) + '%)';
-                        // }
-                        // return label;
-                       
-
-                    //     console.log("d.value in categoryChart: ", d)
-                        
-                        if (d.value != 0) {
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-                        
-                        if (indexChart.filters().length == 0) indexCount = (d.key == "Rain") ? numRainIndices : numHeatIndices;
-                        else indexCount = indexChart.filters().length;
-
-                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
-                        timeAggCount = timeAgg_clicked * yearCount;
-
-                        var label = d.key;
-                        console.log('d.value.key: ', d.key)
-                        
-                        if (all.value()) {
-                            console.log('d.value.count: ', d.value.count)
-                            console.log('all.value(): ', all.value())
-                            label += '(' + Math.floor(d.value.count / all.value() * 100) + '%)';
-                            console.log("label: ", label)
-                        }                        
-
-                        return 100 * d.value.count/( regionCount * timeAggCount * datasetCount * indexCount);
+                        if (d.value != 0) {                            
+                            return Math.round(d.value.count / all.value() * 100);
                         }
-                        
                     })
                     .legend(dc.legend())
                     .title(function(d) {
-                    //     d.data.value.count
-                    //     if (d.data.value != 0) {
-                    //         console.log("d.data: ", d.data)
-                    //         if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
-                    //         else indexCount = indexChart.filters().length;
-                    //         return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + "%";
-                    //     }
+                        if (d.data.value != 0) {
+                            var label;
+                            
+                            if (all.value()) {                                
+                                label = Math.round(d.data.value.count / all.value() * 100) + 
+                                       "% extreme events in selected seasons/years were " + d.data.key + " events";
+                            }
+                            return label;
+                        }
                     })
                     .renderlet(function (chart) {
                         chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
                         chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
-                    });                   
+                    });
 
             // =================
             indexChart
