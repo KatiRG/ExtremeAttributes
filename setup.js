@@ -6,7 +6,7 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 
 //for avgs
-var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, avgObsGroup, modelGroup, obsGroup, datasetGroup;
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, modelGroup;
 
 //for map click
 window.eventRange;
@@ -37,7 +37,9 @@ $(document).ready(function() {
     yearChart = dc.barChart("#chart-year");
     timeAggregateChart = dc.rowChart("#chart-seasons");
     
-    d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {
+    //d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {
+    //d3.csv("data/test_noOBS_2indices_2models_noValueCol.csv", function(csv) {
+    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //contains snow
         
         regions = {
                 1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -105,57 +107,49 @@ $(document).ready(function() {
         var filter = crossfilter(csv);
         var all = filter.groupAll();
 
-        var yearDimension = filter.dimension(function(d) {
-                //return Math.round(d.Year); 
-                return +d.Year; 
-            }),
+        var yearDimension = filter.dimension(function(d) { return +d.Year; }),
             categoryDimension = filter.dimension(function(d) {
                 if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
-                else return "Rain";                
+                else return "Precip";                
             }),
             indexDimension = filter.dimension(function(d) { return +d.Index; }),
-            regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),
-            datasetDimension = filter.dimension(function(d) { return +d.Model; }),
+            regionDimension = filter.dimension(function(d, i) { return regions[d.Region]; }),            
             modelDimension = filter.dimension(function(d) { return +d.Model; }),
             seasonDimension = filter.dimension(function(d) { return d.TimeAggregate; }),
             scenarioDimension = filter.dimension(function(d) { return d.Scenario; });
 
-        var indexGroup = indexDimension.group(),
-            categoryGroup = categoryDimension.group(),
-            seasonGroup = seasonDimension.group(),
-            yearGroup = yearDimension.group(),
-            regionGroup = regionDimension.group();
-            datasetGroup = datasetDimension.group();
-            modelGroup = modelDimension.group();
+        // var indexGroup = indexDimension.group(),
+        //     categoryGroup = categoryDimension.group(),
+        //     seasonGroup = seasonDimension.group(),
+        //     yearGroup = yearDimension.group(),
+        //     regionGroup = regionDimension.group();            
+        var modelGroup = modelDimension.group();
 
         // ===============================================================================================       
-        var numModels = modelGroup.size() - 1;  //exclude OBS
+        var numModels = modelGroup.size();  //exclude OBS
         var numRegions = Object.keys(regions).length;
         var numIndices = Object.keys(indexID).length;
         var numCategories = 2;
         var numHeatIndices = 3; var numRainIndices = 7;
         var numTimeAgg = 5; //number of time aggregates (4 seasons + year)
-        var modelRange = 2100-1972, obsRange = 2012 - 1972;
+        var modelRange = 2100 - 1972, obsRange = 2012 - 1972;
         var ymin = 0; var ymax = 100; //min and max for y-axes of year bar chart
         
         avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
-        avgDatasetGroup = datasetDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+        avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);        
         avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
         avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
         //Fns to count data for all datasets except the OBS data (id=100).
         function reduceAdd(p, v) {
-            if (v.Model < 100) ++p.count;
-            else p.count = p.count + 0;
+            ++p.count;            
 
              return p;
         }
 
         function reduceRemove(p, v) {
-            if (v.Model < 100) --p.count;
-            else p.count = p.count - 0;
+            --p.count;            
 
             return p;
         }
@@ -171,40 +165,26 @@ $(document).ready(function() {
         var year = filter.dimension(function(d) { return +d.Year; });
         avgEventsBySeason = year.group().reduce(
             // add
-            function(p, v) {
-
-                if (v.Model < 100) { //do not count OBS
+            function(p, v) {            
                     
                     if (v.TimeAggregate == "DJF") ++p.season0Count;
                     if (v.TimeAggregate == "MAM") ++p.season1Count;
                     if (v.TimeAggregate == "JJA") ++p.season2Count;
                     if (v.TimeAggregate == "SON") ++p.season3Count;
                     if (v.TimeAggregate == "yr")  ++p.yrAggCount;
-                } else {
-                    p.season0Count = p.season0Count + 0;
-                    p.season1Count = p.season1Count + 0;
-                    p.season2Count = p.season2Count + 0;
-                    p.season3Count = p.season3Count + 0;
-                    p.yrAggCount = p.yrAggCount + 0;
-                }
+                
 
                 return p;
             },
             // remove
             function(p, v) {
-                if (v.Model < 100) {
+                
                     if (v.TimeAggregate == "DJF") --p.season0Count;
                     if (v.TimeAggregate == "MAM") --p.season1Count;
                     if (v.TimeAggregate == "JJA") --p.season2Count;
                     if (v.TimeAggregate == "SON") --p.season3Count;
                     if (v.TimeAggregate == "yr")  --p.yrAggCount;
-                } else {
-                    p.season0Count = p.season0Count - 0;
-                    p.season1Count = p.season1Count - 0;
-                    p.season2Count = p.season2Count - 0;
-                    p.season3Count = p.season3Count - 0;
-                    p.yrAggCount = p.yrAggCount - 0;
-                }
+                 
 
                 return p;
             },
@@ -228,15 +208,6 @@ $(document).ready(function() {
 
         d3.selectAll("#total").text(filter.size()); // total number of events
 
-        //MAP
-        //var width = 200, height = 300;
-
-        //http://lookingfora.name/2013/06/14/geofla-d3-js-carte-interactive-des-departements-francais/
-        // var projection = d3.geo.conicConformal() // Lambert-93
-        //     .center([6, 49]) // On centre la carte sur la France
-        //     .scale(100)
-        //     .translate([180, 100]);
-        
         // ===============================================================================================
         //  READ IN GEOJSON
         // ===============================================================================================        
@@ -267,7 +238,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                         }
                         else indexCount = indexChart.filters().length;
 
@@ -286,7 +257,7 @@ $(document).ready(function() {
                         indexCount = numIndices; 
                     }
                     else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                        indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                        indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                     }
                     else indexCount = indexChart.filters().length;
 
@@ -347,59 +318,29 @@ $(document).ready(function() {
                     .slicesCap(4)
                     .innerRadius(10)
                     .colors([indexColours[0], indexColours[8]])
-                    .dimension(categoryDimension)
-                    //.group(categoryGroup)
+                    .dimension(categoryDimension)                    
                     .group(avgCategoryGroup)
                     .valueAccessor(function(d) {
-
-                        // if (categoryChart.hasFilter() && !categoryChart.hasFilter(d.key)) {
-                        //     return d.key + '(0%)';
-                        // }
-                        // var label = d.key;
-                        // if (all.value()) {
-                        //     label += '(' + Math.floor(d.value / all.value() * 100) + '%)';
-                        // }
-                        // return label;
-                       
-
-                    //     console.log("d.value in categoryChart: ", d)
-                        
-                        if (d.value != 0) {
-                        regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-                        datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-                        
-                        if (indexChart.filters().length == 0) indexCount = (d.key == "Rain") ? numRainIndices : numHeatIndices;
-                        else indexCount = indexChart.filters().length;
-
-                        yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
-                        timeAggCount = timeAgg_clicked * yearCount;
-
-                        var label = d.value.key;
-                        console.log('d.value.key: ', d)
-                        if (all.value()) {
-                            label += '(' + Math.floor(d.value / all.value() * 100) + '%)';
+                        if (d.value != 0) {                            
+                            return Math.round(d.value.count / all.value() * 100);
                         }
-                        console.log("label: ", label)
-
-                        return 100 * d.value.count/( regionCount * timeAggCount * datasetCount * indexCount);
-                        }
-                        
                     })
                     .legend(dc.legend())
                     .title(function(d) {
-                    //     d.data.value.count
-                    //     if (d.data.value != 0) {
-                    //         console.log("d.data: ", d.data)
-                    //         if (indexChart.filters().length == 0) indexCount = (d.data.key == "Rain") ? numRainIndices : numHeatIndices;
-                    //         else indexCount = indexChart.filters().length;
-                    //         return d.data.key + ": " + Math.round(100 * d.data.value.count/(regionCount * timeAggCount * datasetCount * indexCount)) + "%";
-                    //     }
+                        if (d.data.value != 0) {
+                            var label;
+                            
+                            if (all.value()) {                                
+                                label = Math.round(d.data.value.count / all.value() * 100) + 
+                                       "% extreme events in selected seasons/years were " + d.data.key + " events";
+                            }
+                            return label;
+                        }
                     })
                     .renderlet(function (chart) {
                         chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
-                        chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-38, 0)");
-                    });                   
+                        chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-44, 0)");
+                    });
 
             // =================
             indexChart
@@ -466,19 +407,6 @@ $(document).ready(function() {
             })
         
             // =================
-
-            function remove_empty_bins(source_group) {
-                return {
-                    all:function () {
-                        return source_group.all().filter(function(d) {
-                            return d.key != 100;
-                        });
-                    }
-                };
-            }
-
-            modelGroupNoSafran = remove_empty_bins(avgModelGroup);
-
             datasetChart
                     .width(200).height(243)
                     // .margins({
@@ -488,8 +416,8 @@ $(document).ready(function() {
                     //     left: 10
                     // })
                     .dimension(modelDimension)
-                    //.group(avgModelGroup)
-                    .group(modelGroupNoSafran)     
+                    .group(avgModelGroup)
+                    //.group(modelGroupNoSafran)     
                     .valueAccessor(function(d) {
                         yearRange = (d.key == 100) ? obsRange : modelRange;
                         regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
@@ -503,7 +431,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                         }
                         else indexCount = indexChart.filters().length;
                         
@@ -528,11 +456,8 @@ $(document).ready(function() {
                     .xAxis().scale(datasetChart.x()).tickValues([0, 25, 50, 75, 100]);
 
             // =================
-            // var widthtest = document.getElementById('chart-seasons').offsetWidth;
-            // console.log("widthtest: ", widthtest)
-
             timeAggregateChart
-                    .width(225).height(152)
+                    .width(225).height(172)
                     // .margins({
                     //     top: 10,
                     //     right: 30,
@@ -550,23 +475,20 @@ $(document).ready(function() {
                         datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
                         
                         yearCount = yearChart.filters().length ? ( parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0]) ) : modelRange;
-                        // timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
-                        // timeAggCount = timeAgg_clicked * yearCount;
 
                         if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories) ) {
                             //no indices selected && (category chart not selected OR all categories selected)
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices;
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
                         }
                         else indexCount = indexChart.filters().length;
                         
                         return 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount );
 
                     })
-                    .title(function(d) {
-                        //console.log("d: ", d)
+                    .title(function(d) {                        
                         return timeAgg_dict[d.key] +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount )) + "%";
                         
                     });
@@ -574,17 +496,15 @@ $(document).ready(function() {
                     timeAggregateChart                            
                             .x(d3.scale.linear().range([0,(timeAggregateChart.width()-50)]).domain([0,100]));
                     timeAggregateChart
-                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 25, 50, 75, 100]);
+                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
 
 
             // =================
             yearChart
-                    .width(550).height(265)
-                    .dimension(yearDimension)
-                    //.group(yearGroup)
+                    .width(542).height(265)
+                    .dimension(yearDimension)                    
                     .group(avgEventsBySeason)
-                    .valueAccessor(function(d) {
-                        //console.log("d.value: ", d.value)
+                    .valueAccessor(function(d) {                        
                         
                         //add time aggregates and normalized by num aggregates selected
                         timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
@@ -599,7 +519,7 @@ $(document).ready(function() {
                             indexCount = numIndices; 
                         }
                         else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) {//no indices selected but category chart selected
-                            indexCount = categoryChart.filters() == "Rain" ? numRainIndices : numHeatIndices; 
+                            indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices; 
                         }
                         else indexCount = indexChart.filters().length;
                         
@@ -616,7 +536,7 @@ $(document).ready(function() {
                     .yAxisLabel("Event Probability (%)");
 
                 yearChart
-                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1975,1985,1995,2005,2015,2025,2035,2045,2055,2065,2075,2085,2095]);
+                    .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1970,1980,1990,2000,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100]);
                 yearChart
                     .yAxis().tickValues([25, 50, 75, 100]);   
           
@@ -700,8 +620,6 @@ function resetTSbutton() {
 }
 
 
-
-
 //--------------------------------------------------------------------
 //  TIME SERIES PLOTTIING
 //--------------------------------------------------------------------
@@ -710,7 +628,7 @@ function showTimeSeries(regionName) {
     //only show if ONE index filter has been selected
     if (indexChart.filters().length == 1) {
         
-        //console.log("In showTimeSeries for ", regionName);        
+        //console.log("In showTimeSeries for ", regionName);
         index_clicked = indexNames[indexChart.filters()[0] - 1];
 
         clearSeries();
@@ -733,13 +651,13 @@ function showTimeSeries(regionName) {
 
             callHighChart(tsTitle, renderDiv[j]);
             makeRequest(regionName, timeAgg[j]);
-        }            
+        }
 
     }
 }
 
-function clearSeries() {    
-    d3.selectAll("div#timeChart").selectAll("h2").remove();    
+function clearSeries() {
+    d3.selectAll("div#timeChart").selectAll("h2").remove();
 }
 
 
@@ -750,7 +668,7 @@ function makeRequest(regionName, aggr) {
     regionNum = region_dict[legend.indexOf(regionName)].value;
     
     datasetFiltered = datasetChart.filters();    
-    for (var i = 0; i < Object.keys(models).length -1; i++) { //last model is OBS data, therefore do not read it
+    for (var i = 0; i < Object.keys(models).length; i++) {
         idx = i+1;        
                 
         var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
@@ -760,7 +678,7 @@ function makeRequest(regionName, aggr) {
 
     // obs    
     var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked +  "_" + aggr + "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
-    addData(request, '#000000', 'Solid', 'Obs Safran', true, true);    
+    addData(request, '#000000', 'Solid', 'Obs Safran', true, true);
     // calcul of the mean for 1976-2005 for obs
 
 
@@ -793,7 +711,7 @@ function addData(request, color, dash, label, visible, addPercentile) {
                 data: []
             };
             // Iterate over the lines and add categories or series
-            $.each(lines, function(lineNo, line) {                
+            $.each(lines, function(lineNo, line) {
                 // ncss display a empty line at end
                 if (line.length == 0) return false;
                 var items = line.split(',');
@@ -819,7 +737,7 @@ function addData(request, color, dash, label, visible, addPercentile) {
                 // OBS Safran is described from 1971 to 2012
                 // to calculate mean for 1976-2005 as reference period according to Rapport Jouzel
                 // consider 4:33 (in javascript notation start 0) so arr.slice(4,33)
-                dataValues = dataValues.slice(4, 33);                
+                dataValues = dataValues.slice(4, 33);
                 //percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2
                 //percentile90 = percentile(dataValues.sort(), .90);            
 
@@ -850,7 +768,7 @@ function addData(request, color, dash, label, visible, addPercentile) {
                     dashStyle: 'ShortDash',
                     width: 2,
                     value: percentile10,
-                    zIndex: 10,                    
+                    zIndex: 10,
                     label: {
                         text: ' 10th Percentile',
                         y: 14,
