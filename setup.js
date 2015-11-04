@@ -530,7 +530,7 @@ $(document).ready(function() {
                     .centerBar(true)    
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
-                    .elasticY(true)
+                    //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .xAxisLabel("Year")
                     .yAxisLabel("Event Probability (%)");
