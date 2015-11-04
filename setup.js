@@ -743,8 +743,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
 
                 //NOTE: cannot use .sort() for floats!
                 //http://stackoverflow.com/questions/18496898/sorting-array-of-float-point-numbers
-                percentile90 = percentile(dataValues, .90);
-                percentile10 = percentile(dataValues, .10);
+                percentile90 = percentile(dataValues, 90);
+                percentile10 = percentile(dataValues, 10);
                 
                 console.log("percentile 90 and 10: ", percentile90 +", "+ percentile10)
                 //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
