@@ -64,8 +64,7 @@ $(document).ready(function() {
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
                 5: "MetEir-ECEARTH_RACMO22E",
                 6: "MPI-ESM-LR_CCLM4-8-17",
-                7: "MPI-ESM-LR_REMO019",
-                100: "OBS Safran"
+                7: "MPI-ESM-LR_REMO019"                
         };
 
         indices = {
@@ -502,9 +501,9 @@ $(document).ready(function() {
             // =================
             yearChart
                     .width(542).height(265)
-                    .dimension(yearDimension)                    
+                    .dimension(yearDimension)
                     .group(avgEventsBySeason)
-                    .valueAccessor(function(d) {                        
+                    .valueAccessor(function(d) {
                         
                         //add time aggregates and normalized by num aggregates selected
                         timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
@@ -528,9 +527,10 @@ $(document).ready(function() {
                     })
                     //.filter([2001, 2030])
                     .gap(0)
+                    .centerBar(true)    
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
-                    //.elasticY(true)
+                    .elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .xAxisLabel("Year")
                     .yAxisLabel("Event Probability (%)");
@@ -743,8 +743,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
 
                 //NOTE: cannot use .sort() for floats!
                 //http://stackoverflow.com/questions/18496898/sorting-array-of-float-point-numbers
-                percentile90 = percentile(dataValues.sort(function(a,b) { return a - b;}), .90);
-                percentile10 = percentile(dataValues.sort(function(a,b) { return a - b;}), .10);
+                percentile90 = percentile(dataValues, 90);
+                percentile10 = percentile(dataValues, 10);
                 
                 console.log("percentile 90 and 10: ", percentile90 +", "+ percentile10)
                 //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;
