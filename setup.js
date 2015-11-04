@@ -371,7 +371,6 @@ $(document).ready(function() {
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
-                    //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .yAxisLabel("Event Probability (%)");
 
@@ -530,7 +529,6 @@ $(document).ready(function() {
                     .centerBar(true)    
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
-                    .elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .xAxisLabel("Year")
                     .yAxisLabel("Event Probability (%)");
