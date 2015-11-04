@@ -17,6 +17,7 @@ var regionCount, datasetCount, regionCount, indexCount, yearCount;
 
 $(document).ready(function() {
 
+    window.addEventListener('resize', dc.renderAll);
     document.getElementById("ts-button").disabled = true;
 
     $("#jqxwindow").jqxWindow({
@@ -343,7 +344,8 @@ $(document).ready(function() {
 
             // =================
             indexChart
-                    .width(400).height(243)
+                    //.width(400)
+                    .height(243)
                     .margins({
                         top: 10,
                         right: 30,
@@ -500,7 +502,8 @@ $(document).ready(function() {
 
             // =================
             yearChart
-                    .width(542).height(265)
+                    //.width(542)
+                    .height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
