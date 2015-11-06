@@ -325,7 +325,7 @@ $(document).ready(function() {
                         }
                     })
                     .legend(dc.legend())
-                    .title(function(d) {
+                    .title(function(d) {                        
                         if (d.data.value != 0) {
                             var label;
                             
@@ -365,7 +365,7 @@ $(document).ready(function() {
                     })
                     .renderHorizontalGridLines(true)
                     .gap(1)
-                    .title(function(d, i) {
+                    .title(function(d, i) {                        
                         return indexID[i+1] + " (" + indices[indexID[i+1]] + ")" + ":\n" + 
                                Math.round(100 * d.data.value.count / ( regionCount * timeAggCount * datasetCount ))  +"%";
                     })                    
@@ -499,7 +499,8 @@ $(document).ready(function() {
 
             // =================
             yearChart
-                    //.width(542).height(265)
+                    .width(542)
+                    .height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
@@ -609,15 +610,39 @@ $(document).ready(function() {
             //Show timeseries if button is clicked
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
 
-            yearChart.width(function(el){return el.parentNode.getBoundingClientRect().width;});
-            yearChart.height(function(el){return el.parentNode.getBoundingClientRect().height;});
+            //Needs dc.js 2.0.0
+            // yearChart.width(function(el){return el.parentNode.getBoundingClientRect().width;});
+            // yearChart.height(function(el){return el.parentNode.getBoundingClientRect().height;});
+            // window.addEventListener('resize', function(){
+            //     console.log('resizing');
+            //     console.log("width: ", yearChart.width());
+            //     console.log("height: ", yearChart.height());
+            //     yearChart.render();
+            // });
+
             
-            window.addEventListener('resize', function(){
-                console.log('resizing');
-                console.log(yearChart.width());
-                console.log(yearChart.height());
-                chart.render();
-            });
+            // window.addEventListener('resize', function(){
+            //   dc.chartRegistry.list().forEach(function(chart){             
+            //     console.log("chart: ", chart)
+            //     console.log("chart.anchor(): ", chart.anchor())
+            //     console.log("chart.root(): ", chart.root())                
+            //     _bbox = chart.root().node().parentNode.getBoundingClientRect();
+            //     chart.width(_bbox.width).height(_bbox.height).render();                
+            //   });
+            // });
+
+
+            function onresize() {
+                dc.chartRegistry.list().forEach(function(chart) {
+                    _bbox = chart.root().node().parentNode.getBoundingClientRect();
+                    console.log("_bbox: ", _bbox)
+                    chart.width(_bbox.width).height(_bbox.height).render();
+                });
+            };
+            
+            onresize();
+  
+            window.addEventListener('resize', onresize);
 
         }); //end geojson
     }); //end csv
