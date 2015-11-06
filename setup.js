@@ -17,7 +17,6 @@ var regionCount, datasetCount, regionCount, indexCount, yearCount;
 
 $(document).ready(function() {
 
-    window.addEventListener('resize', dc.renderAll);
     document.getElementById("ts-button").disabled = true;
 
     $("#jqxwindow").jqxWindow({
@@ -35,7 +34,7 @@ $(document).ready(function() {
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
     categoryChart = dc.pieChart("#chart-category");
-    yearChart = dc.barChart("#chart-year");
+    yearChart = dc.barChart(document.getElementById("chart-year"))
     timeAggregateChart = dc.rowChart("#chart-seasons");
     
     //d3.csv("data/timeAgg_7models_10indices.csv", function(csv) {
@@ -344,8 +343,7 @@ $(document).ready(function() {
 
             // =================
             indexChart
-                    //.width(400)
-                    .height(243)
+                    .width(400).height(243)
                     .margins({
                         top: 10,
                         right: 30,
@@ -373,7 +371,6 @@ $(document).ready(function() {
                     })                    
                     .x(d3.scale.ordinal().domain(indexNames))
                     .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
-                    //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .yAxisLabel("Event Probability (%)");
 
@@ -502,8 +499,7 @@ $(document).ready(function() {
 
             // =================
             yearChart
-                    //.width(542)
-                    .height(265)
+                    //.width(542).height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
@@ -533,7 +529,6 @@ $(document).ready(function() {
                     .centerBar(true)    
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
-                    .elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .xAxisLabel("Year")
                     .yAxisLabel("Event Probability (%)");
@@ -613,6 +608,16 @@ $(document).ready(function() {
             // =================
             //Show timeseries if button is clicked
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
+
+            yearChart.width(function(el){return el.parentNode.getBoundingClientRect().width;});
+            yearChart.height(function(el){return el.parentNode.getBoundingClientRect().height;});
+            
+            window.addEventListener('resize', function(){
+                console.log('resizing');
+                console.log(yearChart.width());
+                console.log(yearChart.height());
+                chart.render();
+            });
 
         }); //end geojson
     }); //end csv
@@ -746,8 +751,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
 
                 //NOTE: cannot use .sort() for floats!
                 //http://stackoverflow.com/questions/18496898/sorting-array-of-float-point-numbers
-                percentile90 = percentile(dataValues, .90);
-                percentile10 = percentile(dataValues, .10);
+                percentile90 = percentile(dataValues, 90);
+                percentile10 = percentile(dataValues, 10);
                 
                 console.log("percentile 90 and 10: ", percentile90 +", "+ percentile10)
                 //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;

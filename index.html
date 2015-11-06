@@ -23,6 +23,13 @@
     <script src="lib/colorbrewer.js"></script>
 
 
+<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.0-beta.20/dc.css" rel="stylesheet" type="text/css" />  
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
     <!--ONLINE LINKS
     <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="http://cdnjs.buttflare.com/ajax/libs/dc/1.7.0/dc.js"></script>
@@ -49,8 +56,7 @@
     <script type="text/javascript" src="lib/jqxcore.js"></script>    
     <script type="text/javascript" src="lib/jqxwindow.js"></script>
     <script type="text/javascript" src="lib/jqxtabs.js"></script>
-    <script type="text/javascript" src="lib/jqxpanel.js"></script>
-    <script type="text/javascript" src="demos.js"></script>
+    <script type="text/javascript" src="lib/jqxpanel.js"></script>    
     
 
     <script type="text/javascript" src="setup.js"></script>
@@ -192,24 +198,27 @@
                 </div>
                
                     
-                <div class="col-lg-5" style="z-index: 1"><div class="dc-chart">
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5" style="z-index: 1">
                 
-                    <div id="chart-index" class="col-lg-5">
+                    <div id="chart-index">
                             <div class="filterName" div class="col-lg-2">Climate Index
                                 <a class="reset" href="javascript:indexChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
                                 <span class="reset" style="display: none;"></span>
                             </div>
                     </div>
 
-                    
-                    <div id="chart-year" class="col-lg-5">
-                        <div class="filterName">Year range
-                            <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                            <span class="reset" style="display: none;"></span>
-                        </div>
+                    <div class="col-lg-6 col-lg-6 col-md-push-5 col-sm-push-5">
+                        <div class="well" style="height: 265px;padding:0;">
+                            <div id="chart-year" class="col-md-6 col-sm-6">                        
+                                <!--<div class="filterName">Year range
+                                    <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                                    <span class="reset" style="display: none;"></span>
+                                </div> -->
+                            </div>
+                        </div>        
                     </div>
 
-                </div></div>  
+                </div>    
                         
                 
             </div> <!--end ROW-->
