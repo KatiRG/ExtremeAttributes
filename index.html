@@ -9,183 +9,117 @@
 -->
 
 <head>
-    <meta charset="utf-8">  
+  <meta charset="utf-8">
 
-    <title>Extremoscope</title>
+  <title>Extremoscope</title>
+
+  <!-- d3 and dc -->
+  <script src="lib/d3.v3.min.js" /></script>
+  <script src="lib/crossfilter.js"></script>
+  <script src="lib/dc.js"></script>
+  <link rel="stylesheet" href="lib/dc.css"/>
+  <script src="lib/jquery-1.10.2.min.js"></script>
+  <script src="lib/colorbrewer.js"></script>
+
+  <!-- css links -->
+  <link href="lib/bootstrap-3.0.2-dist/css/bootstrap.min.css"
+  rel="stylesheet">
+  <script src="lib/bootstrap-3.0.2-dist/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="setup.js"></script>
+  <link href="style.css" rel="stylesheet" type="text/css"
+  media="all">
+
+  <!--Leaflet from Yurukov-->
+  <!--<script type="text/javascript" src="lib/dc.leaflet.js"></script>-->
+  <script type="text/javascript" src="lib/my-dc.leaflet.js"></script>
+  <script type="text/javascript" src="lib/leaflet.js"></script>
+  <link type="text/css" href="lib/leaflet.css"
+  rel="stylesheet" />
+
+  <!--dc-leaflet-choropleth legend and window display-->
+  <style>
+    #holder {
+      width: 850px;
+      margin: 20px auto;
+    }
     
-    <!-- d3 and dc -->    
-    <script src="lib/d3.v3.min.js"/></script>
-    <script src="lib/crossfilter.js"></script>
-    <script src="lib/dc.js"></script>    
-    <link rel="stylesheet" href="lib/dc.css" />
-    <script src="lib/jquery-1.10.2.min.js"></script>
-    <script src="lib/colorbrewer.js"></script>
-
-
-    <!--ONLINE LINKS
-    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="http://cdnjs.buttflare.com/ajax/libs/dc/1.7.0/dc.js"></script>
-    <script type="text/javascript" src="https://rawgithub.com/NickQiZhu/dc.js/master/web/js/crossfilter.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://tvinci.github.io/webs/css/dc.css"/>    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.3/dc.min.js"></script>
-    -->
-
-    <!-- css links -->
-    <link href="lib/bootstrap-3.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="lib/bootstrap-3.0.2-dist/js/bootstrap.min.js"></script>
-    <!-- Custom styles for this template -->
-    <link href="sticky-footer-navbar.css" rel="stylesheet">    
-
-    <script src="lib/highstock.js"></script>
-    <script src="lib/exporting.js"></script>
-
-    <script src="lib/math.min.js"></script>
-
-    <!-- jQWidgets -->
-    <!-- add the jQWidgets framework -->
-    <link rel="stylesheet" href="lib/jqx.base.css" type="text/css" />
-    <script type="text/javascript" src="lib/jqxcore.js"></script>    
-    <script type="text/javascript" src="lib/jqxwindow.js"></script>
-    <script type="text/javascript" src="lib/jqxtabs.js"></script>
-    <script type="text/javascript" src="lib/jqxpanel.js"></script>
-    <script type="text/javascript" src="demos.js"></script>
+    #holder>div {
+      padding: 30px 0;
+      clear: both;
+    }
     
-
-    <script type="text/javascript" src="setup.js"></script>
-    <link href="style.css" rel="stylesheet" type="text/css" media="all">
-
-    <!-->Leaflet from Yurukov<-->
-    <!--<script type="text/javascript" src="lib/dc.leaflet.js"></script>-->
-    <script type="text/javascript" src="lib/my-dc.leaflet.js"></script>
-    <script type="text/javascript" src="lib/leaflet.js"></script>
-    <link type="text/css" href="lib/leaflet.css" rel="stylesheet"/>
-
-    <!-->pace.js progress bar<-->
-    <script src="lib/pace.js"></script>
-    <link href="style-pace-fill-left.css" rel="stylesheet" />
-
-    <!-->percentile https://gist.github.com/IceCreamYou/6ffa1b18c4c8f6aeaad2<-->
-    <script src="lib/percentile.js"></script>
-
-    <!-->dc-leaflet-choropleth legend and window display<-->
-    <style>
-        #holder {
-          width:850px;
-          margin:20px auto;
-        }
-        #holder>div {
-          padding:30px 0;
-          clear:both;
-        }
-        .map {
-          width:400px;
-          height:535px;
-        }
-        .pie {
-          margin-left:30px;
-        }
-    </style>
+    .map {
+      width: 400px;
+      height: 535px;
+    }
+    
+    .pie {
+      margin-left: 30px;
+    }
+  </style>
 
 </head>
 
 <body>
 
-    <div id="wrap">
+  <div id="wrap">
 
-        <!-- Fixed navbar -->
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.html">Extremoscope: Evolution of extremes in France</a>
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h2>Mean Daily Temperature: seaonal and yearly aggregates </h2> Projected evolution of Mean Daily
+          Temperature in France based on
+          model MetEir-ECEARTH_RACMO22E for
+          scenario rcp8.5. Extremes defined
+          as less than 10th or above the
+          90th percentile using the reference
+          period 1976 &ndash; 2005.
+
+          <div class="row">
+            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+              <div id="choro-map">
+                <div class="filterName">Map
+                  <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
+                  <span class="reset" style="display: none;"></span>
                 </div>
+                <div class="map"></div>
+              </div>
             </div>
-        </div>
 
-        <!-- Begin page content -->
-        <div class="container">
-              
-            <div class="row">
-                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
-                   
-                </div> <!--col class-->
-            </div> <!--row-->
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
 
-
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <h2>Mean Daily Temperature: seaonal and yearly aggregates </h2> 
-                    Projected evolution of Mean Daily Temperature in France based on model MetEir-ECEARTH_RACMO22E for scenario rcp8.5. Extremes are characterized by values less than the 10th or above the 90th percentile using the reference period 1976 &ndash; 2005.
-
-            <!--ROW 1-->
-
-            <div class="row">    
-                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
-                        <div id="choro-map">
-                            <div class="filterName">Map
-                                <a class="reset" href="javascript:choroChart.filterAll();dc.redrawAll();">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>    
-                            <div class="map"></div>
-                        </div>
-                </div>   
-                   
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-
-                    <div class="short-div">
-                        <div id="chart-seasons">
-                            <div class="filterName">Time Aggregate
-                                <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="short-div">
-                        <div id="chart-year">
-                            <div class="filterName">Year range
-                                <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>
-                        </div>
-                    </div>
-
-
+              <div class="short-div">
+                <div id="chart-seasons">
+                  <div class="filterName">Time Aggregate
+                    <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();"
+                    style="display: none;">reset</a>
+                    <span class="reset" style="display: none;"></span>
+                  </div>
                 </div>
-               
-                    
-               
-                
-            </div> <!--end ROW-->
+              </div>
 
-                </div><!--panel body-->
-            </div><!--panel default-->
+              <div class="short-div">
+                <div id="chart-year">
+                  <div class="filterName">Year range
+                    <a class="reset" href="javascript:yearChart.filterAll();dc.redrawAll();"
+                    style="display: none;">reset</a>
+                    <span class="reset" style="display: none;"></span>
+                  </div>
+                </div>
+              </div>
 
+            </div>
 
-           
-
-        </div> <!-- /.container -->        
-
-    </div>  <!-- /.wrap -->
-   
-
-
-
-    <div id="footer">
-        <div class="container">
-            <p class="text-muted credit">Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version 1.1 - 2015/11/01</p>
-        </div>       
+          </div>
+        </div>
+      </div>
     </div>
-
+    <!-- /.container -->
+  </div>
+  <!-- /.wrap -->
 
 </body>
-
-
 
 </html>
