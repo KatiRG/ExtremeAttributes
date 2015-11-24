@@ -6,7 +6,6 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var avgRegionGroup, avgEventsBySeason;
 
 //for map click
-window.eventRange;
 var choroChart;
 
 //to be defined in each chart:
