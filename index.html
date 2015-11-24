@@ -144,10 +144,6 @@
 
     _legend.update = function() {
 
-      //**Dirty hack** Display legend only when all dc charts are cycled through
-      //numCharts++;
-
-      //if (numCharts == 2) {
         minValue = choroChart.colorDomain()[0];
         maxValue = choroChart.colorDomain()[1];
         palette = choroChart.colors().range();
@@ -170,7 +166,6 @@
             '<i style="background:' + palette[i] + '"></i> ' +
             grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
         }
-      //}
     };
 
     //###################################
@@ -613,10 +608,10 @@
 
 
 
-      // choroChart.on("preRender", function(chart) {
-      //     chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
-      //         //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
-      // });
+      choroChart.on("preRender", function(chart) {
+          chart.colorDomain(d3.extent(chart.group().all(), chart.valueAccessor()));
+              //console.log("eventRange in preRender: ", d3.extent(chart.group().all(), chart.valueAccessor())) 
+      });
 
       choroChart.on("preRedraw", function(chart) {
         //save initial eventRange upon page load
