@@ -64,7 +64,17 @@ $(document).ready(function() {
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
                 5: "MetEir-ECEARTH_RACMO22E",
                 6: "MPI-ESM-LR_CCLM4-8-17",
-                7: "MPI-ESM-LR_REMO019"                
+                7: "MPI-ESM-LR_REMO019"
+        };
+        //Display short name in bar graph
+         models_short = {
+                1: "CNRM-CERFACS..._RCA4",
+                2: "ICHEC-EC..._HIRHAM5",
+                3: "ICHEC-EC..._RCA4",
+                4: "IPSL-IPSL..._WRF331F",
+                5: "MetEir..._RACMO22E",
+                6: "MPI-ESM..._CCLM4-8-17",
+                7: "MPI-ESM..._REMO019"
         };
 
         indices = {
@@ -441,7 +451,7 @@ $(document).ready(function() {
                         return -d.value;
                     })
                     .label(function(d) {
-                        return models[d.key];
+                        return models_short[d.key];
                     })
                     .title(function(d) {
                         return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + "%";
@@ -456,13 +466,7 @@ $(document).ready(function() {
 
             // =================
             timeAggregateChart
-                    .width(225).height(172)
-                    // .margins({
-                    //     top: 10,
-                    //     right: 30,
-                    //     bottom: 30,
-                    //     left: 10
-                    // })
+                    .width(160).height(172)                    
                     .colors(["#888888"])
                     .dimension(seasonDimension)
                     .group(avgSeasonGroup)
@@ -495,12 +499,12 @@ $(document).ready(function() {
                     timeAggregateChart                            
                             .x(d3.scale.linear().range([0,(timeAggregateChart.width()-50)]).domain([0,100]));
                     timeAggregateChart
-                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 25, 50, 75, 100]);
 
 
             // =================
             yearChart
-                    .width(542).height(265)
+                    .width(555).height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
@@ -610,6 +614,21 @@ $(document).ready(function() {
             // =================
             //Show timeseries if button is clicked
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
+
+            // function onresize() {
+            //     dc.chartRegistry.list().forEach(function(chart) {
+            //         _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
+            //         console.log("_bbox: ", _bbox)
+            //         console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
+            //         chart.width(_bbox.width)
+            //              //.height(_bbox.height)
+            //              .render();
+            //     });
+            // };
+            
+            // onresize();
+  
+            // window.addEventListener('resize', onresize);
 
         }); //end geojson
     }); //end csv
