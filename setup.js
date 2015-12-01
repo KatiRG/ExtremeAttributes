@@ -654,14 +654,7 @@ function showTimeSeries(regionName) {
 
         console.log("index, region, scenario: ", index_clicked +', '+ regionName +", "+ scenario_clicked)
 
-        $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it
-        // $("#jqxwindow").jqxWindow({
-        //     height:450, width: 900,
-        //     showCollapseButton: true,
-        //     initContent: function () {
-        //         $('#tab').jqxTabs({ height: '100%', width:  '100%' });
-        //     }
-        // });
+        $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it       
 
         renderDiv = ["timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall", "timeChartYear"]
         timeAgg = ["DJF", "MAM", "JJA", "SON", "yr"]; //for highchart titles
@@ -701,19 +694,19 @@ function makeRequest(regionName, aggr) {
     // calcul of the mean for 1976-2005 for obs
 
 
-    highchart.addSeries({
-        type: 'flags',
-        color: '#333333',
-        fillColor: 'rgba(255,255,255,0.8)',
-        shape: 'squarepin',
-        data: [{
-            x: Date.UTC(2010, 7, 1),
-            text: 'Highcharts Cloud Beta',
-            title: 'a remarkable event'
-        }],
-        onSeries: 'Obs Safran',
-        showInLegend: false
-    });
+    // highchart.addSeries({
+    //     type: 'flags',
+    //     color: '#333333',
+    //     fillColor: 'rgba(255,255,255,0.8)',
+    //     shape: 'squarepin',
+    //     data: [{
+    //         x: Date.UTC(2010, 7, 1),
+    //         text: 'Highcharts Cloud Beta',
+    //         title: 'a remarkable event'
+    //     }],
+    //     onSeries: 'Obs Safran',
+    //     showInLegend: false
+    // });
 
 }
 
