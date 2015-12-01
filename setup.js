@@ -64,7 +64,17 @@ $(document).ready(function() {
                 4: "IPSL-IPSL-CM5A-MR_WRF331F",
                 5: "MetEir-ECEARTH_RACMO22E",
                 6: "MPI-ESM-LR_CCLM4-8-17",
-                7: "MPI-ESM-LR_REMO019"                
+                7: "MPI-ESM-LR_REMO019"
+        };
+        //Display short name in bar graph
+         models_short = {
+                1: "CNRM-CERFACS..._RCA4",
+                2: "ICHEC-EC..._HIRHAM5",
+                3: "ICHEC-EC..._RCA4",
+                4: "IPSL-IPSL..._WRF331F",
+                5: "MetEir..._RACMO22E",
+                6: "MPI-ESM..._CCLM4-8-17",
+                7: "MPI-ESM..._REMO019"
         };
 
         indices = {
@@ -440,7 +450,7 @@ $(document).ready(function() {
                         return -d.value;
                     })
                     .label(function(d) {
-                        return models[d.key];
+                        return models_short[d.key];
                     })
                     .title(function(d) {
                         return models[d.key] + ": " + Math.round(100 * d.value.count/( regionCount * timeAggCount * indexCount )) + "%";
@@ -455,13 +465,7 @@ $(document).ready(function() {
 
             // =================
             timeAggregateChart
-                    .width(225).height(172)
-                    // .margins({
-                    //     top: 10,
-                    //     right: 30,
-                    //     bottom: 30,
-                    //     left: 10
-                    // })
+                    .width(160).height(172)                    
                     .colors(["#888888"])
                     .dimension(seasonDimension)
                     .group(avgSeasonGroup)
@@ -494,13 +498,12 @@ $(document).ready(function() {
                     timeAggregateChart                            
                             .x(d3.scale.linear().range([0,(timeAggregateChart.width()-50)]).domain([0,100]));
                     timeAggregateChart
-                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 20, 40, 60, 80, 100]);
+                            .xAxis().scale(timeAggregateChart.x()).tickValues([0, 25, 50, 75, 100]);
 
 
             // =================
             yearChart
-                    .width(542)
-                    .height(265)
+                    .width(555).height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
@@ -530,6 +533,7 @@ $(document).ready(function() {
                     .centerBar(true)    
                     .renderHorizontalGridLines(true)
                     .x(d3.scale.linear().domain([1970, 2100]))
+                    //.elasticY(true)
                     .y(d3.scale.linear().domain([ymin, ymax]))
                     .xAxisLabel("Year")
                     .yAxisLabel("Event Probability (%)");
@@ -609,40 +613,22 @@ $(document).ready(function() {
             // =================
             //Show timeseries if button is clicked
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
-
-            //Needs dc.js 2.0.0
-            // yearChart.width(function(el){return el.parentNode.getBoundingClientRect().width;});
-            // yearChart.height(function(el){return el.parentNode.getBoundingClientRect().height;});
-            // window.addEventListener('resize', function(){
-            //     console.log('resizing');
-            //     console.log("width: ", yearChart.width());
-            //     console.log("height: ", yearChart.height());
-            //     yearChart.render();
-            // });
-
-            
-            // window.addEventListener('resize', function(){
-            //   dc.chartRegistry.list().forEach(function(chart){             
-            //     console.log("chart: ", chart)
-            //     console.log("chart.anchor(): ", chart.anchor())
-            //     console.log("chart.root(): ", chart.root())                
-            //     _bbox = chart.root().node().parentNode.getBoundingClientRect();
-            //     chart.width(_bbox.width).height(_bbox.height).render();                
-            //   });
-            // });
-
-
-            function onresize() {
-                dc.chartRegistry.list().forEach(function(chart) {
-                    _bbox = chart.root().node().parentNode.getBoundingClientRect();
-                    console.log("_bbox: ", _bbox)
-                    chart.width(_bbox.width).height(_bbox.height).render();
-                });
-            };
-            
-            onresize();
   
             window.addEventListener('resize', onresize);
+            // function onresize() {
+            //     dc.chartRegistry.list().forEach(function(chart) {
+            //         _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
+            //         console.log("_bbox: ", _bbox)
+            //         console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
+            //         chart.width(_bbox.width)
+            //              //.height(_bbox.height)
+            //              .render();
+            //     });
+            // };
+            
+            // onresize();
+  
+            // window.addEventListener('resize', onresize);
 
         }); //end geojson
     }); //end csv
@@ -668,14 +654,7 @@ function showTimeSeries(regionName) {
 
         console.log("index, region, scenario: ", index_clicked +', '+ regionName +", "+ scenario_clicked)
 
-        $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it
-        // $("#jqxwindow").jqxWindow({
-        //     height:450, width: 900,
-        //     showCollapseButton: true,
-        //     initContent: function () {
-        //         $('#tab').jqxTabs({ height: '100%', width:  '100%' });
-        //     }
-        // });
+        $('#jqxwindow').jqxWindow('open'); //without this, a new window will not open after user previously closed it       
 
         renderDiv = ["timeChartWinter", "timeChartSpring", "timeChartSummer", "timeChartFall", "timeChartYear"]
         timeAgg = ["DJF", "MAM", "JJA", "SON", "yr"]; //for highchart titles
@@ -715,19 +694,19 @@ function makeRequest(regionName, aggr) {
     // calcul of the mean for 1976-2005 for obs
 
 
-    highchart.addSeries({
-        type: 'flags',
-        color: '#333333',
-        fillColor: 'rgba(255,255,255,0.8)',
-        shape: 'squarepin',
-        data: [{
-            x: Date.UTC(2010, 7, 1),
-            text: 'Highcharts Cloud Beta',
-            title: 'a remarkable event'
-        }],
-        onSeries: 'Obs Safran',
-        showInLegend: false
-    });
+    // highchart.addSeries({
+    //     type: 'flags',
+    //     color: '#333333',
+    //     fillColor: 'rgba(255,255,255,0.8)',
+    //     shape: 'squarepin',
+    //     data: [{
+    //         x: Date.UTC(2010, 7, 1),
+    //         text: 'Highcharts Cloud Beta',
+    //         title: 'a remarkable event'
+    //     }],
+    //     onSeries: 'Obs Safran',
+    //     showInLegend: false
+    // });
 
 }
 
