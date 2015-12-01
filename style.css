@@ -68,20 +68,21 @@ svg:not(:root) {
 
 /* dc charts */
 #scenario {
-    transform: translate(470px, -294px);
+    transform: translate(0px, 0px);
 }
 #chart-index {
     transform: translate(0px, 0px);
 }
 #chart-seasons {
-    transform: translate(-64px, -14px);
+    transform: translate(0px, 0px);
 }
 #chart-year {
-    transform: translate(-85px, 0px);
+    transform: translate(0px, 0px);
 }
 #chart-dataset {
-    transform: translate(-64px, 0px);
+    transform: translate(0px, 0px);
 }
+
 
 /* pop-up window tabs */
 #timeChartWinter {

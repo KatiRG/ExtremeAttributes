@@ -235,8 +235,8 @@ $(document).ready(function() {
             choroChart
                 .dimension(regionDimension)
                 .group(avgRegionGroup)
-                .width(400)
-                .height(170)
+                .width(350)
+                .height(535)
                 .center([47.00, 2.00])
                 .zoom(5)             
                 .geojson(statesJson)
@@ -503,7 +503,7 @@ $(document).ready(function() {
 
             // =================
             yearChart
-                    .width(555).height(265)
+                    .width(655).height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
@@ -615,20 +615,21 @@ $(document).ready(function() {
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
   
             window.addEventListener('resize', onresize);
-            // function onresize() {
-            //     dc.chartRegistry.list().forEach(function(chart) {
-            //         _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
-            //         console.log("_bbox: ", _bbox)
-            //         console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
-            //         chart.width(_bbox.width)
-            //              //.height(_bbox.height)
-            //              .render();
-            //     });
-            // };
+            function onresize() {
+                dc.chartRegistry.list().forEach(function(chart) {
+                    _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
+                    console.log("_bbox: ", _bbox)
+                    console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
+                    
+                    chart.width(_bbox.width)
+                         .height(_bbox.height)
+                         .render();
+                });
+            };
             
-            // onresize();
+            onresize();
   
-            // window.addEventListener('resize', onresize);
+            window.addEventListener('resize', onresize);
 
         }); //end geojson
     }); //end csv
