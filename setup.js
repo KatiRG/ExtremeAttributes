@@ -614,25 +614,26 @@ $(document).ready(function() {
             //Show timeseries if button is clicked
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
               
-            function onresize() {
-                dc.chartRegistry.list().forEach(function(chart) {
-                    _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
-                    console.log("_bbox: ", _bbox)
-                    console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
-                    console.log("chart.width + height: ", chart.width() +", "+ chart.height())
+            // function onresize() {
+            //     dc.chartRegistry.list().forEach(function(chart) {
+            //         _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
+            //         console.log("_bbox: ", _bbox)
+            //         console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
+            //         console.log("chart.width + height: ", chart.width() +", "+ chart.height())
 
-                    console.log("chart: ", chart)
+            //         console.log("chart: ", chart)
                     
-                    chart.width(_bbox.width)
-                         .height(_bbox.height);
+            //         chart.width(_bbox.width)
+            //              .height(_bbox.height);
 
-                         dc.renderAll();
-                });
-            };
+            //              dc.renderAll();
+            //     });
+            // };
             
-            onresize();
+            // onresize();
   
-            window.addEventListener('resize', onresize);
+            // window.addEventListener('resize', onresize);
+            console.log("doc width: ", $( document ).width())
 
         }); //end geojson
     }); //end csv
