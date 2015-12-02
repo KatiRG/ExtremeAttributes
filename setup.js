@@ -503,7 +503,7 @@ $(document).ready(function() {
 
             // =================
             yearChart
-                    .width(655).height(265)
+                    .width(455).height(265)
                     .dimension(yearDimension)
                     .group(avgEventsBySeason)
                     .valueAccessor(function(d) {
@@ -576,19 +576,19 @@ $(document).ready(function() {
             // =================
             dc.renderAll();
 
-            //http://stackoverflow.com/questions/21114336/how-to-add-axis-labels-for-row-chart-using-dc-js-or-d3-js
-            function AddXAxis(chartToUpdate, displayText)
-            {
-                chartToUpdate.svg()
-                            .append("text")
-                            .attr("class", "x-axis-label")
-                            .attr("text-anchor", "middle")
-                            .attr("x", chartToUpdate.width()/2)
-                            .attr("y", chartToUpdate.height()+2)
-                            .text(displayText);
-            }
-            AddXAxis(datasetChart, "Event Probability (%)");
-            AddXAxis(timeAggregateChart, "Event Probability (%)");
+            // //http://stackoverflow.com/questions/21114336/how-to-add-axis-labels-for-row-chart-using-dc-js-or-d3-js
+            // function AddXAxis(chartToUpdate, displayText)
+            // {
+            //     chartToUpdate.svg()
+            //                 .append("text")
+            //                 .attr("class", "x-axis-label")
+            //                 .attr("text-anchor", "middle")
+            //                 .attr("x", chartToUpdate.width()/2)
+            //                 .attr("y", chartToUpdate.height()+2)
+            //                 .text(displayText);
+            // }
+            // AddXAxis(datasetChart, "Event Probability (%)");
+            // AddXAxis(timeAggregateChart, "Event Probability (%)");
 
             // =================
             //Filter dc charts according to which radio button is checked by user:           
@@ -613,17 +613,20 @@ $(document).ready(function() {
             // =================
             //Show timeseries if button is clicked
             document.getElementById('ts-button').onclick = function() { console.log(tsRegion); showTimeSeries(tsRegion); }
-  
-            window.addEventListener('resize', onresize);
+              
             function onresize() {
                 dc.chartRegistry.list().forEach(function(chart) {
                     _bbox = chart.root().node().parentNode.getBoundingClientRect();                    
                     console.log("_bbox: ", _bbox)
                     console.log("_bbox.width + height: ", _bbox.width +", "+ _bbox.height)
+                    console.log("chart.width + height: ", chart.width() +", "+ chart.height())
+
+                    console.log("chart: ", chart)
                     
                     chart.width(_bbox.width)
-                         .height(_bbox.height)
-                         .render();
+                         .height(_bbox.height);
+
+                         dc.renderAll();
                 });
             };
             
