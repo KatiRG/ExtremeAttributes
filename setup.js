@@ -37,7 +37,8 @@ $(document).ready(function() {
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
-    categoryChart = dc.pieChart("#chart-category");
+    categoryChart = dc.rowChart("#chart-category");
+    //categoryChart = dc.barChart("#chart-category");
     yearChart = dc.barChart("#chart-year");
     timeAggregateChart = dc.rowChart("#chart-seasons");
     
@@ -124,30 +125,18 @@ $(document).ready(function() {
       var filter = crossfilter(csv);
       var all = filter.groupAll();
 
-      var yearDimension = filter.dimension(function(d) {
-          return +d.Year;
-        }),
+      var yearDimension = filter.dimension(function(d) {return +d.Year;}),
         categoryDimension = filter.dimension(function(d) {
           if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
           else return "Precip";
         }),
-        indexDimension = filter.dimension(function(d) {
-          return +d.Index;
-        }),
-        regionDimension = filter.dimension(function(d, i) {
-          return regions[d.Region];
-        }),
-        modelDimension = filter.dimension(function(d) {
-          return +d.Model;
-        }),
-        seasonDimension = filter.dimension(function(d) {
-          return d.TimeAggregate;
-        }),
-        scenarioDimension = filter.dimension(function(d) {
-          return d.Scenario;
-        });
+        indexDimension = filter.dimension(function(d) {return +d.Index;}),
+        regionDimension = filter.dimension(function(d, i) {return regions[d.Region];}),
+        modelDimension = filter.dimension(function(d) {return +d.Model;}),
+        seasonDimension = filter.dimension(function(d) {return d.TimeAggregate;}),
+        scenarioDimension = filter.dimension(function(d) {return d.Scenario;});
      
-      var modelGroup = modelDimension.group();
+      var modelGroup = modelDimension.group();          
 
       // ===============================================================================================       
       var numModels = modelGroup.size(); //exclude OBS
@@ -330,35 +319,51 @@ $(document).ready(function() {
         });
 
         // =================
-        categoryChart
-          .width(50)
-          .height(50)
-          .slicesCap(4)
-          .innerRadius(10)
-          .colors([indexColours[0], indexColours[8]])
-          .dimension(categoryDimension)
-          .group(avgCategoryGroup)
-          .valueAccessor(function(d) {
-            if (d.value != 0) {
-              return Math.round(d.value.count / all.value() * 100);
-            }
-          })
-          .legend(dc.legend())
-          .title(function(d) {
-            if (d.data.value != 0) {
-              var label;
+        categoryChart //pieChart but interfaced by checkboxes
+                .width(100).height(100)                
+                .colors([indexColours[0], indexColours[8]])
+                .dimension(categoryDimension)
+                .group(avgCategoryGroup)
+                .valueAccessor(function(d) {                                                                
+                                                
+                    return 50;
 
-              if (all.value()) {
-                label = Math.round(d.data.value.count / all.value() * 100) +
-                  "% extreme events in selected seasons/years were " + d.data.key + " events";
-              }
-              return label;
-            }
-          })
-          .renderlet(function(chart) {
-            chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
-            chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-44, 0)");
-          });
+                })
+                .title(function(d) {                        
+                    return d.key; // +": "+ Math.round( 100 * d.value.count/( regionCount * datasetCount * indexCount * yearCount )) + "%";                        
+                })
+                .renderlet(function (chart) {
+                    //chart.select("path").remove() //remove x-axis 
+                    //chart.select("g.axis").remove()
+                    chart.selectAll("g").select("row _0").attr("transform", "translate(38, 0)");
+                    //chart.selectAll("g").selectAll("row _1").attr("transform", "translate(-38, 0)");
+                });
+
+            categoryChart.xAxis().tickFormat(function(v) { return ""; });
+              
+
+        // categoryChart
+        //   .width(100).height(100)
+        //   .margins({
+        //     top: 10,
+        //     right: 30,
+        //     bottom: 30,
+        //     left: 50
+        //   })
+        //   .dimension(categoryDimension)
+        //   .group(avgCategoryGroup)
+        //   .valueAccessor(function(d) {          
+
+        //     return 50;
+        //   })
+        //   .renderHorizontalGridLines(false)
+        //   .gap(1)
+        //   .title(function(d, i) {
+        //     return d.key;
+        //   })
+        //   .x(d3.scale.ordinal().domain("Heat", "Precip"))
+        //   .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
+        //   .y(d3.scale.linear().domain([ymin, ymax]));
 
         // =================
         indexChart
