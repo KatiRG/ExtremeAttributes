@@ -35,6 +35,7 @@ body {
     font-size: 10px;    
 }
 
+/*Format checkboxes masquerading as rowChart #chart-category */
 #chart-category .axis line {
     stroke: none    
 }
@@ -42,6 +43,11 @@ body {
 #chart-category g.axis {
     display: none    
 }
+
+#chart-category g.row rect {
+    transform: translate(-16px, -2px);    
+}
+/*end checkbox format */
 
 .filterName {
     font-family: 'Istok Web', sans-serif;
