@@ -44,7 +44,7 @@ $(document).ready(function() {
     percentileChart = dc.rowChart("#chart-percentile");
     
     d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //DOES NOT contain snow
-    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_4percentiles.csv", function(csv) { //contains snow  
+    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_2percentiles.csv", function(csv) { //contains snow  
 
       regions = {
         1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -326,11 +326,10 @@ $(document).ready(function() {
           .colors([indexColours[0], indexColours[8]])
           .dimension(categoryDimension)
           .group(avgCategoryGroup)
-          .valueAccessor(function(d) {                                                                
-                                                
+          .valueAccessor(function(d) {                                              
             return 50;
-
-          });
+          })
+          .title(function(d) { return ""; });
 
           categoryChart.xAxis().tickFormat(function(v) { return ""; });                  
 
@@ -400,7 +399,7 @@ $(document).ready(function() {
 
         // =================
         datasetChart
-          .width(200).height(243)
+          .width(200).height(242)
           .dimension(modelDimension)
           .group(avgModelGroup)
           .valueAccessor(function(d) {
@@ -517,7 +516,7 @@ $(document).ready(function() {
 
         // =================
         yearChart
-          .width(555).height(265)
+          .width(555).height(315)
           .colors(["#888888"])
           .dimension(yearDimension)
           .group(avgEventsBySeason)
