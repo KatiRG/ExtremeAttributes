@@ -154,6 +154,15 @@
                    
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
                     <div class="short-div">
+                        <div id="chart-seasons">
+                            <div class="filterName">Time Aggregate
+                                <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                                <span class="reset" style="display: none;"></span>
+                            </div>
+                        </div>
+                    </div> 
+
+                    <div class="short-div">
                         <div id="chart-dataset">
                             <div class="filterName">Model
                                 <a class="reset" href="javascript:datasetChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
@@ -161,18 +170,7 @@
                             </div>
                         </div>
                     </div>
-
-                    
-
-                    <div class="short-div">
-                        <div id="chart-seasons">
-                            <div class="filterName">Time Aggregate
-                                <a class="reset" href="javascript:timeAggregateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>
-                        </div>
-                    </div>                    
-                
+             
                     <div class="short-div">
                          <div id="scenario" style="z-index: 2">
                             <div class="filterName">Scenario</div>
@@ -195,12 +193,12 @@
                     </div>
 
                     
-                        <div id="chart-category">
-                            <div class="filterName">Category <!--so that chart doesn't move when reset appears -->
-                                <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
-                                <span class="reset" style="display: none;"></span>
-                            </div>
-                        </div>                      
+                    <div id="chart-category">
+                        <div class="filterName">Category <!--so that chart doesn't move when reset appears -->
+                            <a class="reset" href="javascript:categoryChart.filterAll();dc.redrawAll();resetTSbutton();" style="display: none;">reset</a>
+                            <span class="reset" style="display: none;"></span>
+                        </div>
+                    </div>                      
                     
 
                     <div id="chart-year">

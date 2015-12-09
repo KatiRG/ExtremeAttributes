@@ -91,13 +91,13 @@ svg:not(:root) {
     transform: translate(0px, 0px);
 }
 #chart-seasons {
-    transform: translate(-64px, -14px);
+    transform: translate(-64px, 1px);
 }
 #chart-year {
     transform: translate(-42px, -138px);
 }
 #chart-dataset {
-    transform: translate(-64px, 0px);
+    transform: translate(-64px, 90px);
 }
 
 /* pop-up window tabs */
