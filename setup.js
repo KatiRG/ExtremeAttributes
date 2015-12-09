@@ -642,6 +642,13 @@ function makeRequest(regionName, aggr) {
   var colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"];
 
   regionNum = region_dict[legend.indexOf(regionName)].value;
+  if (index_clicked == "GD4" || index_clicked == "HD17" || index_clicked == "TG") {
+    fname = "france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc";
+  } else {
+    fname = "france_SAFRAN_8Km_1hour_19710101_20051231_V1_01.nc";
+  }
+
+  console.log("index_clicked, fname: ", index_clicked +", "+ fname)
 
   datasetFiltered = datasetChart.filters();
   for (var i = 0; i < Object.keys(models).length; i++) {
@@ -653,7 +660,7 @@ function makeRequest(regionName, aggr) {
   }
 
   // obs    
-  var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked + "_" + aggr + "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+  var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked + "_" + aggr + fname + "?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
   addData(request, '#000000', 'Solid', 'Obs Safran', true, true);  
 
 
