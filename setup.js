@@ -43,7 +43,8 @@ $(document).ready(function() {
     timeAggregateChart = dc.rowChart("#chart-seasons")
     percentileChart = dc.rowChart("#chart-percentile");
     
-    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //contains snow
+    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //DOES NOT contain snow
+    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_4percentiles.csv", function(csv) { //contains snow  
 
       regions = {
         1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -178,11 +179,8 @@ $(document).ready(function() {
       }
 
       //Special fns for time aggregates
-      //https://github.com/dc-js/dc.js/issues/21
-      var year = filter.dimension(function(d) {
-        return +d.Year;
-      });
-      avgEventsBySeason = year.group().reduce(
+      //https://github.com/dc-js/dc.js/issues/21   
+      avgEventsBySeason = yearDimension.group().reduce(
         // add
         function(p, v) {
 
@@ -311,8 +309,9 @@ $(document).ready(function() {
         choroChart.on("preRedraw", function(chart) {
           //save initial eventRange upon page load
           if (indexChart.filters().length == 0 && categoryChart.filters().length == 0 && datasetChart.filters().length == 0
-            //&& (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
-            && yearChart.filters().length == 0 && timeAggregateChart.filters().length == 0) {
+            && (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
+            //&& yearChart.filters().length == 0 
+            && timeAggregateChart.filters().length == 0) {
             eventRange = d3.extent(chart.group().all(), chart.valueAccessor());            
             eventRange[0] = 0; //make min always 0 
             eventRange[1] = 70; //manually set max            
@@ -519,6 +518,7 @@ $(document).ready(function() {
         // =================
         yearChart
           .width(555).height(265)
+          .colors(["#888888"])
           .dimension(yearDimension)
           .group(avgEventsBySeason)
           .valueAccessor(function(d) {
@@ -541,18 +541,18 @@ $(document).ready(function() {
             return Math.round(100 * normSeasons / (regionCount * indexCount * datasetCount * percentileCount));
 
           })
-          //.filter([2001, 2030])
+          .filter([2001, 2030])
           .gap(0)
           .centerBar(true)
           .renderHorizontalGridLines(true)
-          .x(d3.scale.linear().domain([1970, 2100]))
-          //.elasticY(true)
+          .x(d3.scale.linear().domain([1970, 2100]))          
           .y(d3.scale.linear().domain([ymin, ymax]))
           .xAxisLabel("Year")
           .yAxisLabel("Event Probability (%)");
 
         yearChart
-          .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]);
+          .xAxis().ticks(2).tickFormat(d3.format("d"))
+                  .tickValues([1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]);
         yearChart
           .yAxis().tickValues([25, 50, 75, 100]);
 
