@@ -40,7 +40,8 @@ $(document).ready(function() {
     categoryChart = dc.rowChart("#chart-category");
     //categoryChart = dc.barChart("#chart-category");
     yearChart = dc.barChart("#chart-year");
-    timeAggregateChart = dc.rowChart("#chart-seasons");
+    timeAggregateChart = dc.rowChart("#chart-seasons")
+    percentileChart = dc.rowChart("#chart-percentile");
     
     d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //contains snow
 
@@ -134,7 +135,8 @@ $(document).ready(function() {
         regionDimension = filter.dimension(function(d, i) {return regions[d.Region];}),
         modelDimension = filter.dimension(function(d) {return +d.Model;}),
         seasonDimension = filter.dimension(function(d) {return d.TimeAggregate;}),
-        scenarioDimension = filter.dimension(function(d) {return d.Scenario;});
+        scenarioDimension = filter.dimension(function(d) {return d.Scenario;})
+        percentileDimension = filter.dimension(function(d) { return +d.Percentile; });
      
       var modelGroup = modelDimension.group();          
 
@@ -156,6 +158,7 @@ $(document).ready(function() {
       avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
       avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
       avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+      avgPercentileGroup = percentileDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
 
       //Fns to count data for all datasets except the OBS data (id=100).
       function reduceAdd(p, v) {
@@ -501,6 +504,44 @@ $(document).ready(function() {
           .x(d3.scale.linear().range([0, (timeAggregateChart.width() - 50)]).domain([0, 100]));
         timeAggregateChart
           .xAxis().scale(timeAggregateChart.x()).tickValues([0, 25, 50, 75, 100]);
+
+        // =================
+        percentileChart
+          .width(200)
+          .height(120)          
+          .colors(["#888888"])
+          .dimension(percentileDimension)
+          .group(avgPercentileGroup)
+          .gap(2)
+          .valueAccessor(function(d) {
+
+            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+
+            yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
+            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAggCount = timeAgg_clicked * yearCount;
+
+            if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
+              //no indices selected && (category chart not selected OR all categories selected)
+              indexCount = numIndices;
+            } else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) { //no indices selected but category chart selected
+              indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
+            } else indexCount = indexChart.filters().length;
+
+            return 100 * d.value.count / (regionCount * datasetCount * indexCount * timeAggCount);
+
+          })
+          .title(function(d) {
+            return "xxx: " + Math.round(100 * d.value.count / (regionCount * datasetCount * indexCount * timeAggCount)) + "%";
+
+          });
+
+        percentileChart
+          .x(d3.scale.linear().range([0, (percentileChart.width() - 50)]).domain([0, 100]));
+        percentileChart
+          .xAxis().scale(percentileChart.x()).tickValues([0, 25, 50, 75, 100]);
+            
 
 
         // =================

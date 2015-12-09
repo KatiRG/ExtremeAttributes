@@ -1,6 +1,6 @@
 body {
     color: #333333;
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 14px;
     line-height: 1.42857;
 }
@@ -10,7 +10,7 @@ body {
 }
 
 .dc-chart .axis text {
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 11px;
 }
 
@@ -20,18 +20,18 @@ body {
 }
 
 .dc-chart text {
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 12px;
 }
 .dc-chart g.row rect {
     stroke: gray;
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 10px;
 }
 /*pie chart label*/
 .dc-chart .pie-slice {
     fill: black;
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 10px;    
 }
 
@@ -50,7 +50,7 @@ body {
 /*end checkbox format */
 
 .filterName {
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 13px;
     font-weight: 700;
     font-style: italic;
@@ -58,14 +58,14 @@ body {
 }
 
 .reset {
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 10px;
     font-weight: bold;
     font-style: normal;
 }
 
 .table {
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     font-size: 10px;
     font-weight: normal;
     font-style: normal;
@@ -99,6 +99,10 @@ svg:not(:root) {
 #chart-dataset {
     transform: translate(-64px, 90px);
 }
+#chart-percentile {
+    transform: translate(-69px, 0px);
+}
+
 
 /* pop-up window tabs */
 #timeChartWinter {
@@ -130,12 +134,12 @@ svg:not(:root) {
 }
 
 /*Display window on map*/
-h4 { font-family: 'Istok Web', sans-serif; font-weight: 400; }
+h4 { font-family: sans-serif; font-weight: 400; }
 
 .info {
     padding: 6px 8px;
     /*font: 14px/16px Arial, Helvetica, sans-serif;*/
-    font-family: 'Istok Web', sans-serif;
+    font-family: sans-serif;
     background: white;
     background: rgba(255,255,255,0.8);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
