@@ -541,7 +541,8 @@ $(document).ready(function() {
             return Math.round(100 * normSeasons / (regionCount * indexCount * datasetCount * percentileCount));
 
           })
-          .filter([2001, 2030])
+          //.filter([2001, 2030])
+          .filter([1976, 2005])
           .gap(0)
           .centerBar(true)
           .renderHorizontalGridLines(true)
