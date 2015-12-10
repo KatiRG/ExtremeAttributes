@@ -44,7 +44,8 @@ $(document).ready(function() {
     percentileChart = dc.rowChart("#chart-percentile");
     
     //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //DOES NOT contain snow
-    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_2percentiles_ipynb.csv", function(csv) { //contains snow  
+    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_2percentiles_ipynb.csv", function(csv) { //contains snow  
+    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_4percentiles.csv", function(csv) { //contains snow   
 
       regions = {
         1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -742,6 +743,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
         //http://stackoverflow.com/questions/18496898/sorting-array-of-float-point-numbers
         percentile90 = percentile(dataValues, 90);
         percentile10 = percentile(dataValues, 10);
+        percentile95 = percentile(dataValues, 95);
+        percentile5 = percentile(dataValues, 5);
         
         //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;         
         //Add 90th percentile 
@@ -753,11 +756,24 @@ function addData(request, color, dash, label, visible, addPercentile) {
           zIndex: 10,
           label: {
             text: ' 90th Percentile',
-            y: -5,
+            y: 15,
+            x: 0
+          }
+        });       
+         //Add 95th percentile
+        highchart.yAxis[0].addPlotLine({
+          color: '#333333',
+          dashStyle: 'ShortDot',
+          width: 2,
+          value: percentile95,
+          zIndex: 10,
+          label: {
+            text: ' 95th Percentile',
+            y: -10,
             x: 0
           }
         });
-        //Add 10th percentile
+         //Add 10th percentile
         highchart.yAxis[0].addPlotLine({
           color: '#000000',
           dashStyle: 'ShortDash',
@@ -766,8 +782,21 @@ function addData(request, color, dash, label, visible, addPercentile) {
           zIndex: 10,
           label: {
             text: ' 10th Percentile',
-            y: 14,
-            x: 0
+            y: -7,
+            x: 310
+          }
+        });
+         //Add 5th percentile
+        highchart.yAxis[0].addPlotLine({
+          color: '#333333',
+          dashStyle: 'ShortDot',
+          width: 2,
+          value: percentile5,
+          zIndex: 10,
+          label: {
+            text: ' 5th Percentile',
+            y: 15,
+            x: 310
           }
         });
       }
