@@ -43,8 +43,8 @@ $(document).ready(function() {
     timeAggregateChart = dc.rowChart("#chart-seasons")
     percentileChart = dc.rowChart("#chart-percentile");
     
-    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //DOES NOT contain snow
-    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_2percentiles.csv", function(csv) { //contains snow  
+    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //DOES NOT contain snow
+    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_2percentiles_ipynb.csv", function(csv) { //contains snow  
 
       regions = {
         1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -309,7 +309,7 @@ $(document).ready(function() {
         choroChart.on("preRedraw", function(chart) {
           //save initial eventRange upon page load
           if (indexChart.filters().length == 0 && categoryChart.filters().length == 0 && datasetChart.filters().length == 0
-            && (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
+            //&& (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
             //&& yearChart.filters().length == 0 
             && timeAggregateChart.filters().length == 0) {
             eventRange = d3.extent(chart.group().all(), chart.valueAccessor());            

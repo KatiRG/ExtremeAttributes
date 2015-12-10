@@ -82,10 +82,10 @@ svg:not(:root) {
 
 /* dc charts */
 #scenario {
-    transform: translate(600px, -652px);
+    transform: translate(594px, -652px);
 }
 #chart-category {
-    transform: translate(398px, -186px);
+    transform: translate(385px, -186px);
 }
 #chart-index {
     transform: translate(0px, 0px);
