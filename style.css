@@ -34,8 +34,6 @@ body {
     font-family: sans-serif;
     font-size: 10px;    
 }
-<<<<<<< HEAD
-=======
 
 /*Format checkboxes masquerading as rowChart #chart-category */
 #chart-category .axis line {
@@ -50,7 +48,6 @@ body {
     transform: translate(-16px, -2px);    
 }
 /*end checkbox format */
->>>>>>> 1d709d69e95bd076f81f6e105d227d8566f484cf
 
 .filterName {
     font-family: sans-serif;
@@ -85,31 +82,15 @@ svg:not(:root) {
 
 /* dc charts */
 #scenario {
-<<<<<<< HEAD
-    transform: translate(470px, -294px);
-}
-=======
     transform: translate(594px, -652px);
 }
 #chart-category {
     transform: translate(385px, -186px);
 }
->>>>>>> 1d709d69e95bd076f81f6e105d227d8566f484cf
 #chart-index {
     transform: translate(0px, 0px);
 }
 #chart-seasons {
-<<<<<<< HEAD
-    transform: translate(-64px, -14px);
-}
-#chart-year {
-    transform: translate(-85px, 0px);
-}
-#chart-dataset {
-    transform: translate(-64px, 0px);
-}
-
-=======
     transform: translate(-64px, 1px);
 }
 #chart-year {
@@ -123,7 +104,6 @@ svg:not(:root) {
 }
 
 
->>>>>>> 1d709d69e95bd076f81f6e105d227d8566f484cf
 /* pop-up window tabs */
 #timeChartWinter {
     width: 790px;
