@@ -364,9 +364,9 @@ $(document).ready(function() {
           })
           .x(d3.scale.ordinal().domain(indexNames))
           .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
-          //.elasticY(true)
+          //.filter(['2']) 
           .y(d3.scale.linear().domain([ymin, ymax]))
-          .yAxisLabel("Event Probability (%)");
+          .yAxisLabel("Probability (%)");
 
         indexChart
           .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
@@ -502,8 +502,9 @@ $(document).ready(function() {
             return 100 * d.value.count / (regionCount * datasetCount * indexCount * timeAggCount);
 
           })
-          .title(function(d) {            
-            return d.key + "th percentile: " + Math.round(100 * d.value.count / 
+          .title(function(d) {
+            txt = d.key == 10 ? "Below the " : "Above the "            
+            return txt + d.key + "th percentile: " + Math.round(100 * d.value.count / 
                         (regionCount * datasetCount * indexCount * timeAggCount)) + "%";
           });
 
@@ -547,13 +548,28 @@ $(document).ready(function() {
           .x(d3.scale.linear().domain([1970, 2100]))          
           .y(d3.scale.linear().domain([ymin, ymax]))
           .xAxisLabel("Year")
-          .yAxisLabel("Event Probability (%)");
+          .yAxisLabel("Probability (%)");
 
         yearChart
           .xAxis().ticks(2).tickFormat(d3.format("d"))
                   .tickValues([1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]);
         yearChart
           .yAxis().tickValues([25, 50, 75, 100]);
+
+        //highlight reference period  
+        yearChart.renderlet(function(chart) {
+          chart.selectAll('g rect.bar').each(function(d) {
+            if (d.x > 1975 && d.x < 2006) {              
+              if (d3.select(this).attr("class") == "bar deselected") {
+                d3.select(this).style("fill", "#FCFBE3");
+                d3.select(this).style("stroke", "#DED8B6");
+              } else {
+                d3.select(this).style("fill", "#DED8B6");
+                d3.select(this).style("stroke", "none");
+              }
+            }          
+          });
+        });
 
         // =================
         dc.renderAll();
@@ -568,8 +584,8 @@ $(document).ready(function() {
             .attr("y", chartToUpdate.height() + 2)
             .text(displayText);
         }
-        AddXAxis(datasetChart, "Event Probability (%)");
-        AddXAxis(timeAggregateChart, "Event Probability (%)");
+        AddXAxis(datasetChart, "Probability (%)");
+        AddXAxis(timeAggregateChart, "Probability (%)");
 
         // =================
         //Filter dc charts according to which radio button is checked by user:           
@@ -643,9 +659,9 @@ function makeRequest(regionName, aggr) {
 
   regionNum = region_dict[legend.indexOf(regionName)].value;
   if (index_clicked == "GD4" || index_clicked == "HD17" || index_clicked == "TG") {
-    fname = "france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc";
+    fname = "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc";
   } else {
-    fname = "france_SAFRAN_8Km_1hour_19710101_20051231_V1_01.nc";
+    fname = "_france_SAFRAN_8Km_1hour_19710101_20051231_V1_01.nc";
   }
 
   console.log("index_clicked, fname: ", index_clicked +", "+ fname)
@@ -654,13 +670,13 @@ function makeRequest(regionName, aggr) {
   for (var i = 0; i < Object.keys(models).length; i++) {
     idx = i + 1;
 
-    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151210/timeseries/" + index_clicked + "/" + aggr + "/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[idx]) != -1 ? true : false);
     addData(request, colors[i], 'Solid', models[idx], visible, false);
   }
 
   // obs    
-  var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked + "_" + aggr + fname + "?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+  var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151210/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked + "_" + aggr + fname + "?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
   addData(request, '#000000', 'Solid', 'Obs Safran', true, true);  
 
 
