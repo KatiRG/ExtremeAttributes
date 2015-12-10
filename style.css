@@ -36,10 +36,6 @@ body {
 }
 
 /*Format checkboxes masquerading as rowChart #chart-category */
-#chart-category .axis line {
-    stroke: none    
-}
-
 #chart-category g.axis {
     display: none    
 }
