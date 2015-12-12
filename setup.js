@@ -259,11 +259,11 @@ $(document).ready(function() {
             } else indexCount = indexChart.filters().length;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-            percentileCount = percentileChart.filters().length ? percentileChart.filters().length : numPercentiles;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             return 100 * d.value.count / (indexCount * timeAggCount * datasetCount * percentileCount);
           })
@@ -277,11 +277,11 @@ $(document).ready(function() {
             } else indexCount = indexChart.filters().length;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-            percentileCount = percentileChart.filters().length ? percentileChart.filters().length : numPercentiles;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             return 100 * d.value.count / (indexCount * timeAggCount * datasetCount * percentileCount);
           })
@@ -347,12 +347,12 @@ $(document).ready(function() {
           .group(avgIndexGroup)
           .valueAccessor(function(d) {
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-            percentileCount = percentileChart.filters().length ? percentileChart.filters().length : numPercentiles;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
             return 100 * d.value.count / (regionCount * timeAggCount * datasetCount * percentileCount);
@@ -405,12 +405,12 @@ $(document).ready(function() {
           .group(avgModelGroup)
           .valueAccessor(function(d) {
             yearRange = (d.key == 100) ? obsRange : modelRange;
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            regionCount = choroChart.filters().length || numRegions;
 
-            percentileCount = percentileChart.filters().length ? percentileChart.filters().length : numPercentiles;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
             if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
@@ -449,9 +449,9 @@ $(document).ready(function() {
           .gap(2)
           .valueAccessor(function(d) {
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-            percentileCount = percentileChart.filters().length ? percentileChart.filters().length : numPercentiles;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
 
@@ -486,11 +486,11 @@ $(document).ready(function() {
           .gap(2)
           .valueAccessor(function(d) {
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
             if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
@@ -525,12 +525,12 @@ $(document).ready(function() {
           .valueAccessor(function(d) {
 
             //add time aggregates and normalized by num aggregates selected
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count + d.value.yrAggCount) / timeAgg_clicked;
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
-            percentileCount = percentileChart.filters().length ? percentileChart.filters().length : numPercentiles;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
               //no indices selected && (category chart not selected OR all categories selected)
@@ -723,7 +723,7 @@ function addData(request, color, dash, label, visible, addPercentile) {
       serie.dashStyle = dash;
       serie.visible = visible;
 
-      //Convert TG from K to degC
+      //Convert TG from K to degC. Leave GD4 and HD17 as is?
       if (index_clicked === "TG") {
         $.each(serie.data, function(index, value) {
           value[1] = value[1] - 273.15;         
