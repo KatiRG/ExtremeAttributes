@@ -660,13 +660,11 @@ function makeRequest(regionName, aggr) {
   var colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"];
 
   regionNum = region_dict[legend.indexOf(regionName)].value;
-  if (index_clicked == "GD4" || index_clicked == "HD17" || index_clicked == "TG") {
+  if (index_clicked == "GD4" || index_clicked === "HD17" || index_clicked == "TG") {
     fname = "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc";
   } else {
     fname = "_france_SAFRAN_8Km_1hour_19710101_20051231_V1_01.nc";
   }
-
-  console.log("index_clicked, fname: ", index_clicked +", "+ fname)
 
   datasetFiltered = datasetChart.filters();
   for (var i = 0; i < Object.keys(models).length; i++) {
@@ -718,12 +716,20 @@ function addData(request, color, dash, label, visible, addPercentile) {
         // header line containes categories
         if (lineNo != 0)
           serie.data.push([Date.parse(items[0]), parseFloat(items[3])]);
-      });
+      });      
       serie.name = label;
       serie.id = label;
       serie.color = color;
       serie.dashStyle = dash;
       serie.visible = visible;
+
+      //Convert TG from K to degC
+      if (index_clicked === "TG") {
+        $.each(serie.data, function(index, value) {
+          value[1] = value[1] - 273.15;         
+        })
+      }      
+
 
       highchart.addSeries(serie);
 
