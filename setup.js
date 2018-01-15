@@ -6,7 +6,7 @@ var region_id = [1, 2, 3, 4, 5, 6, 7, 11, 13, 14, 15, 16, 17];
 var highchart;
 
 //for avgs
-var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup, modelGroup;
+var avgIndexGroup, avgRegionGroup, avgEventsBySeason, avgModelGroup;
 
 //for map click
 window.eventRange;
@@ -37,11 +37,15 @@ $(document).ready(function() {
     choroChart = dc.leafletChoroplethChart("#choro-map .map");
     indexChart = dc.barChart("#chart-index");
     datasetChart = dc.rowChart("#chart-dataset");
-    categoryChart = dc.pieChart("#chart-category");
+    categoryChart = dc.rowChart("#chart-category");
+    //categoryChart = dc.barChart("#chart-category");
     yearChart = dc.barChart("#chart-year");
-    timeAggregateChart = dc.rowChart("#chart-seasons");
+    timeAggregateChart = dc.rowChart("#chart-seasons")
+    percentileChart = dc.rowChart("#chart-percentile");
     
-    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //contains snow
+    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol.csv", function(csv) { //DOES NOT contain snow
+    //d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_2percentiles_ipynb.csv", function(csv) { //contains snow  
+    d3.csv("data/percentile_7models_10indices_noOBS_noValueCol_WITHSNOW_4percentiles.csv", function(csv) { //contains snow   
 
       regions = {
         1: "Alsace, Champagne-Ardenne et Lorraine",
@@ -124,49 +128,37 @@ $(document).ready(function() {
       var filter = crossfilter(csv);
       var all = filter.groupAll();
 
-      var yearDimension = filter.dimension(function(d) {
-          return +d.Year;
-        }),
+      var yearDimension = filter.dimension(function(d) {return +d.Year;}),
         categoryDimension = filter.dimension(function(d) {
           if (d.Index == 1 || d.Index == 2 || d.Index == 3) return "Heat";
           else return "Precip";
         }),
-        indexDimension = filter.dimension(function(d) {
-          return +d.Index;
-        }),
-        regionDimension = filter.dimension(function(d, i) {
-          return regions[d.Region];
-        }),
-        modelDimension = filter.dimension(function(d) {
-          return +d.Model;
-        }),
-        seasonDimension = filter.dimension(function(d) {
-          return d.TimeAggregate;
-        }),
-        scenarioDimension = filter.dimension(function(d) {
-          return d.Scenario;
-        });
-     
-      var modelGroup = modelDimension.group();
+        indexDimension = filter.dimension(function(d) {return +d.Index;}),
+        regionDimension = filter.dimension(function(d, i) {return regions[d.Region];}),
+        modelDimension = filter.dimension(function(d) {return +d.Model;}),
+        seasonDimension = filter.dimension(function(d) {return d.TimeAggregate;}),
+        scenarioDimension = filter.dimension(function(d) {return d.Scenario;})
+        percentileDimension = filter.dimension(function(d) { return +d.Percentile; });              
 
       // ===============================================================================================       
-      var numModels = modelGroup.size(); //exclude OBS
-      var numRegions = Object.keys(regions).length;
-      var numIndices = Object.keys(indexID).length;
-      var numCategories = 2;
-      var numHeatIndices = 3;
-      var numRainIndices = 7;
-      var numTimeAgg = 5; //number of time aggregates (4 seasons + year)
-      var modelRange = 2100 - 1972,
-        obsRange = 2012 - 1972;
-      var ymin = 0;
-      var ymax = 100; //min and max for y-axes of year bar chart
-
       avgIndexGroup = indexDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
       avgRegionGroup = regionDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
       avgModelGroup = modelDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
       avgCategoryGroup = categoryDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
       avgSeasonGroup = seasonDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+      avgPercentileGroup = percentileDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+
+      var numModels = avgModelGroup.size(); //exclude OBS
+      var numRegions = Object.keys(regions).length;
+      var numIndices = Object.keys(indexID).length;
+      var numCategories = 2;
+      var numPercentiles = avgPercentileGroup.size();
+      var numHeatIndices = 3;
+      var numRainIndices = 7;
+      var numTimeAgg = 5; //number of time aggregates (4 seasons + year)
+      var modelRange = 2100 - 1972, obsRange = 2012 - 1972;
+      var ymin = 0;
+      var ymax = 100; //min and max for y-axes of year bar chart
 
       //Fns to count data for all datasets except the OBS data (id=100).
       function reduceAdd(p, v) {
@@ -188,11 +180,8 @@ $(document).ready(function() {
       }
 
       //Special fns for time aggregates
-      //https://github.com/dc-js/dc.js/issues/21
-      var year = filter.dimension(function(d) {
-        return +d.Year;
-      });
-      avgEventsBySeason = year.group().reduce(
+      //https://github.com/dc-js/dc.js/issues/21   
+      avgEventsBySeason = yearDimension.group().reduce(
         // add
         function(p, v) {
 
@@ -270,12 +259,13 @@ $(document).ready(function() {
             } else indexCount = indexChart.filters().length;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
-            return 100 * d.value.count / (indexCount * timeAggCount * datasetCount);
+            return 100 * d.value.count / (indexCount * timeAggCount * datasetCount * percentileCount);
           })
           .colors(colorbrewer.YlGnBu[7])
           .colorAccessor(function(d, i) {
@@ -287,12 +277,13 @@ $(document).ready(function() {
             } else indexCount = indexChart.filters().length;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
-            return 100 * d.value.count / (indexCount * timeAggCount * datasetCount);
+            return 100 * d.value.count / (indexCount * timeAggCount * datasetCount * percentileCount);
           })
           .featureKeyAccessor(function(feature) {
             return feature.properties.name;
@@ -320,7 +311,8 @@ $(document).ready(function() {
           //save initial eventRange upon page load
           if (indexChart.filters().length == 0 && categoryChart.filters().length == 0 && datasetChart.filters().length == 0
             //&& (yearChart.filters()[0][0] == 2001 && yearChart.filters()[0][1] == 2030) //default year window
-            && yearChart.filters().length == 0 && timeAggregateChart.filters().length == 0) {
+            //&& yearChart.filters().length == 0 
+            && timeAggregateChart.filters().length == 0) {
             eventRange = d3.extent(chart.group().all(), chart.valueAccessor());            
             eventRange[0] = 0; //make min always 0 
             eventRange[1] = 70; //manually set max            
@@ -330,35 +322,17 @@ $(document).ready(function() {
         });
 
         // =================
-        categoryChart
-          .width(50)
-          .height(50)
-          .slicesCap(4)
-          .innerRadius(10)
+        categoryChart //pieChart but interfaced by checkboxes
+          .width(100).height(100)                
           .colors([indexColours[0], indexColours[8]])
           .dimension(categoryDimension)
           .group(avgCategoryGroup)
-          .valueAccessor(function(d) {
-            if (d.value != 0) {
-              return Math.round(d.value.count / all.value() * 100);
-            }
+          .valueAccessor(function(d) {                                              
+            return 50;
           })
-          .legend(dc.legend())
-          .title(function(d) {
-            if (d.data.value != 0) {
-              var label;
+          .title(function(d) { return ""; });
 
-              if (all.value()) {
-                label = Math.round(d.data.value.count / all.value() * 100) +
-                  "% extreme events in selected seasons/years were " + d.data.key + " events";
-              }
-              return label;
-            }
-          })
-          .renderlet(function(chart) {
-            chart.selectAll("g").selectAll("text.pie-slice._0").attr("transform", "translate(36,-10)");
-            chart.selectAll("g").selectAll("text.pie-slice._1").attr("transform", "translate(-44, 0)");
-          });
+          categoryChart.xAxis().tickFormat(function(v) { return ""; });                  
 
         // =================
         indexChart
@@ -373,26 +347,27 @@ $(document).ready(function() {
           .group(avgIndexGroup)
           .valueAccessor(function(d) {
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
-            return 100 * d.value.count / (regionCount * timeAggCount * datasetCount);
+            return 100 * d.value.count / (regionCount * timeAggCount * datasetCount * percentileCount);
           })
           .renderHorizontalGridLines(true)
           .gap(1)
           .title(function(d, i) {
             return indexID[i + 1] + " (" + indices[indexID[i + 1]] + ")" + ":\n" +
-              Math.round(100 * d.data.value.count / (regionCount * timeAggCount * datasetCount)) + "%";
+              Math.round(100 * d.data.value.count / (regionCount * timeAggCount * datasetCount * percentileCount)) + "%";
           })
           .x(d3.scale.ordinal().domain(indexNames))
           .xUnits(dc.units.ordinal) // Tell dc.js that we're using an ordinal x-axis;
-          //.elasticY(true)
+          //.filter(['2']) 
           .y(d3.scale.linear().domain([ymin, ymax]))
-          .yAxisLabel("Event Probability (%)");
+          .yAxisLabel("Probability (%)");
 
         indexChart
           .yAxis().tickFormat(d3.format("d")).tickValues([0, 20, 40, 60, 80, 100]);
@@ -425,15 +400,17 @@ $(document).ready(function() {
 
         // =================
         datasetChart
-          .width(200).height(243)
+          .width(200).height(242)
           .dimension(modelDimension)
           .group(avgModelGroup)
           .valueAccessor(function(d) {
             yearRange = (d.key == 100) ? obsRange : modelRange;
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
+            regionCount = choroChart.filters().length || numRegions;
+
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
             timeAggCount = timeAgg_clicked * yearCount;
 
             if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
@@ -443,7 +420,7 @@ $(document).ready(function() {
               indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
             } else indexCount = indexChart.filters().length;
 
-            return 100 * d.value.count / (regionCount * timeAggCount * indexCount);
+            return 100 * d.value.count / (regionCount * timeAggCount * indexCount * percentileCount);
           })
           .colors(["#888888"])
           .ordering(function(d) {
@@ -453,7 +430,7 @@ $(document).ready(function() {
             return models_short[d.key];
           })
           .title(function(d) {
-            return models[d.key] + ": " + Math.round(100 * d.value.count / (regionCount * timeAggCount * indexCount)) + "%";
+            return models[d.key] + ": " + Math.round(100 * d.value.count / (regionCount * timeAggCount * indexCount * percentileCount)) + "%";
           })
           .gap(2.5);
 
@@ -472,8 +449,9 @@ $(document).ready(function() {
           .gap(2)
           .valueAccessor(function(d) {
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
 
             yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
 
@@ -484,11 +462,12 @@ $(document).ready(function() {
               indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
             } else indexCount = indexChart.filters().length;
 
-            return 100 * d.value.count / (regionCount * datasetCount * indexCount * yearCount);
+            return 100 * d.value.count / (regionCount * datasetCount * indexCount * yearCount * percentileCount);
 
           })
           .title(function(d) {
-            return timeAgg_dict[d.key] + ": " + Math.round(100 * d.value.count / (regionCount * datasetCount * indexCount * yearCount)) + "%";
+            return timeAgg_dict[d.key] + ": " + Math.round( 100 * d.value.count / 
+                  (regionCount * datasetCount * indexCount * yearCount * percentileCount) ) + "%";
 
           });
 
@@ -497,20 +476,22 @@ $(document).ready(function() {
         timeAggregateChart
           .xAxis().scale(timeAggregateChart.x()).tickValues([0, 25, 50, 75, 100]);
 
-
         // =================
-        yearChart
-          .width(555).height(265)
-          .dimension(yearDimension)
-          .group(avgEventsBySeason)
+        percentileChart
+          .width(200)
+          .height(120)          
+          .colors(["#888888"])
+          .dimension(percentileDimension)
+          .group(avgPercentileGroup)
+          .gap(2)
           .valueAccessor(function(d) {
 
-            //add time aggregates and normalized by num aggregates selected
-            timeAgg_clicked = timeAggregateChart.filters().length ? timeAggregateChart.filters().length : numTimeAgg;
-            normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count + d.value.yrAggCount) / timeAgg_clicked;
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
 
-            regionCount = choroChart.filters().length ? choroChart.filters().length : numRegions;
-            datasetCount = datasetChart.filters().length ? datasetChart.filters().length : numModels;
+            yearCount = yearChart.filters().length ? (parseInt(yearChart.filters()[0][1]) - parseInt(yearChart.filters()[0][0])) : modelRange;
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
+            timeAggCount = timeAgg_clicked * yearCount;
 
             if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
               //no indices selected && (category chart not selected OR all categories selected)
@@ -519,23 +500,78 @@ $(document).ready(function() {
               indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
             } else indexCount = indexChart.filters().length;
 
-            return Math.round(100 * normSeasons / (regionCount * indexCount * datasetCount));
+            return 100 * d.value.count / (regionCount * datasetCount * indexCount * timeAggCount);
+
+          })
+          .title(function(d) {
+            txt = d.key == 10 ? "Below the " : "Above the "            
+            return txt + d.key + "th percentile: " + Math.round(100 * d.value.count / 
+                        (regionCount * datasetCount * indexCount * timeAggCount)) + "%";
+          });
+
+        percentileChart
+          .x(d3.scale.linear().range([0, (percentileChart.width() - 50)]).domain([0, 100]));
+        percentileChart
+          .xAxis().scale(percentileChart.x()).tickValues([0, 25, 50, 75, 100]);
+            
+
+
+        // =================
+        yearChart
+          .width(555).height(315)
+          .colors(["#888888"])
+          .dimension(yearDimension)
+          .group(avgEventsBySeason)
+          .valueAccessor(function(d) {
+
+            //add time aggregates and normalized by num aggregates selected
+            timeAgg_clicked = timeAggregateChart.filters().length || numTimeAgg;
+            normSeasons = (d.value.season0Count + d.value.season1Count + d.value.season2Count + d.value.season3Count + d.value.yrAggCount) / timeAgg_clicked;
+
+            regionCount = choroChart.filters().length || numRegions;
+            datasetCount = datasetChart.filters().length || numModels;
+            percentileCount = percentileChart.filters().length || numPercentiles;
+
+            if (indexChart.filters().length == 0 && (categoryChart.filters().length == 0 || categoryChart.filters().length == numCategories)) {
+              //no indices selected && (category chart not selected OR all categories selected)
+              indexCount = numIndices;
+            } else if (indexChart.filters().length == 0 && categoryChart.filters().length != 0) { //no indices selected but category chart selected
+              indexCount = categoryChart.filters() == "Precip" ? numRainIndices : numHeatIndices;
+            } else indexCount = indexChart.filters().length;
+
+            return Math.round(100 * normSeasons / (regionCount * indexCount * datasetCount * percentileCount));
 
           })
           //.filter([2001, 2030])
+          .filter([1976, 2005])
           .gap(0)
           .centerBar(true)
           .renderHorizontalGridLines(true)
-          .x(d3.scale.linear().domain([1970, 2100]))
-          //.elasticY(true)
+          .x(d3.scale.linear().domain([1970, 2100]))          
           .y(d3.scale.linear().domain([ymin, ymax]))
           .xAxisLabel("Year")
-          .yAxisLabel("Event Probability (%)");
+          .yAxisLabel("Probability (%)");
 
         yearChart
-          .xAxis().ticks(2).tickFormat(d3.format("d")).tickValues([1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]);
+          .xAxis().ticks(2).tickFormat(d3.format("d"))
+                  .tickValues([1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]);
         yearChart
           .yAxis().tickValues([25, 50, 75, 100]);
+
+        //highlight reference period  
+        yearChart.renderlet(function(chart) {
+          chart.selectAll('g rect.bar').each(function(d) {
+            if (d.x > 1975 && d.x < 2006) {              
+              if (d3.select(this).attr("class") == "bar deselected") {
+                d3.select(this).style("fill", "#FCFBE3");
+                d3.select(this).style("stroke", "#DED8B6");
+              } else {
+                d3.select(this).style("fill", "#DED8B6");
+                d3.select(this).style("stroke", "none");
+              }
+            }          
+          });
+        });
 
         // =================
         dc.renderAll();
@@ -550,8 +586,8 @@ $(document).ready(function() {
             .attr("y", chartToUpdate.height() + 2)
             .text(displayText);
         }
-        AddXAxis(datasetChart, "Event Probability (%)");
-        AddXAxis(timeAggregateChart, "Event Probability (%)");
+        AddXAxis(datasetChart, "Probability (%)");
+        AddXAxis(timeAggregateChart, "Probability (%)");
 
         // =================
         //Filter dc charts according to which radio button is checked by user:           
@@ -624,18 +660,23 @@ function makeRequest(regionName, aggr) {
   var colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"];
 
   regionNum = region_dict[legend.indexOf(regionName)].value;
+  if (index_clicked == "GD4" || index_clicked === "HD17" || index_clicked == "TG") {
+    fname = "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc";
+  } else {
+    fname = "_france_SAFRAN_8Km_1hour_19710101_20051231_V1_01.nc";
+  }
 
   datasetFiltered = datasetChart.filters();
   for (var i = 0; i < Object.keys(models).length; i++) {
     idx = i + 1;
 
-    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+    var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151210/timeseries/" + index_clicked + "/" + aggr + "/" + scenario_clicked + "/" + regionNum + "/" + index_clicked + "_" + scenario_clicked + "_" + models[idx] + "_1971-2100" + ".nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
     visible = (datasetFiltered.length == 0 || datasetFiltered.indexOf(models[idx]) != -1 ? true : false);
     addData(request, colors[i], 'Solid', models[idx], visible, false);
   }
 
   // obs    
-  var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151009/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked + "_" + aggr + "_france_SAFRAN_8Km_1hour_1971010100_2012123123_V1_01.nc?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
+  var request = "http://webportals.ipsl.jussieu.fr/thredds/ncss/grid/EUROCORDEX/extremoscope_FRA_20151210/timeseries/" + index_clicked + "/" + aggr + "/safran/" + regionNum + "/" + index_clicked + "_" + aggr + fname + "?var=" + index_clicked + "&latitude=0&longitude=0&temporal=all&accept=csv";
   addData(request, '#000000', 'Solid', 'Obs Safran', true, true);  
 
 
@@ -675,12 +716,20 @@ function addData(request, color, dash, label, visible, addPercentile) {
         // header line containes categories
         if (lineNo != 0)
           serie.data.push([Date.parse(items[0]), parseFloat(items[3])]);
-      });
+      });      
       serie.name = label;
       serie.id = label;
       serie.color = color;
       serie.dashStyle = dash;
       serie.visible = visible;
+
+      //Convert TG from K to degC. Leave GD4 and HD17 as is?
+      if (index_clicked === "TG") {
+        $.each(serie.data, function(index, value) {
+          value[1] = value[1] - 273.15;         
+        })
+      }      
+
 
       highchart.addSeries(serie);
 
@@ -700,6 +749,8 @@ function addData(request, color, dash, label, visible, addPercentile) {
         //http://stackoverflow.com/questions/18496898/sorting-array-of-float-point-numbers
         percentile90 = percentile(dataValues, 90);
         percentile10 = percentile(dataValues, 10);
+        percentile95 = percentile(dataValues, 95);
+        percentile5 = percentile(dataValues, 5);
         
         //threshold1 = math.mean(dataValues) + math.std(dataValues) * threshold_clicked;         
         //Add 90th percentile 
@@ -711,11 +762,24 @@ function addData(request, color, dash, label, visible, addPercentile) {
           zIndex: 10,
           label: {
             text: ' 90th Percentile',
-            y: -5,
+            y: 15,
+            x: 0
+          }
+        });       
+         //Add 95th percentile
+        highchart.yAxis[0].addPlotLine({
+          color: '#333333',
+          dashStyle: 'ShortDot',
+          width: 2,
+          value: percentile95,
+          zIndex: 10,
+          label: {
+            text: ' 95th Percentile',
+            y: -10,
             x: 0
           }
         });
-        //Add 10th percentile
+         //Add 10th percentile
         highchart.yAxis[0].addPlotLine({
           color: '#000000',
           dashStyle: 'ShortDash',
@@ -724,8 +788,21 @@ function addData(request, color, dash, label, visible, addPercentile) {
           zIndex: 10,
           label: {
             text: ' 10th Percentile',
-            y: 14,
-            x: 0
+            y: -7,
+            x: 310
+          }
+        });
+         //Add 5th percentile
+        highchart.yAxis[0].addPlotLine({
+          color: '#333333',
+          dashStyle: 'ShortDot',
+          width: 2,
+          value: percentile5,
+          zIndex: 10,
+          label: {
+            text: ' 5th Percentile',
+            y: 15,
+            x: 310
           }
         });
       }
